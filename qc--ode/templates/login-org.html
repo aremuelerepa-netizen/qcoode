@@ -73,7 +73,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+{% raw %}<script>
 const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co', SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -83,24 +83,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const {data:p}=await db.from('profiles').select('role,approval_status').eq('id',session.user.id).single();
   if(p?.role==='organization'&&p.approval_status==='approved') window.location.href='../dashboard/org.html';
 })();
-async function signIn() {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
 
-  // Simple check: if password matches a specific pattern or just attempt the POST
-  // In your case, you can just add a button or logic to hit the python route
-  const formData = new FormData();
-  formData.append('email', email);
-  formData.append('password', password);
-
-  const res = await fetch('/super-admin-login', { method: 'POST', body: formData });
-  if (res.ok) {
-    window.location.href = '/admin-dashboard';
-    return;
-  }
-  
-  // ... original Supabase login logic follows if not an admin ...
-}
 async function doLogin(){
   const err=document.getElementById('err'), pend=document.getElementById('pending-err');
   err.style.display='none'; pend.style.display='none';
@@ -123,6 +106,6 @@ async function doLogin(){
   }
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-</script>
+</script>{% endraw %}
 </body>
 </html>
