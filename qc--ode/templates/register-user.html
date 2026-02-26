@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Account — QCode</title>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
@@ -87,32 +88,79 @@
   </div>
   <a href="../index.html" class="back">← Back to home</a>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-{% raw %}<script>
-const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co', SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
+<script>
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const lang = localStorage.getItem('qcode_lang')||'en';
 document.getElementById('lang').value = lang;
+
 async function register(){
-  const err=document.getElementById('err'); err.style.display='none';
-  const name=document.getElementById('name').value.trim(), email=document.getElementById('email').value.trim(),
-        phone=document.getElementById('phone').value.trim(), password=document.getElementById('password').value,
-        confirm=document.getElementById('confirm').value, selLang=document.getElementById('lang').value;
-  const btn=document.getElementById('btn');
-  if(!name||!email||!password){err.textContent='Please fill in all required fields.';err.style.display='block';return;}
-  if(password.length<8){err.textContent='Password must be at least 8 characters.';err.style.display='block';return;}
-  if(password!==confirm){err.textContent='Passwords do not match.';err.style.display='block';return;}
-  btn.disabled=true;btn.textContent='Creating account…';
+  const err = document.getElementById('err');
+  err.style.display = 'none';
+
+  const name = document.getElementById('name').value.trim(),
+        email = document.getElementById('email').value.trim(),
+        phone = document.getElementById('phone').value.trim(),
+        password = document.getElementById('password').value,
+        confirm = document.getElementById('confirm').value,
+        selLang = document.getElementById('lang').value;
+
+  const btn = document.getElementById('btn');
+
+  if(!name || !email || !password){
+    err.textContent = 'Please fill in all required fields.';
+    err.style.display = 'block';
+    return;
+  }
+
+  if(password.length < 8){
+    err.textContent = 'Password must be at least 8 characters.';
+    err.style.display = 'block';
+    return;
+  }
+
+  if(password !== confirm){
+    err.textContent = 'Passwords do not match.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
+
   try{
-    const {data:auth,error:ae}=await db.auth.signUp({email,password});
-    if(ae)throw ae;
-    const {error:pe}=await db.from('profiles').insert({id:auth.user.id,role:'user',full_name:name,email,phone:phone||null,preferred_lang:selLang,is_online:true,approval_status:'approved'});
-    if(pe)throw pe;
-    localStorage.setItem('qcode_lang',selLang);
-    window.location.href='../dashboard/user.html';
-  }catch(e){err.textContent=e.message||'Registration failed.';err.style.display='block';btn.disabled=false;btn.textContent='Create Account';}
+    const { data: auth, error: ae } = await db.auth.signUp({ email, password });
+    if(ae) throw ae;
+
+    const { error: pe } = await db.from('profiles').insert({
+      id: auth.user.id,
+      role: 'user',
+      full_name: name,
+      email,
+      phone: phone || null,
+      preferred_lang: selLang,
+      is_online: true,
+      approval_status: 'approved'
+    });
+
+    if(pe) throw pe;
+
+    localStorage.setItem('qcode_lang', selLang);
+    window.location.href = '../dashboard/user.html';
+  } catch(e){
+    err.textContent = e.message || 'Registration failed.';
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter')register();});
-</script>{% endraw %}
+
+// Trigger registration on Enter key
+document.addEventListener('keydown', e => { if(e.key === 'Enter') register(); });
+</script>
 </body>
 </html>
