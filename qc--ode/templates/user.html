@@ -240,7 +240,7 @@ function badgeHtml(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-
 let profile=null,activeEntry=null,activeSvc=null,channel=null,foundSvc=null;
 async function init(){
   const {data:{session}}=await db.auth.getSession();
-  if(!session){window.location.href='../login-user.html';return;}
+  if(!session){window.location.href='../login-user';return;}
   const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
   if(!p||p.role!=='user'){window.location.href='../login-org.html';return;}
   profile=p;
