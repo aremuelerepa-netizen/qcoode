@@ -1,19 +1,84 @@
 import os
 import re
-import requests
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from supabase import create_client, Client
-from datetime import datetime, timedelta
-from functools import wraps
+from dotenv import load_dotenv
+from datetime import datetime
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("APP_SECRET", "super-secret-key")
+app.secret_key = os.environ.get("SECRET_KEY", "super-secret-dev-key")
 
-# --- PAGE ROUTES ---
+# -----------------------------
+# Supabase Config
+# -----------------------------
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise Exception("Supabase credentials missing")
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# -----------------------------
+# Environment Config
+# -----------------------------
+WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
+if not WEBHOOK_SECRET:
+    raise Exception("WEBHOOK_SECRET not set")
+
+# -----------------------------
+# Utilities
+# -----------------------------
+def normalize_phone(phone):
+    digits = re.sub(r"\D", "", phone)
+
+    # Nigerian default handling example
+    if digits.startswith("0"):
+        digits = "234" + digits[1:]
+
+    if not digits.startswith("234") and len(digits) == 10:
+        digits = "234" + digits
+
+    return "+" + digits
+
+
+def is_admin():
+    return session.get("is_super_admin") is True
+
+
+# -----------------------------
+# Basic Routes
+# -----------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
+
+
+@app.route("/health")
+def health():
+    return "OK", 200
+
+
+# -----------------------------
+# Admin Login
+# -----------------------------
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        password = request.form.get("password")
+
+        if password and password == ADMIN_PASSWORD:
+            session["is_super_admin"] = True
+            session["login_time"] = datetime.utcnow().isoformat()
+            return redirect(url_for("super_admin_dashboard"))
+
+        return "Invalid credentials", 401
+
+    return render_template("login-admin.html")
 
 @app.route("/register-user")
 def register_user():
@@ -42,154 +107,151 @@ def dashboard_org():
 @app.route("/guest-ticket")
 def guest_ticket():
     return render_template("guest.html")
-
-# --- CONFIGURATION ---
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") # Use Service Role for atomic DB ops
-WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET") # Set this in your SMS gateway & Env
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") # Your special admin password
-
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# --- UTILITIES ---
-
-def normalize_phone(phone):
-    """Clean phone numbers and ensure E.164 format."""
-    phone = re.sub(r'\D', '', phone)
-    if not phone.startswith('+'):
-        # Default to +234 if 11 digits starting with 0, else keep as is
-        if len(phone) == 11 and phone.startswith('0'):
-            return '+234' + phone[1:]
-        return '+' + phone
-    return phone
-
-def require_webhook_secret(f):
-    """Security decorator for incoming SMS webhooks."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        secret = request.headers.get('X-Webhook-Secret')
-        if not secret or secret != WEBHOOK_SECRET:
-            return jsonify({"error": "Unauthorized"}), 403
-        return f(*args, **kwargs)
-    return decorated_function
-
-def send_sms_via_gateway(phone, message):
-    """
-    Replace this with your specific SMS Gateway API logic.
-    """
-    # Example for a generic gateway
-    gateway_url = os.environ.get("SMS_GATEWAY_URL")
-    api_key = os.environ.get("SMS_GATEWAY_API_KEY")
     
-    try:
-        # payload = {"to": phone, "message": message, "key": api_key}
-        # requests.post(gateway_url, json=payload, timeout=5)
-        print(f"SMS SENT TO {phone}: {message}") # Logging for dev
-    except Exception as e:
-        print(f"Failed to send SMS: {e}")
+@app.route("/admin")
+def super_admin_dashboard():
+    if not is_admin():
+        return redirect(url_for("admin_login"))
 
-# --- SMS COMMAND LOGIC ---
+    services = supabase.table("services").select("*").execute().data
+    return render_template("super_admin.html", services=services)
 
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.clear()
+    return redirect(url_for("home"))
+
+
+# -----------------------------
+# SMS Webhook (CRITICAL CORE)
+# -----------------------------
 @app.route("/sms/incoming", methods=["POST"])
-@require_webhook_secret
-def handle_sms():
-    # Adjust based on your Gateway's POST format (request.json or request.form)
-    data = request.get_json() or request.form
-    sender = normalize_phone(data.get("from") or data.get("sender"))
-    text = (data.get("text") or data.get("message", "")).strip().upper()
+def incoming_sms():
+    secret = request.headers.get("X-Webhook-Secret")
 
-    try:
-        # 1. COMMAND: STATUS
-        if text == "STATUS":
-            entry = supabase.table("queue_entries").select("*, services(name)").eq("phone", sender).eq("status", "waiting").order("created_at", desc=True).limit(1).execute()
-            if not entry.data:
-                send_sms_via_gateway(sender, "QCode: You are not in any active queue.")
-            else:
-                svc_id = entry.data[0]['service_id']
-                ahead = supabase.table("queue_entries").select("*", count="exact").eq("service_id", svc_id).eq("status", "waiting").lt("created_at", entry.data[0]['created_at']).execute()
-                send_sms_via_gateway(sender, f"QCode: {entry.data[0]['services']['name']}. Position: {ahead.count + 1}. Ticket: {entry.data[0]['ticket_label']}")
+    if secret != WEBHOOK_SECRET:
+        return jsonify({"error": "Unauthorized"}), 403
 
-        # 2. COMMAND: JOIN [CODE] [NAME]
-        elif text.startswith("JOIN"):
-            parts = text.split(" ", 2)
-            if len(parts) < 2:
-                send_sms_via_gateway(sender, "Usage: JOIN [CODE] [NAME]. Example: JOIN VISA24 John Doe")
-                return "OK"
-            
-            code = parts[1]
-            name = parts[2] if len(parts) > 2 else "SMS Guest"
-            
-            # Fetch Service
-            svc = supabase.table("services").select("*, profiles(approval_status)").eq("service_code", code).single().execute()
-            if not svc.data:
-                send_sms_via_gateway(sender, "Error: Invalid service code.")
-                return "OK"
-            
-            if svc.data['profiles']['approval_status'] != 'approved' or svc.data['status'] != 'open':
-                send_sms_via_gateway(sender, "Error: This service is currently unavailable.")
-                return "OK"
+    data = request.json
+    if not data:
+        return jsonify({"error": "Invalid payload"}), 400
 
-            # Check Duplicates
-            dup = supabase.table("queue_entries").select("id").eq("service_id", svc.data['id']).eq("phone", sender).eq("status", "waiting").execute()
-            if dup.data:
-                send_sms_via_gateway(sender, "You are already in this queue.")
-                return "OK"
+    phone = normalize_phone(data.get("from", ""))
+    message = data.get("text", "").strip().upper()
 
-            # ATOMIC INCREMENT (Using the SQL function created earlier)
-            rpc_res = supabase.rpc("increment_ticket_counter", {"service_id_input": svc.data['id']}).execute()
-            new_val = rpc_res.data[0] # Returns {new_counter, ticket_prefix, time_interval}
+    if not phone or not message:
+        return jsonify({"error": "Missing phone or message"}), 400
 
-            label = f"{new_val['ticket_prefix']}{str(new_val['new_counter']).zfill(3)}"
-            
-            # Calculate ETA
-            ahead = supabase.table("queue_entries").select("*", count="exact").eq("service_id", svc.data['id']).eq("status", "waiting").execute()
-            wait_mins = (ahead.count) * (new_val['time_interval'] or 5)
-            eta = datetime.utcnow() + timedelta(minutes=wait_mins)
+    # Format expected:
+    # JOIN <service_code>
+    # STATUS
 
-            # Insert Entry
-            supabase.table("queue_entries").insert({
-                "service_id": svc.data['id'],
-                "guest_name": name,
-                "phone": sender,
-                "ticket_label": label,
-                "ticket_number": new_val['new_counter'],
-                "status": "waiting",
-                "estimated_time": eta.isoformat(),
-                "join_method": "sms"
-            }).execute()
+    parts = message.split()
 
-            send_sms_via_gateway(sender, f"Success! You joined {svc.data['name']}. Ticket: {label}. Est. Wait: {wait_mins} mins.")
+    if parts[0] == "JOIN" and len(parts) == 2:
+        return handle_join(phone, parts[1])
 
-        else:
-            send_sms_via_gateway(sender, "QCode: Command not recognized. Reply HELP for commands.")
+    if parts[0] == "STATUS":
+        return handle_status(phone)
 
-    except Exception as e:
-        print(f"Critical Webhook Error: {e}")
-    
-    return "OK", 200
+    return jsonify({"message": "Invalid command"}), 200
 
-# --- ADMIN AUTH & ROUTES ---
 
-@app.route("/super-admin-login", methods=["POST"])
-def admin_login():
-    """Custom login route for the Super Admin using Environment Password."""
-    email = request.form.get("email")
-    password = request.form.get("password")
-    
-    # We allow the super admin to login through the organization login page
-    # by checking if the password matches the secret env variable
-    if password == ADMIN_PASSWORD:
-        session['is_super_admin'] = True
-        return redirect("/admin-dashboard") # Redirect to your super_admin.html
-    
-    return "Invalid Admin Credentials", 401
+# -----------------------------
+# JOIN LOGIC
+# -----------------------------
+def handle_join(phone, service_code):
+    svc = (
+        supabase.table("services")
+        .select("*")
+        .eq("code", service_code)
+        .execute()
+    )
 
-@app.route("/admin-dashboard")
-def admin_dashboard():
-    if not session.get('is_super_admin'):
-        return redirect("/")
-    return render_template("super_admin.html")
-    
+    if not svc.data:
+        return jsonify({"message": "Service not found"}), 200
+
+    svc_id = svc.data[0]["id"]
+
+    # Check if already waiting
+    existing = (
+        supabase.table("queue_entries")
+        .select("*")
+        .eq("phone", phone)
+        .eq("service_id", svc_id)
+        .eq("status", "waiting")
+        .execute()
+    )
+
+    if existing.data:
+        return jsonify({"message": "Already in queue"}), 200
+
+    # Increment ticket safely
+    rpc_res = supabase.rpc(
+        "increment_ticket_counter",
+        {"service_id_input": svc_id}
+    ).execute()
+
+    if not rpc_res.data:
+        return jsonify({"error": "Failed to generate ticket"}), 500
+
+    new_ticket_number = rpc_res.data[0]
+
+    insert_res = supabase.table("queue_entries").insert({
+        "phone": phone,
+        "service_id": svc_id,
+        "ticket_number": new_ticket_number,
+        "status": "waiting"
+    }).execute()
+
+    if not insert_res.data:
+        return jsonify({"error": "Failed to join queue"}), 500
+
+    return jsonify({
+        "message": f"Joined successfully. Your ticket number is {new_ticket_number}"
+    }), 200
+
+
+# -----------------------------
+# STATUS LOGIC
+# -----------------------------
+def handle_status(phone):
+    entry = (
+        supabase.table("queue_entries")
+        .select("*")
+        .eq("phone", phone)
+        .eq("status", "waiting")
+        .order("created_at", desc=False)
+        .limit(1)
+        .execute()
+    )
+
+    if not entry.data:
+        return jsonify({"message": "No active queue entry"}), 200
+
+    svc_id = entry.data[0]["service_id"]
+    created_at = entry.data[0]["created_at"]
+
+    ahead = (
+        supabase.table("queue_entries")
+        .select("*", count="exact")
+        .eq("service_id", svc_id)
+        .eq("status", "waiting")
+        .lt("created_at", created_at)
+        .execute()
+    )
+
+    count_ahead = ahead.count if ahead.count is not None else 0
+
+    return jsonify({
+        "message": f"There are {count_ahead} people ahead of you."
+    }), 200
+
+
+# -----------------------------
+# Run
+# -----------------------------
 if __name__ == "__main__":
-    # In production, this is ignored by Gunicorn
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
