@@ -1,39 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Organization Login — QCode</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root{--q-navy:#0a1628;--q-blue:#1a3a6b;--q-accent:#2563eb;--q-cyan:#06b6d4;--slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-300:#cbd5e1;--slate-500:#64748b;--slate-700:#334155;--slate-900:#0f172a;--red:#ef4444;--amber:#f59e0b;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--r:.625rem;--shadow-lg:0 16px 48px rgba(10,22,40,.20);--t:.2s cubic-bezier(.4,0,.2,1)}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-body);min-height:100vh;background:linear-gradient(135deg,var(--q-navy),var(--q-blue) 55%,#0f172a);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    h1{font-family:var(--font-head);letter-spacing:-.02em}
-    a{color:var(--q-accent);text-decoration:none}
-    .wrap{width:100%;max-width:420px}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
-    .logo-q{color:var(--q-cyan)}
-    .org-badge{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.625rem 1rem;font-size:.8rem;color:#fbbf24;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
-    .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:var(--shadow-lg)}
-    .title{font-size:1.5rem;color:var(--q-navy);margin-bottom:.375rem}
-    .sub{font-size:.9rem;color:var(--slate-500);margin-bottom:2rem}
-    .form-group{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
-    .label{font-size:.85rem;font-weight:600;color:var(--slate-700)}
-    .input{padding:.8rem 1rem;background:var(--slate-50);border:1.5px solid var(--slate-300);border-radius:var(--r);font-family:var(--font-body);font-size:.9rem;color:var(--slate-900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
-    .input:focus{outline:none;border-color:var(--q-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
-    .input::placeholder{color:var(--slate-300)}
-    .err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
-    .pending-err{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#92400e;display:none;margin-bottom:1rem}
-    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--font-body);font-size:1rem;font-weight:700;cursor:pointer;background:var(--q-accent);color:#fff;transition:all var(--t)}
-    .btn:hover:not(:disabled){background:#1d4ed8}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--slate-500)}
-    .back{display:block;text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.4)}
-    .divider{display:flex;align-items:center;gap:.875rem;margin:1.25rem 0;color:var(--slate-300);font-size:.8rem}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--slate-200)}
-    .alt{display:block;width:100%;padding:.875rem;border-radius:var(--r);border:1.5px solid var(--slate-300);font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--slate-700);text-align:center;transition:all var(--t);text-decoration:none;background:#fff}
-    .alt:hover{border-color:var(--q-accent);color:var(--q-accent)}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Organization Login — QCode</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --q-navy:#0a1628; --q-blue:#1a3a6b; --q-accent:#2563eb; --q-cyan:#06b6d4;
+  --slate-50:#f8fafc; --slate-200:#e2e8f0; --slate-300:#cbd5e1; --slate-500:#64748b; --slate-700:#334155; --slate-900:#0f172a;
+  --red:#ef4444; --amber:#f59e0b; --font-head:'Syne',sans-serif; --font-body:'DM Sans',sans-serif;
+  --r:.625rem; --shadow-lg:0 16px 48px rgba(10,22,40,.20); --t:.2s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);min-height:100vh;background:linear-gradient(135deg,var(--q-navy),var(--q-blue) 55%,#0f172a);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+.wrap{width:100%;max-width:420px}
+.logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
+.logo-q{color:var(--q-cyan)}
+.org-badge{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.625rem 1rem;font-size:.8rem;color:#fbbf24;margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem}
+.card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:var(--shadow-lg)}
+.title{font-size:1.5rem;color:var(--q-navy);margin-bottom:.375rem}
+.sub{font-size:.9rem;color:var(--slate-500);margin-bottom:2rem}
+.form-group{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem;position:relative}
+.label{font-size:.85rem;font-weight:600;color:var(--slate-700)}
+.input{padding:.8rem 1rem;background:var(--slate-50);border:1.5px solid var(--slate-300);border-radius:var(--r);font-family:var(--font-body);font-size:.9rem;color:var(--slate-900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+.input:focus{outline:none;border-color:var(--q-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+.input::placeholder{color:var(--slate-300)}
+.pass-toggle{position:absolute;top:50%;right:1rem;transform:translateY(-50%);cursor:pointer;font-size:.9rem;color:var(--slate-500)}
+.err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
+.pending-err{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#92400e;display:none;margin-bottom:1rem}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--font-body);font-size:1rem;font-weight:700;cursor:pointer;background:var(--q-accent);color:#fff;transition:all var(--t)}
+.btn:hover:not(:disabled){background:#1d4ed8}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--slate-500)}
+.back{display:block;text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+.divider{display:flex;align-items:center;gap:.875rem;margin:1.25rem 0;color:var(--slate-300);font-size:.8rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--slate-200)}
+.alt{display:block;width:100%;padding:.875rem;border-radius:var(--r);border:1.5px solid var(--slate-300);font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--slate-700);text-align:center;transition:all var(--t);text-decoration:none;background:#fff}
+.alt:hover{border-color:var(--q-accent);color:var(--q-accent)}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -49,17 +54,17 @@
     <p class="sub">Access your QCode organization dashboard</p>
 
     <div id="err" class="err"></div>
-    <div id="pending-err" class="pending-err">
-      ⏳ Your organization is <strong>pending admin approval</strong>. You'll receive an email once approved. <a href="../index.html">Return home</a>
-    </div>
+    <div id="pending-err" class="pending-err">⏳ Your organization is <strong>pending admin approval</strong>.</div>
 
     <div class="form-group">
       <label class="label">Email Address</label>
       <input id="email" class="input" type="email" placeholder="admin@yourorg.com"/>
     </div>
+
     <div class="form-group">
       <label class="label">Password</label>
       <input id="password" class="input" type="password" placeholder="••••••••"/>
+      <span class="pass-toggle" onclick="togglePass()">👁️</span>
     </div>
 
     <button id="btn" class="btn" onclick="doLogin()">Sign In to Dashboard</button>
@@ -73,39 +78,73 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-{% raw %}<script>
-const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co', SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
+<script>
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 (async()=>{
-  const {data:{session}}=await db.auth.getSession();
+  const {data:{session}} = await db.auth.getSession();
   if(!session) return;
-  const {data:p}=await db.from('profiles').select('role,approval_status').eq('id',session.user.id).single();
-  if(p?.role==='organization'&&p.approval_status==='approved') window.location.href='../dashboard/org.html';
+  const {data:p} = await db.from('profiles').select('role,approval_status').eq('id',session.user.id).single();
+  if(p?.role==='organization' && p.approval_status==='approved') window.location.href='../dashboard/org.html';
 })();
 
+function togglePass(){
+  const pass = document.getElementById('password');
+  pass.type = pass.type==='password' ? 'text' : 'password';
+}
+
 async function doLogin(){
-  const err=document.getElementById('err'), pend=document.getElementById('pending-err');
+  const err = document.getElementById('err');
+  const pend = document.getElementById('pending-err');
   err.style.display='none'; pend.style.display='none';
-  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
-  const btn=document.getElementById('btn');
-  if(!email||!password){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const btn = document.getElementById('btn');
+  if(!email||!password){ err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
   btn.disabled=true; btn.textContent='Signing in…';
+
   try{
-    const {data,error}=await db.auth.signInWithPassword({email,password});
+    const {data, error} = await db.auth.signInWithPassword({email,password});
     if(error) throw error;
-    const {data:p}=await db.from('profiles').select('role,approval_status').eq('id',data.user.id).single();
-    if(p?.role!=='organization'){ err.textContent='This login is for organizations only. Use the user login.'; err.style.display='block'; await db.auth.signOut(); btn.disabled=false; btn.textContent='Sign In to Dashboard'; return; }
-    if(p.approval_status==='pending'){ pend.style.display='block'; await db.auth.signOut(); btn.disabled=false; btn.textContent='Sign In to Dashboard'; return; }
-    if(p.approval_status==='suspended'){ err.textContent='This account has been suspended. Contact support@qcode.com'; err.style.display='block'; await db.auth.signOut(); btn.disabled=false; btn.textContent='Sign In to Dashboard'; return; }
+
+    const {data:p} = await db.from('profiles').select('role,approval_status').eq('id', data.user.id).single();
+    if(p?.role!=='organization'){ 
+      err.textContent='This login is for organizations only. Use the user login.';
+      err.style.display='block'; 
+      await db.auth.signOut(); 
+      btn.disabled=false; btn.textContent='Sign In to Dashboard'; 
+      return;
+    }
+
+    if(p.approval_status==='pending'){ 
+      pend.style.display='block'; 
+      await db.auth.signOut(); 
+      btn.disabled=false; btn.textContent='Sign In to Dashboard'; 
+      return; 
+    }
+
+    if(p.approval_status==='suspended'){ 
+      err.textContent='This account has been suspended. Contact support@qcode.com';
+      err.style.display='block'; 
+      await db.auth.signOut(); 
+      btn.disabled=false; btn.textContent='Sign In to Dashboard'; 
+      return; 
+    }
+
     await db.from('profiles').update({is_online:true}).eq('id',data.user.id);
     window.location.href='../dashboard/org.html';
+
   }catch(e){
-    err.textContent=e.message?.includes('Invalid')?'Invalid email or password.':(e.message||'Login failed.');
-    err.style.display='block'; btn.disabled=false; btn.textContent='Sign In to Dashboard';
+    err.textContent = e.message?.includes('Invalid') ? 'Invalid email or password.' : (e.message||'Login failed.');
+    err.style.display='block'; 
+    btn.disabled=false; 
+    btn.textContent='Sign In to Dashboard';
   }
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-</script>{% endraw %}
+
+document.addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
 </body>
 </html>
