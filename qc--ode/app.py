@@ -1,274 +1,259 @@
-"""
-app.py — QCode SMS Gateway + Web Backend
-========================================
-Handles web pages, admin dashboard, and incoming SMS via Africa's Talking.
-
-HOW TO RUN:
-  pip install flask supabase africastalking python-dotenv
-  python app.py
-
-DEPLOY:
-  - Render: set Start Command to "python app.py"
-  - Africa's Talking SMS webhook → POST /sms/incoming
-"""
-
-import os
-import re
+import os, re, json
+from functools import wraps
 from datetime import datetime, timezone, timedelta
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
-from supabase import create_client, Client
-from dotenv import load_dotenv
 
-# Africa's Talking (optional)
+import requests
+from flask import Flask, render_template, request, jsonify, session, redirect
+from dotenv import load_dotenv
+from flask_cors import CORS  # <-- Added for frontend fetch cross-origin support
+
+# ── Africa's Talking (optional) ───────────────────────────────
 try:
     import africastalking
     AT_AVAILABLE = True
 except ImportError:
     AT_AVAILABLE = False
-    print("⚠ africastalking not installed. Run: pip install africastalking")
+    print("⚠ africastalking not installed — SMS will be mocked in console.")
 
 load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.getenv("APP_SECRET", "super-secret-dev-key")
+CORS(app)  # <-- Enable CORS globally
+app.secret_key = os.getenv("APP_SECRET", "qcode-dev-secret-CHANGE-IN-PROD")
 
-# -----------------------------
-# Supabase
-# -----------------------------
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+# ── CONFIG ─────────────────────────────────────────────
+SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
+AT_USERNAME       = os.getenv("AT_USERNAME", "sandbox")
+AT_API_KEY        = os.getenv("AT_API_KEY", "")
+AT_SENDER_ID      = os.getenv("AT_SENDER_ID", "QCode")
+SMS_NUMBER        = os.getenv("SMS_NUMBER", "+0000000000")
+ADMIN_PASSWORD    = os.getenv("ADMIN_PASSWORD", "admin123")
 
-# -----------------------------
-# Africa's Talking SMS
-# -----------------------------
-AT_USERNAME  = os.getenv("AT_USERNAME", "sandbox")
-AT_API_KEY   = os.getenv("AT_API_KEY", "")
-AT_SENDER_ID = os.getenv("AT_SENDER_ID", "QCode")
-
-if AT_AVAILABLE:
+sms_client = None
+if AT_AVAILABLE and AT_API_KEY:
     africastalking.initialize(AT_USERNAME, AT_API_KEY)
-    sms = africastalking.SMS
+    sms_client = africastalking.SMS
 
-# -----------------------------
-# Admin Config
-# -----------------------------
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+# ── SUPABASE HELPERS ─────────────────────────────
+def _h_anon(extra=None):
+    h = {"apikey": SUPABASE_ANON_KEY,
+         "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+         "Content-Type": "application/json",
+         "Prefer": "return=representation"}
+    if extra: h.update(extra)
+    return h
+
+def _h_service(extra=None):
+    h = {"apikey": SUPABASE_KEY,
+         "Authorization": f"Bearer {SUPABASE_KEY}",
+         "Content-Type": "application/json",
+         "Prefer": "return=representation"}
+    if extra: h.update(extra)
+    return h
+
+def _h_user(token, extra=None):
+    h = {"apikey": SUPABASE_ANON_KEY,
+         "Authorization": f"Bearer {token}",
+         "Content-Type": "application/json",
+         "Prefer": "return=representation"}
+    if extra: h.update(extra)
+    return h
+
+def sb_signup(email: str, password: str) -> dict:
+    try:
+        r = requests.post(
+            f"{SUPABASE_URL}/auth/v1/signup",
+            headers=_h_anon(),
+            json={"email": email, "password": password},
+            timeout=15,
+        )
+        return r.json()
+    except Exception as e:
+        print(f"[SIGNUP ERROR] {e}")
+        return {"error": "Signup request failed."}
+
+def sb_signin(email: str, password: str) -> dict:
+    try:
+        r = requests.post(
+            f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
+            headers=_h_anon(),
+            json={"email": email, "password": password},
+            timeout=15,
+        )
+        return r.json()
+    except Exception as e:
+        print(f"[SIGNIN ERROR] {e}")
+        return {"error": "Signin request failed."}
+
+def sb_signout(token: str):
+    try:
+        requests.post(
+            f"{SUPABASE_URL}/auth/v1/logout",
+            headers=_h_user(token),
+            timeout=5
+        )
+    except Exception:
+        pass
+
+# ── Database helpers ─────────────────────────────
+def db_insert(table: str, data: dict) -> dict:
+    try:
+        r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}", headers=_h_service(), json=data, timeout=15)
+        return {"ok": r.ok, "data": r.json(), "status": r.status_code}
+    except Exception as e:
+        print(f"[DB INSERT ERROR] {table} {e}")
+        return {"ok": False, "data": None, "status": 500}
+
+def db_select(table: str, filters: dict = None, cols: str = "*", single: bool = False) -> any:
+    try:
+        params = {"select": cols}
+        if filters:
+            params.update(filters)
+        h = _h_service()
+        if single:
+            h["Accept"] = "application/vnd.pgrst.object+json"
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, params=params, timeout=15)
+        if not r.ok:
+            return None if single else []
+        return r.json()
+    except Exception as e:
+        print(f"[DB SELECT ERROR] {table} {e}")
+        return None if single else []
+
+def db_update(table: str, match: dict, data: dict) -> dict:
+    params = {k: f"eq.{v}" for k, v in match.items()}
+    try:
+        r = requests.patch(f"{SUPABASE_URL}/rest/v1/{table}", headers=_h_service(), params=params, json=data, timeout=15)
+        return {"ok": r.ok, "status": r.status_code}
+    except Exception as e:
+        print(f"[DB UPDATE ERROR] {table} {e}")
+        return {"ok": False, "status": 500}
+
+def db_count(table: str, filters: dict = None) -> int:
+    try:
+        h = {**_h_service(), "Prefer": "count=exact"}
+        params = {"select": "id"}
+        if filters:
+            params.update(filters)
+        r = requests.head(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, params=params, timeout=15)
+        return int(r.headers.get("content-range", "0/0").split("/")[1])
+    except Exception:
+        return 0
+
+def get_profile(user_id: str) -> dict:
+    return db_select("profiles", {"id": f"eq.{user_id}"}, single=True) or {}
+
+# ── Session Utilities ─────────────────────────────
+def save_session(user_id: str, token: str, profile: dict):
+    session.permanent = True
+    session.update({
+        "user_id": user_id,
+        "access_token": token,
+        "role": profile.get("role", "user"),
+        "email": profile.get("email", ""),
+        "full_name": profile.get("full_name") or profile.get("org_name") or "",
+        "org_name": profile.get("org_name", ""),
+        "preferred_lang": profile.get("preferred_lang", "en"),
+        "approval_status": profile.get("approval_status", "approved"),
+    })
+
+def role_to_url(role: str) -> str:
+    return {"user": "/dashboard/user", "organization": "/dashboard/org", "super_admin": "/admin"}.get(role, "/")
+
+def mark_online(uid: str, online: bool = True):
+    db_update("profiles", {"id": uid}, {"is_online": online})
 
 def require_admin(f):
-    from functools import wraps
     @wraps(f)
     def wrapper(*args, **kwargs):
-        if not session.get("is_super_admin"):
-            return redirect(url_for("admin_login"))
+        if session.get("role") != "super_admin":
+            return jsonify({"error": "Unauthorized"}), 403
         return f(*args, **kwargs)
     return wrapper
 
-# -----------------------------
-# Helpers
-# -----------------------------
-def send_sms(phone: str, message: str) -> bool:
-    if not AT_AVAILABLE:
-        print(f"[SMS MOCK] To: {phone}\n{message}")
-        return True
-    try:
-        sms.send(message, [phone], sender_id=AT_SENDER_ID)
-        return True
-    except Exception as e:
-        print(f"[SMS ERROR] {e}")
-        return False
-
-def normalize_phone(phone: str) -> str:
-    phone = re.sub(r"[^\d+]", "", phone)
-    if phone.startswith("0"):
-        phone = "+234" + phone[1:]
-    elif not phone.startswith("+"):
-        phone = "+" + phone
-    return phone
-
-def calculate_eta(position: int, interval_minutes: int) -> str:
-    total_mins = position * interval_minutes
-    eta_time = datetime.now(timezone.utc) + timedelta(minutes=total_mins)
-    return f"~{total_mins} min ({eta_time.strftime('%I:%M %p UTC')})"
-
-def find_active_entry(phone: str):
-    result = supabase.table("queue_entries") \
-        .select("*") \
-        .eq("phone", phone) \
-        .in_("status", ["waiting", "called", "serving"]) \
-        .order("created_at", desc=True).limit(1).execute()
-    return result.data[0] if result.data else None
-
-def get_position(service_id, ticket_number):
-    res = supabase.table("queue_entries") \
-        .select("id", count="exact") \
-        .eq("service_id", service_id) \
-        .eq("status", "waiting") \
-        .lt("ticket_number", ticket_number).execute()
-    return (res.count or 0) + 1
-
-# -----------------------------
-# Web Pages
-# -----------------------------
+# ── Page Routes ─────────────────────────────
 @app.route("/")
 def home():
     return render_template("index.html")
 
-@app.route("/register-user")
-def register_user():
-    return render_template("register-user.html")
+@app.route("/auth/register-user")
+@app.route("/auth/register-user.html")
+def page_register_user():
+    return render_template("auth/register-user.html")
 
-@app.route("/register-org")
-def register_org():
-    return render_template("register-org.html")
+@app.route("/auth/login-user")
+@app.route("/auth/login-user.html")
+def page_login_user():
+    if session.get("role") == "user":
+        return redirect("/dashboard/user")
+    return render_template("auth/login-user.html")
 
-@app.route("/login-user")
-def login_user():
-    return render_template("login-user.html")
+# ── API Routes (User registration/login) ─────────────────────────────
+@app.route("/api/auth/register-user", methods=["POST"])
+def api_register_user():
+    data = request.get_json() or {}
+    name = (data.get("full_name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
 
-@app.route("/login-org")
-def login_org():
-    return render_template("login-org.html")
+    if not name:
+        return jsonify({"error": "Full name required"}), 400
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        return jsonify({"error": "Valid email required"}), 400
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 chars"}), 400
 
-@app.route("/dashboard-user")
-def dashboard_user():
-    return render_template("user.html")
+    signup = sb_signup(email, password)
+    uid = signup.get("id")
+    if not uid:
+        msg = signup.get("error_description") or signup.get("message") or "Registration failed"
+        if "already registered" in str(msg).lower():
+            msg = "Email already exists"
+        return jsonify({"error": msg}), 400
 
-@app.route("/dashboard-org")
-def dashboard_org():
-    return render_template("org.html")
+    ins = db_insert("profiles", {"id": uid, "role": "user", "full_name": name, "email": email, "approval_status": "approved"})
+    if not ins["ok"]:
+        return jsonify({"error": "Profile could not be saved"}), 500
 
-@app.route("/guest-ticket")
-def guest_ticket():
-    return render_template("guest.html")
+    return jsonify({"success": True, "message": "Account created! Please confirm email."}), 201
 
-# Redirect .html URLs to avoid 404
-@app.route("/register-user.html")
-def redirect_user_html(): return redirect(url_for("register_user"))
-@app.route("/register-org.html")
-def redirect_org_html(): return redirect(url_for("register_org"))
-@app.route("/login-user.html")
-def redirect_login_user_html(): return redirect(url_for("login_user"))
-@app.route("/login-org.html")
-def redirect_login_org_html(): return redirect(url_for("login_org"))
+@app.route("/api/auth/login", methods=["POST"])
+def api_login():
+    data = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+    if not email or not password:
+        return jsonify({"error": "Email and password required"}), 400
 
-# -----------------------------
-# Admin
-# -----------------------------
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST":
-        password = request.form.get("password")
-        if password == ADMIN_PASSWORD:
-            session["is_super_admin"] = True
-            return redirect(url_for("admin_dashboard"))
-        return "❌ Invalid credentials", 401
-    return render_template("login-admin.html")
+    signin = sb_signin(email, password)
+    token = signin.get("access_token")
+    if not token:
+        return jsonify({"error": "Invalid email or password"}), 401
 
-@app.route("/admin/logout")
-def admin_logout():
-    session.clear()
-    return redirect(url_for("home"))
+    uid = (signin.get("user") or {}).get("id")
+    profile = get_profile(uid)
+    if not profile:
+        sb_signout(token)
+        return jsonify({"error": "Profile not found"}), 404
 
-@app.route("/admin/dashboard")
-@require_admin
-def admin_dashboard():
-    services = supabase.table("services").select("*").execute().data
-    return render_template("super_admin.html", services=services)
+    save_session(uid, token, profile)
+    mark_online(uid, True)
+    return jsonify({"success": True, "role": profile.get("role"), "redirect": role_to_url(profile.get("role"))}), 200
 
-# -----------------------------
-# SMS Handlers
-# -----------------------------
-def handle_join(phone: str, code: str, guest_name=None) -> str:
-    result = supabase.table("services").select("*").eq("service_code", code.upper()).execute()
-    if not result.data:
-        return f"❌ Service '{code.upper()}' not found."
-    svc = result.data[0]
+# ── Health Check ─────────────────────────────
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "service": "QCode",
+        "supabase_url": bool(SUPABASE_URL),
+        "sms_ready": sms_client is not None,
+        "time": datetime.now().isoformat()
+    })
 
-    # Check if already in queue
-    existing = supabase.table("queue_entries") \
-        .select("*") \
-        .eq("service_id", svc['id']) \
-        .eq("phone", phone) \
-        .in_("status", ["waiting", "called", "serving"]) \
-        .execute()
-    if existing.data:
-        entry = existing.data[0]
-        return f"⚠ Already in queue: {entry['ticket_label']} ({entry['status']})"
-
-    # Increment ticket
-    new_counter = svc.get("ticket_counter", 0) + 1
-    ticket_label = f"{svc.get('ticket_prefix','Q')}{str(new_counter).zfill(3)}"
-    supabase.table("services").update({"ticket_counter": new_counter}).eq("id", svc['id']).execute()
-
-    # Insert queue entry
-    position = 1 + (supabase.table("queue_entries").select("id", count="exact")
-                    .eq("service_id", svc['id']).eq("status", "waiting").execute().count or 0)
-    eta = calculate_eta(position, svc.get("time_interval", 5))
-
-    supabase.table("queue_entries").insert({
-        "service_id": svc['id'],
-        "guest_name": guest_name or f"SMS:{phone[-4:]}",
-        "phone": phone,
-        "ticket_label": ticket_label,
-        "ticket_number": new_counter,
-        "status": "waiting",
-        "estimated_time": (datetime.now(timezone.utc) + timedelta(minutes=position*svc.get("time_interval",5))).isoformat(),
-        "join_method": "sms"
-    }).execute()
-
-    return f"✅ Joined '{svc['name']}'! Ticket: {ticket_label} | Position: {position} | ETA: {eta}"
-
-def handle_status(phone: str) -> str:
-    entry = find_active_entry(phone)
-    if not entry: return "ℹ Not in any queue."
-    position = get_position(entry['service_id'], entry['ticket_number'])
-    svc_name = entry.get('service_name', 'Queue')
-    eta = calculate_eta(position, entry.get('time_interval', 5))
-    return f"📋 {svc_name} Update | Ticket: {entry['ticket_label']} | Position: {position} | ETA: {eta}"
-
-def handle_cancel(phone: str) -> str:
-    entry = find_active_entry(phone)
-    if not entry: return "ℹ Not in any queue."
-    if entry['status'] in ("called","serving"): return "⚠ Cannot cancel, already being served."
-    supabase.table("queue_entries").update({"status":"cancelled"}).eq("id", entry['id']).execute()
-    return f"✅ Cancelled ticket {entry['ticket_label']}"
-
-def handle_help() -> str:
-    return "📱 Commands: [CODE] JOIN queue | STATUS | CANCEL | HELP"
-
-@app.route("/sms/incoming", methods=["POST"])
-def sms_incoming():
-    data = request.form if request.form else request.json or {}
-    phone = normalize_phone(data.get("from", ""))
-    msg = (data.get("text", "") or "").strip().upper()
-    print(f"[SMS IN] {phone}: {msg}")
-
-    if not phone or not msg: return jsonify({'status':'ignored'}), 200
-    reply = ""
-    if msg == "STATUS": reply = handle_status(phone)
-    elif msg == "CANCEL": reply = handle_cancel(phone)
-    elif msg in ("HELP","HI","HELLO","?"): reply = handle_help()
-    elif msg.startswith("JOIN "):
-        parts = msg.split(" ",2)
-        code = parts[1]
-        name = parts[2].title() if len(parts)>2 else None
-        reply = handle_join(phone, code, guest_name=name)
-    elif re.match(r"^[A-Z0-9]{4,8}$", msg):
-        reply = handle_join(phone, msg)
-    else:
-        reply = "❓ Unknown command. Reply HELP for instructions."
-
-    send_sms(phone, reply)
-    return jsonify({'status':'processed','reply_sent':True}), 200
-
-@app.route("/health", methods=["GET"])
-def health(): return jsonify({"status":"ok","time":datetime.now().isoformat()})
-
-# -----------------------------
-# Run App
-# -----------------------------
 if __name__ == "__main__":
-    port = int(os.getenv("PORT",5000))
-    debug = os.getenv("FLASK_ENV","development") != "production"
-    print(f"QCode Gateway running on port {port} | Debug={debug} | AT Available={AT_AVAILABLE}")
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("FLASK_ENV", "development") != "production"
     app.run(host="0.0.0.0", port=port, debug=debug)
