@@ -1,72 +1,118 @@
+"""
+app.py — QCode SMS Gateway + Web Backend
+========================================
+Handles web pages, admin dashboard, and incoming SMS via Africa's Talking.
+
+HOW TO RUN:
+  pip install flask supabase africastalking python-dotenv
+  python app.py
+
+DEPLOY:
+  - Render: set Start Command to "python app.py"
+  - Africa's Talking SMS webhook → POST /sms/incoming
+"""
+
 import os
 import re
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from datetime import datetime, timezone, timedelta
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
-from functools import wraps
 
-# -----------------------------
-# Load environment variables
-# -----------------------------
+# Africa's Talking (optional)
+try:
+    import africastalking
+    AT_AVAILABLE = True
+except ImportError:
+    AT_AVAILABLE = False
+    print("⚠ africastalking not installed. Run: pip install africastalking")
+
 load_dotenv()
-
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "super-secret-dev-key")
+app.secret_key = os.getenv("APP_SECRET", "super-secret-dev-key")
 
 # -----------------------------
-# Supabase Configuration
+# Supabase
 # -----------------------------
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise Exception("Supabase credentials missing")
-
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # -----------------------------
-# Environment Config
+# Africa's Talking SMS
 # -----------------------------
-WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+AT_USERNAME  = os.getenv("AT_USERNAME", "sandbox")
+AT_API_KEY   = os.getenv("AT_API_KEY", "")
+AT_SENDER_ID = os.getenv("AT_SENDER_ID", "QCode")
 
-if not WEBHOOK_SECRET:
-    raise Exception("WEBHOOK_SECRET not set")
+if AT_AVAILABLE:
+    africastalking.initialize(AT_USERNAME, AT_API_KEY)
+    sms = africastalking.SMS
 
 # -----------------------------
-# Utilities
+# Admin Config
 # -----------------------------
-def normalize_phone(phone):
-    digits = re.sub(r"\D", "", phone)
-    if digits.startswith("0"):
-        digits = "234" + digits[1:]
-    if not digits.startswith("234") and len(digits) == 10:
-        digits = "234" + digits
-    return "+" + digits
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 
 def require_admin(f):
+    from functools import wraps
     @wraps(f)
-    def decorated(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         if not session.get("is_super_admin"):
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
-    return decorated
+    return wrapper
 
 # -----------------------------
-# Basic Routes
+# Helpers
+# -----------------------------
+def send_sms(phone: str, message: str) -> bool:
+    if not AT_AVAILABLE:
+        print(f"[SMS MOCK] To: {phone}\n{message}")
+        return True
+    try:
+        sms.send(message, [phone], sender_id=AT_SENDER_ID)
+        return True
+    except Exception as e:
+        print(f"[SMS ERROR] {e}")
+        return False
+
+def normalize_phone(phone: str) -> str:
+    phone = re.sub(r"[^\d+]", "", phone)
+    if phone.startswith("0"):
+        phone = "+234" + phone[1:]
+    elif not phone.startswith("+"):
+        phone = "+" + phone
+    return phone
+
+def calculate_eta(position: int, interval_minutes: int) -> str:
+    total_mins = position * interval_minutes
+    eta_time = datetime.now(timezone.utc) + timedelta(minutes=total_mins)
+    return f"~{total_mins} min ({eta_time.strftime('%I:%M %p UTC')})"
+
+def find_active_entry(phone: str):
+    result = supabase.table("queue_entries") \
+        .select("*") \
+        .eq("phone", phone) \
+        .in_("status", ["waiting", "called", "serving"]) \
+        .order("created_at", desc=True).limit(1).execute()
+    return result.data[0] if result.data else None
+
+def get_position(service_id, ticket_number):
+    res = supabase.table("queue_entries") \
+        .select("id", count="exact") \
+        .eq("service_id", service_id) \
+        .eq("status", "waiting") \
+        .lt("ticket_number", ticket_number).execute()
+    return (res.count or 0) + 1
+
+# -----------------------------
+# Web Pages
 # -----------------------------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-@app.route("/health")
-def health():
-    return "OK", 200
-
-# -----------------------------
-# User & Org Routes
-# -----------------------------
 @app.route("/register-user")
 def register_user():
     return render_template("register-user.html")
@@ -95,27 +141,18 @@ def dashboard_org():
 def guest_ticket():
     return render_template("guest.html")
 
-# -----------------------------
-# Redirects for old .html URLs
-# -----------------------------
+# Redirect .html URLs to avoid 404
 @app.route("/register-user.html")
-def redirect_register_user():
-    return redirect(url_for("register_user"))
-
+def redirect_user_html(): return redirect(url_for("register_user"))
 @app.route("/register-org.html")
-def redirect_register_org():
-    return redirect(url_for("register_org"))
-
+def redirect_org_html(): return redirect(url_for("register_org"))
 @app.route("/login-user.html")
-def redirect_login_user():
-    return redirect(url_for("login_user"))
-
+def redirect_login_user_html(): return redirect(url_for("login_user"))
 @app.route("/login-org.html")
-def redirect_login_org():
-    return redirect(url_for("login_org"))
+def redirect_login_org_html(): return redirect(url_for("login_org"))
 
 # -----------------------------
-# Admin Login & Dashboard
+# Admin
 # -----------------------------
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -123,9 +160,8 @@ def admin_login():
         password = request.form.get("password")
         if password == ADMIN_PASSWORD:
             session["is_super_admin"] = True
-            session["login_time"] = datetime.utcnow().isoformat()
-            return redirect(url_for("super_admin_dashboard"))
-        return "Invalid credentials", 401
+            return redirect(url_for("admin_dashboard"))
+        return "❌ Invalid credentials", 401
     return render_template("login-admin.html")
 
 @app.route("/admin/logout")
@@ -135,109 +171,104 @@ def admin_logout():
 
 @app.route("/admin/dashboard")
 @require_admin
-def super_admin_dashboard():
+def admin_dashboard():
     services = supabase.table("services").select("*").execute().data
     return render_template("super_admin.html", services=services)
 
 # -----------------------------
-# SMS Webhook
+# SMS Handlers
 # -----------------------------
-@app.route("/sms/incoming", methods=["POST"])
-def incoming_sms():
-    secret = request.headers.get("X-Webhook-Secret")
-    if secret != WEBHOOK_SECRET:
-        return jsonify({"error": "Unauthorized"}), 403
+def handle_join(phone: str, code: str, guest_name=None) -> str:
+    result = supabase.table("services").select("*").eq("service_code", code.upper()).execute()
+    if not result.data:
+        return f"❌ Service '{code.upper()}' not found."
+    svc = result.data[0]
 
-    data = request.json or request.form
-    phone = normalize_phone(data.get("from") or data.get("sender", ""))
-    message = (data.get("text") or data.get("message", "")).strip().upper()
-    if not phone or not message:
-        return jsonify({"error": "Missing phone or message"}), 400
-
-    # Commands: JOIN <CODE> or STATUS
-    parts = message.split()
-    try:
-        if parts[0] == "JOIN" and len(parts) >= 2:
-            service_code = parts[1]
-            guest_name = " ".join(parts[2:]) if len(parts) > 2 else "SMS Guest"
-            return handle_join(phone, service_code, guest_name)
-        elif parts[0] == "STATUS":
-            return handle_status(phone)
-        else:
-            return jsonify({"message": "Invalid command. Use JOIN <CODE> or STATUS."}), 200
-    except Exception as e:
-        print(f"Webhook Error: {e}")
-        return jsonify({"error": "Internal server error"}), 500
-
-# -----------------------------
-# JOIN Logic
-# -----------------------------
-def handle_join(phone, service_code, guest_name):
-    svc = supabase.table("services").select("*").eq("service_code", service_code).single().execute()
-    if not svc.data:
-        return jsonify({"message": "Service not found"}), 200
-
-    svc_id = svc.data['id']
-
-    # Already waiting?
-    existing = supabase.table("queue_entries").select("*")\
-        .eq("phone", phone).eq("service_id", svc_id).eq("status", "waiting").execute()
+    # Check if already in queue
+    existing = supabase.table("queue_entries") \
+        .select("*") \
+        .eq("service_id", svc['id']) \
+        .eq("phone", phone) \
+        .in_("status", ["waiting", "called", "serving"]) \
+        .execute()
     if existing.data:
-        return jsonify({"message": "Already in queue"}), 200
+        entry = existing.data[0]
+        return f"⚠ Already in queue: {entry['ticket_label']} ({entry['status']})"
 
     # Increment ticket
-    rpc_res = supabase.rpc("increment_ticket_counter", {"service_id_input": svc_id}).execute()
-    if not rpc_res.data:
-        return jsonify({"error": "Failed to generate ticket"}), 500
-
-    ticket_info = rpc_res.data[0]
-    ticket_label = f"{ticket_info['ticket_prefix']}{str(ticket_info['new_counter']).zfill(3)}"
-    time_interval = ticket_info.get('time_interval') or 5
-
-    # Calculate ETA
-    ahead = supabase.table("queue_entries").select("*", count="exact")\
-        .eq("service_id", svc_id).eq("status", "waiting").execute()
-    wait_mins = ahead.count * time_interval if ahead.count else 0
-    eta = datetime.utcnow() + timedelta(minutes=wait_mins)
+    new_counter = svc.get("ticket_counter", 0) + 1
+    ticket_label = f"{svc.get('ticket_prefix','Q')}{str(new_counter).zfill(3)}"
+    supabase.table("services").update({"ticket_counter": new_counter}).eq("id", svc['id']).execute()
 
     # Insert queue entry
+    position = 1 + (supabase.table("queue_entries").select("id", count="exact")
+                    .eq("service_id", svc['id']).eq("status", "waiting").execute().count or 0)
+    eta = calculate_eta(position, svc.get("time_interval", 5))
+
     supabase.table("queue_entries").insert({
-        "service_id": svc_id,
-        "guest_name": guest_name,
+        "service_id": svc['id'],
+        "guest_name": guest_name or f"SMS:{phone[-4:]}",
         "phone": phone,
         "ticket_label": ticket_label,
-        "ticket_number": ticket_info['new_counter'],
+        "ticket_number": new_counter,
         "status": "waiting",
-        "estimated_time": eta.isoformat(),
+        "estimated_time": (datetime.now(timezone.utc) + timedelta(minutes=position*svc.get("time_interval",5))).isoformat(),
         "join_method": "sms"
     }).execute()
 
-    return jsonify({
-        "message": f"Joined successfully. Ticket: {ticket_label}, Est. wait: {wait_mins} mins."
-    }), 200
+    return f"✅ Joined '{svc['name']}'! Ticket: {ticket_label} | Position: {position} | ETA: {eta}"
+
+def handle_status(phone: str) -> str:
+    entry = find_active_entry(phone)
+    if not entry: return "ℹ Not in any queue."
+    position = get_position(entry['service_id'], entry['ticket_number'])
+    svc_name = entry.get('service_name', 'Queue')
+    eta = calculate_eta(position, entry.get('time_interval', 5))
+    return f"📋 {svc_name} Update | Ticket: {entry['ticket_label']} | Position: {position} | ETA: {eta}"
+
+def handle_cancel(phone: str) -> str:
+    entry = find_active_entry(phone)
+    if not entry: return "ℹ Not in any queue."
+    if entry['status'] in ("called","serving"): return "⚠ Cannot cancel, already being served."
+    supabase.table("queue_entries").update({"status":"cancelled"}).eq("id", entry['id']).execute()
+    return f"✅ Cancelled ticket {entry['ticket_label']}"
+
+def handle_help() -> str:
+    return "📱 Commands: [CODE] JOIN queue | STATUS | CANCEL | HELP"
+
+@app.route("/sms/incoming", methods=["POST"])
+def sms_incoming():
+    data = request.form if request.form else request.json or {}
+    phone = normalize_phone(data.get("from", ""))
+    msg = (data.get("text", "") or "").strip().upper()
+    print(f"[SMS IN] {phone}: {msg}")
+
+    if not phone or not msg: return jsonify({'status':'ignored'}), 200
+    reply = ""
+    if msg == "STATUS": reply = handle_status(phone)
+    elif msg == "CANCEL": reply = handle_cancel(phone)
+    elif msg in ("HELP","HI","HELLO","?"): reply = handle_help()
+    elif msg.startswith("JOIN "):
+        parts = msg.split(" ",2)
+        code = parts[1]
+        name = parts[2].title() if len(parts)>2 else None
+        reply = handle_join(phone, code, guest_name=name)
+    elif re.match(r"^[A-Z0-9]{4,8}$", msg):
+        reply = handle_join(phone, msg)
+    else:
+        reply = "❓ Unknown command. Reply HELP for instructions."
+
+    send_sms(phone, reply)
+    return jsonify({'status':'processed','reply_sent':True}), 200
+
+@app.route("/health", methods=["GET"])
+def health(): return jsonify({"status":"ok","time":datetime.now().isoformat()})
 
 # -----------------------------
-# STATUS Logic
-# -----------------------------
-def handle_status(phone):
-    entry = supabase.table("queue_entries").select("*")\
-        .eq("phone", phone).eq("status", "waiting")\
-        .order("created_at", desc=False).limit(1).execute()
-    if not entry.data:
-        return jsonify({"message": "No active queue entry"}), 200
-
-    svc_id = entry.data[0]['service_id']
-    created_at = entry.data[0]['created_at']
-    ahead = supabase.table("queue_entries").select("*", count="exact")\
-        .eq("service_id", svc_id).eq("status", "waiting")\
-        .lt("created_at", created_at).execute()
-    count_ahead = ahead.count if ahead.count else 0
-
-    return jsonify({"message": f"There are {count_ahead} people ahead of you."}), 200
-
-# -----------------------------
-# Run
+# Run App
 # -----------------------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.getenv("PORT",5000))
+    debug = os.getenv("FLASK_ENV","development") != "production"
+    print(f"QCode Gateway running on port {port} | Debug={debug} | AT Available={AT_AVAILABLE}")
+    app.run(host="0.0.0.0", port=port, debug=debug)
