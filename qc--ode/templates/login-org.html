@@ -47,8 +47,8 @@
     <div class="fg"><label class="lbl">Email Address</label><input id="email" class="inp" type="email" placeholder="admin@yourorg.com" autocomplete="email"/></div>
     <div class="fg"><label class="lbl">Password</label><input id="password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
     <button id="btn" class="btn" onclick="doLogin()">Sign In to Dashboard</button>
-    <div class="sw">Not registered yet? <a href="register-org.html">Register organization →</a></div>
-    <div class="sw" style="margin-top:.375rem"><a href="login-user.html" style="color:#94a3b8;font-size:.8rem">← User login</a></div>
+    <div class="sw">Not registered yet? <a href="register-org">Register organization →</a></div>
+    <div class="sw" style="margin-top:.375rem"><a href="login-user" style="color:#94a3b8;font-size:.8rem">← User login</a></div>
   </div>
   <a href="../index.html" class="back">← Back to home</a>
 </div>
@@ -71,7 +71,7 @@ async function doLogin() {
   btn.textContent = 'Signing in…';
 
   try {
-    const res  = await fetch('/api/auth/login-org', {
+    const res  = await fetch('/api/login-org', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ email, password }),
@@ -98,7 +98,7 @@ async function doLogin() {
     }
 
     btn.textContent = '✓ Redirecting…';
-    window.location.href = data.redirect || '/dashboard/org';
+    window.location.href = data.redirect || '/org';
 
   } catch(e) {
     showErr('Network error. Please try again.');
@@ -118,7 +118,7 @@ async function checkSession() {
   try {
     const res  = await fetch('/api/auth/me');
     const data = await res.json();
-    if (data.logged_in && data.role === 'organization') window.location.href = '/dashboard/org';
+    if (data.logged_in && data.role === 'organization') window.location.href = '/org';
     if (data.logged_in && data.role === 'super_admin')  window.location.href = '/admin';
   } catch(e) {}
 }
