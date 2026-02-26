@@ -340,13 +340,13 @@ var pollTimer = null;
 // ── Init ──────────────────────────────────────────────────
 async function init() {
   var session = await api('/api/auth/me');
-  if (!session.ok || !session.data.logged_in) { window.location.href = '/auth/login-org'; return; }
+  if (!session.ok || !session.data.logged_in) { window.location.href = 'login-org'; return; }
   if (session.data.role !== 'organization') {
-    window.location.href = session.data.role === 'user' ? '/dashboard/user' : '/admin';
+    window.location.href = session.data.role === 'user' ? '/user' : '/admin';
     return;
   }
   var pr = await api('/api/org/profile');
-  if (!pr.ok) { window.location.href = '/auth/login-org'; return; }
+  if (!pr.ok) { window.location.href = '/login-org'; return; }
   profile = pr.data;
 
   document.getElementById('org-name-display').textContent = profile.org_name || 'Dashboard';
