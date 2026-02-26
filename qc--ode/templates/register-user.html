@@ -88,7 +88,7 @@
   <a href="../index.html" class="back">← Back to home</a>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+{% raw %}<script>
 const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co', SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const lang = localStorage.getItem('qcode_lang')||'en';
@@ -113,6 +113,6 @@ async function register(){
   }catch(e){err.textContent=e.message||'Registration failed.';err.style.display='block';btn.disabled=false;btn.textContent='Create Account';}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter')register();});
-</script>
+</script>{% endraw %}
 </body>
 </html>
