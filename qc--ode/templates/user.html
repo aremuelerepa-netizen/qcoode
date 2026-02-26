@@ -225,14 +225,14 @@
 </div>
 <div id="toasts"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+{% raw %}<script>
 const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
 const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
 const SMS_NUMBER='+1234567890';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 let curLang=localStorage.getItem('qcode_lang')||'en';
 function changeLang(l){curLang=l;localStorage.setItem('qcode_lang',l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';}
-function toast(msg,type='i',ms=4500){const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ',w:'⚠'}[type]}</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
+function toast(msg,type='i',ms=4500){const el=document.createElement('div');el.className=`toast t-${type}`;const icons={s:'✓',e:'✕',i:'ℹ',w:'⚠'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
 function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function diffMin(a,b){if(!a||!b)return'—';return Math.round((new Date(b)-new Date(a))/60000);}
@@ -371,6 +371,6 @@ async function saveAccount(){
 async function doLogout(){if(channel)channel.unsubscribe();await db.from('profiles').update({is_online:false}).eq('id',profile.id);await db.auth.signOut();window.location.href='../index.html';}
 document.getElementById('code-in').addEventListener('keydown',e=>{if(e.key==='Enter')findService();});
 init();
-</script>
+</script>{% endraw %}
 </body>
 </html>
