@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Org Dashboard — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s700:#334155;--s900:#0f172a;--green:#22c55e;--green-l:#dcfce7;--amber:#f59e0b;--amber-l:#fef3c7;--red:#ef4444;--red-l:#fee2e2;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--rl:1rem;--sh:0 1px 3px rgba(10,22,40,.08);--shm:0 4px 16px rgba(10,22,40,.10);--shl:0 12px 40px rgba(10,22,40,.15);--t:.18s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fb);background:var(--s50);color:var(--s900);min-height:100vh;display:flex;flex-direction:column}
+    h1,h2,h3,h4{font-family:var(--fh);line-height:1.2;letter-spacing:-.02em;color:var(--navy)}
+    a{text-decoration:none;color:var(--accent)}
+
+    /* ── NAVBAR ── */
+    .topbar{background:var(--navy);height:60px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0;position:sticky;top:0;z-index:100}
+    .tb-logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none}
+    .tb-logo span{color:var(--cyan)}
+    .tb-name{font-size:.875rem;color:rgba(255,255,255,.6);margin-left:.5rem;padding-left:.75rem;border-left:1px solid rgba(255,255,255,.15)}
+    .tb-right{margin-left:auto;display:flex;align-items:center;gap:.5rem}
+    .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fb);font-size:.825rem;font-weight:500;color:rgba(255,255,255,.7);transition:all var(--t)}
+    .tb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+    .tb-logout{color:#f87171!important}.tb-logout:hover{background:rgba(239,68,68,.15)!important}
+    .pending-bar{background:rgba(245,158,11,.15);border-bottom:1px solid rgba(245,158,11,.3);padding:.625rem 1.5rem;text-align:center;font-size:.8rem;color:#92400e;display:none}
+
+    /* ── LAYOUT ── */
+    .shell{display:flex;flex:1;overflow:hidden}
+    .sidebar{width:260px;background:#fff;border-right:1px solid var(--s200);padding:1.25rem;flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;gap:.25rem}
+    .main{flex:1;overflow-y:auto;padding:1.75rem}
+
+    /* ── SIDEBAR ── */
+    .sb-section{font-size:.7rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .625rem;margin-top:.75rem}
+    .sb-item{display:flex;align-items:center;gap:.625rem;padding:.625rem .875rem;border-radius:var(--r);font-size:.875rem;font-weight:500;color:var(--s700);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--t)}
+    .sb-item:hover{background:var(--s100);color:var(--navy)}
+    .sb-item.active{background:rgba(37,99,235,.08);color:var(--accent);font-weight:600}
+    .sb-item .ico{width:18px;text-align:center;font-size:1rem}
+    .sb-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:999px}
+    .sb-divider{height:1px;background:var(--s200);margin:.5rem 0}
+    .create-svc-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.75rem;background:var(--accent);color:#fff;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.875rem;font-weight:700;cursor:pointer;transition:all var(--t);margin-bottom:1rem}
+    .create-svc-btn:hover{background:#1d4ed8}
+
+    /* ── PANELS ── */
+    .panel{display:none}.panel.active{display:block}
+
+    /* ── PAGE HEADER ── */
+    .ph{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+    .ph h1{font-size:1.75rem}.ph p{color:var(--s500);margin-top:.25rem;font-size:.9rem}
+
+    /* ── STATS ── */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat{background:#fff;border:1px solid var(--s200);border-radius:var(--rl);padding:1.25rem 1.5rem;text-align:center}
+    .stat-n{font-family:var(--fh);font-size:2.25rem;font-weight:800;color:var(--accent);line-height:1}
+    .stat-l{font-size:.75rem;color:var(--s500);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+
+    /* ── CARDS ── */
+    .card{background:#fff;border:1px solid var(--s200);border-radius:var(--rl);padding:1.75rem;box-shadow:var(--sh)}
+    .card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1.25rem}
+
+    /* ── SERVICE CARDS ── */
+    .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
+    .svc-card{background:#fff;border:1.5px solid var(--s200);border-radius:var(--rl);padding:1.5rem;transition:all var(--t);cursor:pointer;position:relative;overflow:hidden}
+    .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--cyan))}
+    .svc-card:hover{border-color:var(--accent);box-shadow:var(--shm)}
+    .svc-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.875rem}
+    .svc-name{font-family:var(--fh);font-size:1.1rem;font-weight:700;color:var(--navy)}
+    .svc-staff{font-size:.8rem;color:var(--s500);margin-top:.2rem}
+    .svc-code{font-family:var(--fh);font-size:1.4rem;font-weight:800;letter-spacing:.2em;color:var(--accent);background:rgba(37,99,235,.08);border:1.5px dashed rgba(37,99,235,.3);border-radius:var(--r);padding:.4rem .875rem;cursor:pointer;display:inline-block;transition:all var(--t)}
+    .svc-code:hover{background:rgba(37,99,235,.12)}
+    .svc-meta{display:flex;gap:1rem;margin-top:.875rem;flex-wrap:wrap}
+    .svc-meta span{font-size:.78rem;color:var(--s500);display:flex;align-items:center;gap:.3rem}
+    .svc-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
+
+    /* ── QUEUE PANEL ── */
+    .q-wrap{display:grid;grid-template-columns:1fr 360px;gap:1.5rem;align-items:start}
+    .called-banner{background:linear-gradient(135deg,#15803d,var(--green));color:#fff;border-radius:var(--rl);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;animation:slideDown .3s ease}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-.5rem)}to{opacity:1;transform:translateY(0)}}
+    .cb-ticket{font-family:var(--fh);font-size:2rem;font-weight:800}
+    .cb-name{font-size:.875rem;opacity:.85;margin-top:.1rem}
+    .cb-acts{display:flex;gap:.5rem;flex-wrap:wrap}
+
+    /* ── TABS ── */
+    .tabs{display:flex;border-bottom:2px solid var(--s200);margin-bottom:1.25rem}
+    .tab{padding:.625rem 1.25rem;background:none;border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;color:var(--s500);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--t)}
+    .tab:hover{color:var(--accent)}.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+    /* ── TABLES ── */
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    thead{border-bottom:2px solid var(--s200)}
+    th{text-align:left;padding:.75rem 1rem;font-size:.72rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.06em}
+    td{padding:.875rem 1rem;font-size:.875rem;border-bottom:1px solid var(--s100);color:var(--s700)}
+    tr:last-child td{border-bottom:none}tr:hover td{background:var(--s50)}
+    .ticket-tag{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--accent)}
+
+    /* ── BADGES ── */
+    .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em}
+    .b-waiting{background:rgba(37,99,235,.1);color:var(--accent)}
+    .b-called{background:var(--amber-l);color:#92400e}
+    .b-serving{background:var(--green-l);color:#15803d}
+    .b-completed{background:var(--s100);color:var(--s500)}
+    .b-no_show{background:var(--red-l);color:var(--red)}
+    .b-cancelled{background:var(--s100);color:var(--s500)}
+    .b-open{background:var(--green-l);color:#15803d}
+    .b-paused{background:var(--amber-l);color:#92400e}
+    .b-closed{background:var(--red-l);color:var(--red)}
+    .b-pending{background:var(--amber-l);color:#92400e}
+    .b-approved{background:var(--green-l);color:#15803d}
+
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem 1.25rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.825rem;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap;text-decoration:none}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bp{background:var(--accent);color:#fff}.bp:hover:not(:disabled){background:#1d4ed8}
+    .bs{background:var(--green);color:#fff}.bs:hover:not(:disabled){filter:brightness(1.07)}
+    .bd{background:var(--red);color:#fff}.bd:hover:not(:disabled){filter:brightness(1.07)}
+    .bg{background:transparent;color:var(--s500);border:1.5px solid var(--s300)}.bg:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+    .bsm{padding:.325rem .75rem;font-size:.75rem}
+    .btn-full{width:100%;display:flex}
+
+    /* ── FORMS ── */
+    .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+    .lbl{font-size:.82rem;font-weight:600;color:var(--s700)}.hint{font-size:.76rem;color:var(--s500);margin-top:.2rem}
+    .inp{padding:.75rem 1rem;background:var(--s50);border:1.5px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;color:var(--s900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+    .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+    .inp::placeholder{color:var(--s300)}
+    .inp-row{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
+    textarea.inp{resize:vertical;min-height:75px}
+    select.inp{cursor:pointer}
+    .ferr{font-size:.8rem;color:var(--red);margin-top:.25rem;display:none}
+
+    /* ── MODAL ── */
+    .overlay{position:fixed;inset:0;z-index:300;background:rgba(10,22,40,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeIn .15s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal{background:#fff;border-radius:1.25rem;padding:2rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);animation:slideUp .2s cubic-bezier(.16,1,.3,1)}
+    @keyframes slideUp{from{opacity:0;transform:translateY(1rem)}to{opacity:1;transform:translateY(0)}}
+    .modal-title{font-size:1.25rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--s200)}
+    .modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--s200)}
+
+    /* ── FORM BUILDER ── */
+    .form-builder{border:1px solid var(--s200);border-radius:var(--rl);overflow:hidden}
+    .fb-header{background:var(--s50);padding:.75rem 1rem;font-size:.8rem;font-weight:600;color:var(--s700);border-bottom:1px solid var(--s200)}
+    .fb-fields{padding:.875rem}
+    .fb-field{background:var(--s50);border:1px solid var(--s200);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.625rem;display:flex;align-items:center;gap:.75rem}
+    .fb-field-info{flex:1}
+    .fb-field-label{font-size:.825rem;font-weight:600;color:var(--navy)}
+    .fb-field-type{font-size:.72rem;color:var(--s500);margin-top:.1rem}
+    .fb-add{padding:.625rem;display:flex;gap:.5rem;border-top:1px solid var(--s200);background:var(--s50)}
+    .fb-add select{flex:1;padding:.5rem;border:1px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.8rem}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:3.5rem 2rem;color:var(--s500)}
+    .empty h3{color:var(--s700);font-size:1.05rem;margin:.75rem 0 .375rem}
+    .empty p{font-size:.875rem}
+
+    /* ── SPINNER ── */
+    .spin{width:20px;height:20px;border:2.5px solid var(--s200);border-top-color:var(--accent);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--s500)}
+
+    /* ── ONLINE DOT ── */
+    .dot-on{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 2px rgba(34,197,94,.3)}
+    .dot-off{width:7px;height:7px;border-radius:50%;background:var(--s300);display:inline-block}
+
+    /* ── RESTORE ROW ── */
+    .restore-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--s50);border:1px solid var(--s200);border-radius:var(--r);margin-bottom:.625rem}
+    .ri-info .ri-name{font-weight:600;color:var(--navy);font-size:.9rem}
+    .ri-info .ri-meta{font-size:.75rem;color:var(--s500);margin-top:.2rem}
+
+    /* ── REPORT ── */
+    .report-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem}
+
+    /* ── TOAST ── */
+    #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+    .toast{padding:.75rem 1.125rem;border-radius:.5rem;box-shadow:var(--shl);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+    .t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#15803d}
+    .t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
+    .t-i{background:#eff6ff;border-left:3px solid var(--accent);color:#1d4ed8}
+    @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:translateX(0)}}
+
+    @media(max-width:900px){.q-wrap{grid-template-columns:1fr}.sidebar{width:220px}}
+    @media(max-width:700px){.shell{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--s200);flex-direction:row;flex-wrap:wrap;padding:.75rem}.main{padding:1rem}.svc-grid{grid-template-columns:1fr}.inp-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="../index.html" class="tb-logo">
+    <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+    <span>Q</span>Code
+  </a>
+  <span class="tb-name" id="org-name-display">Dashboard</span>
+  <div class="tb-right">
+    <span id="status-badge" class="badge" style="font-size:.7rem"></span>
+    <button class="tb-btn tb-logout" onclick="doLogout()">↩ Logout</button>
+  </div>
+</div>
+<div class="pending-bar" id="pending-bar">⏳ Your organization is <strong>pending approval</strong> by QCode admin. You can set up services but they won't be accessible until approved.</div>
+
+<div class="shell">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="create-svc-btn" onclick="openCreateModal()">+ Create Service</button>
+    <div class="sb-section">Menu</div>
+    <button class="sb-item active" onclick="showPanel('services')" id="nav-services">
+      <span class="ico">🗂</span> My Services <span class="sb-badge" id="svc-count">0</span>
+    </button>
+    <button class="sb-item" onclick="showPanel('queue')" id="nav-queue">
+      <span class="ico">📋</span> Live Queue
+    </button>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Data</div>
+    <button class="sb-item" onclick="showPanel('reports')" id="nav-reports">
+      <span class="ico">📊</span> Reports
+    </button>
+    <button class="sb-item" onclick="showPanel('restore')" id="nav-restore">
+      <span class="ico">🗑</span> Restore Deleted
+    </button>
+    <div class="sb-divider"></div>
+    <button class="sb-item" onclick="showPanel('account')" id="nav-account">
+      <span class="ico">⚙️</span> Account
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ── SERVICES PANEL ── -->
+    <div class="panel active" id="panel-services">
+      <div class="ph"><div><h1>My Services</h1><p>Create and manage your queue services</p></div></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">Total Services</div></div>
+        <div class="stat"><div class="stat-n" id="s-waiting">—</div><div class="stat-l">Waiting Now</div></div>
+        <div class="stat"><div class="stat-n" id="s-served">—</div><div class="stat-l">Served Today</div></div>
+        <div class="stat"><div class="stat-n" id="s-noshow">—</div><div class="stat-l">No-Shows</div></div>
+      </div>
+      <div class="svc-grid" id="svc-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
+    </div>
+
+    <!-- ── QUEUE PANEL ── -->
+    <div class="panel" id="panel-queue">
+      <div id="no-svc-sel" class="empty">
+        <div style="font-size:3rem;margin-bottom:.75rem">📋</div>
+        <h3>Select a service first</h3>
+        <p>Click "Manage Queue" on a service card to view its live queue.</p>
+      </div>
+      <div id="queue-view" style="display:none">
+        <div class="ph">
+          <div>
+            <div style="display:flex;align-items:center;gap:.875rem;flex-wrap:wrap">
+              <h1 id="q-svc-name" style="font-size:1.5rem"></h1>
+              <span id="q-svc-badge" class="badge"></span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.875rem;margin-top:.5rem;flex-wrap:wrap">
+              <span style="font-size:.85rem;color:var(--s500)">Code:</span>
+              <span class="svc-code" id="q-code" onclick="copyCode()" title="Click to copy">—</span>
+              <span style="font-size:.78rem;color:var(--s400)">Staff: <span id="q-staff">—</span></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+            <button class="btn bs" id="call-btn" onclick="callNext()">▶ Call Next</button>
+            <select class="inp" style="padding:.5rem .875rem;width:auto" id="status-sel" onchange="changeStatus()">
+              <option value="open">Open</option>
+              <option value="paused">⏸ Paused</option>
+              <option value="closed">🔒 Closed</option>
+            </select>
+          </div>
+        </div>
+        <div id="called-banner" style="display:none" class="called-banner">
+          <div><div class="cb-ticket" id="cb-ticket">—</div><div class="cb-name" id="cb-name">—</div></div>
+          <div class="cb-acts">
+            <button class="btn bsm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)" onclick="markEntry('serving')">Serving</button>
+            <button class="btn bsm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)" onclick="markEntry('no_show')">No-Show</button>
+            <button class="btn bs bsm" onclick="markEntry('completed')">✓ Done</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tabs">
+            <button class="tab active" id="t-live"    onclick="switchTab('live')">Live Queue</button>
+            <button class="tab"        id="t-history" onclick="switchTab('history')">History</button>
+          </div>
+          <div id="pane-live">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Online</th><th>ETA</th><th>Actions</th></tr></thead>
+                <tbody id="live-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="pane-history" style="display:none">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th></tr></thead>
+                <tbody id="hist-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS PANEL ── -->
+    <div class="panel" id="panel-reports">
+      <div class="ph"><div><h1>Reports</h1><p>Download queue history for any service</p></div></div>
+      <div class="card">
+        <div class="report-bar">
+          <div class="fg" style="margin:0;flex:1;max-width:280px">
+            <select class="inp" id="report-svc">
+              <option value="">Select service…</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:.625rem">
+            <button class="btn bp" onclick="loadReport()">📊 Load Report</button>
+            <button class="btn bg" onclick="downloadCSV()">⬇ Download CSV</button>
+            <button class="btn bg" onclick="downloadPDF()">⬇ Download PDF</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Ticket</th><th>Name</th><th>Phone</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead>
+            <tbody id="report-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--s400)">Select a service and click Load Report</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESTORE PANEL ── -->
+    <div class="panel" id="panel-restore">
+      <div class="ph"><div><h1>Restore Deleted Services</h1><p>Services deleted in the last 30 days can be restored</p></div></div>
+      <div id="restore-list"><div class="loading"><div class="spin"></div> Loading…</div></div>
+    </div>
+
+    <!-- ── ACCOUNT PANEL ── -->
+    <div class="panel" id="panel-account">
+      <div class="ph"><div><h1>Account Settings</h1></div></div>
+      <div class="card" style="max-width:560px">
+        <div class="card-title">Organization Info</div>
+        <div id="acc-info" style="font-size:.875rem;color:var(--s700);line-height:1.8"></div>
+        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--s200)">
+          <div class="fg"><label class="lbl">Update Phone</label><input id="acc-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/></div>
+          <button class="btn bp" onclick="updateAccount()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div>
+
+<!-- ── CREATE SERVICE MODAL ── -->
+<div id="modal-create" class="overlay" style="display:none" onclick="bgClose(event,'modal-create')">
+  <div class="modal">
+    <h2 class="modal-title">Create New Service</h2>
+    <div class="inp-row">
+      <div class="fg"><label class="lbl">Service Name *</label><input id="m-name" class="inp" placeholder="e.g. Window 1 – General"/></div>
+      <div class="fg"><label class="lbl">Staff Member Name</label><input id="m-staff" class="inp" placeholder="e.g. John Doe"/></div>
+    </div>
+    <div class="fg"><label class="lbl">Description</label><textarea id="m-desc" class="inp" placeholder="Brief description (optional)"></textarea></div>
+    <div class="inp-row">
+      <div class="fg"><label class="lbl">Ticket Prefix *</label><input id="m-prefix" class="inp" placeholder="A" maxlength="5" value="A"/><span class="hint">e.g. A → A001, VIP → VIP001</span></div>
+      <div class="fg"><label class="lbl">Time per Person (min) *</label><input id="m-interval" class="inp" type="number" min="1" max="120" value="5"/><span class="hint">Used to calculate user ETA</span></div>
+    </div>
+    <div class="fg"><label class="lbl">Max Queue Size (optional)</label><input id="m-max" class="inp" type="number" min="1" placeholder="Leave blank for unlimited"/></div>
+
+    <div style="margin-top:.5rem">
+      <div style="font-family:var(--fh);font-size:.75rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">📋 Optional User Info Form</div>
+      <p style="font-size:.8rem;color:var(--s500);margin-bottom:.875rem;line-height:1.5">Add custom fields users must fill in before joining. Leave empty for no form.</p>
+      <div class="form-builder">
+        <div class="fb-header">Form Fields</div>
+        <div class="fb-fields" id="fb-fields"><p style="font-size:.8rem;color:var(--s400);text-align:center;padding:.5rem">No fields added yet</p></div>
+        <div class="fb-add">
+          <select id="fb-type">
+            <option value="text">Text input</option>
+            <option value="textarea">Long text</option>
+            <option value="select">Dropdown</option>
+            <option value="file">File upload</option>
+          </select>
+          <input id="fb-label" class="inp" style="flex:2;padding:.5rem" placeholder="Field label…"/>
+          <button class="btn bp bsm" onclick="addFormField()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="m-err" class="ferr" style="margin-top:.75rem"></div>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="closeModal('modal-create')">Cancel</button>
+      <button class="btn bp" onclick="createService()">Create Service</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ╔═══════════════════════════════════════╗
+// ║  REPLACE YOUR SUPABASE CREDENTIALS   ║
+// ╚═══════════════════════════════════════╝
+const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ── Helpers ───────────────────────────────────────────────────
+function toast(msg, type='i', ms=4000){
+  const el=document.createElement('div'); el.className=`toast t-${type}`;
+  el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),ms);
+}
+function bgClose(e,id){if(e.target.id===id)closeModal(id);}
+function closeModal(id){document.getElementById(id).style.display='none';}
+function openModal(id){document.getElementById(id).style.display='flex';}
+function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],(h:'2-digit',m:'2-digit'));}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function diffMin(a,b){if(!a||!b)return'—';return Math.round((new Date(b)-new Date(a))/60000);}
+function badgeHtml(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved'};return `<span class="badge ${m[s]||'b-waiting'}">${s.replace('_',' ')}</span>`;}
+
+// ── State ─────────────────────────────────────────────────────
+let profile=null, services=[], activeSvc=null, calledEntry=null, channel=null, formFields=[];
+let reportData=[];
+
+// ── INIT ──────────────────────────────────────────────────────
+async function init(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){window.location.href='../auth/login-org.html';return;}
+  const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
+  if(!p||p.role!=='organization'){window.location.href='../auth/login-user.html';return;}
+  profile=p;
+  document.getElementById('org-name-display').textContent=p.org_name||'Dashboard';
+  const sb=document.getElementById('status-badge');
+  sb.textContent=p.approval_status; sb.className=`badge b-${p.approval_status}`;
+  if(p.approval_status==='pending') document.getElementById('pending-bar').style.display='block';
+  if(p.preferred_lang) document.documentElement.lang=p.preferred_lang;
+
+  // account panel
+  document.getElementById('acc-info').innerHTML=`
+    <div><strong>Org:</strong> ${p.org_name||'—'}</div>
+    <div><strong>Email:</strong> ${p.email}</div>
+    <div><strong>Address:</strong> ${p.company_address||'—'}</div>
+    <div><strong>Phone:</strong> ${p.phone||'—'}</div>
+    <div><strong>Status:</strong> ${badgeHtml(p.approval_status)}</div>
+  `;
+  document.getElementById('acc-phone').value=p.phone||'';
+  await loadServices();
+}
+
+// ── Panel navigation ──────────────────────────────────────────
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='restore') loadRestore();
+  if(name==='reports') populateReportSelect();
+}
+
+// ── Load services ─────────────────────────────────────────────
+async function loadServices(){
+  const {data}=await db.from('services').select('*').eq('org_id',profile.id).is('deleted_at',null).order('created_at',{ascending:false});
+  services=data||[];
+  document.getElementById('svc-count').textContent=services.length;
+  document.getElementById('s-total').textContent=services.length;
+  renderServices();
+  await loadStats();
+}
+async function loadStats(){
+  if(!services.length){['s-waiting','s-served','s-noshow'].forEach(id=>document.getElementById(id).textContent='0');return;}
+  const ids=services.map(s=>s.id);
+  const {data:all}=await db.from('queue_entries').select('status,joined_at').in('service_id',ids);
+  const today=new Date().toDateString();
+  const waiting=(all||[]).filter(e=>e.status==='waiting').length;
+  const served=(all||[]).filter(e=>e.status==='completed'&&new Date(e.joined_at).toDateString()===today).length;
+  const noshow=(all||[]).filter(e=>e.status==='no_show').length;
+  document.getElementById('s-waiting').textContent=waiting;
+  document.getElementById('s-served').textContent=served;
+  document.getElementById('s-noshow').textContent=noshow;
+}
+function renderServices(){
+  const grid=document.getElementById('svc-grid');
+  if(!services.length){grid.innerHTML=`<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" to add your first queue.</p></div>`;return;}
+  grid.innerHTML=services.map(s=>`
+    <div class="svc-card">
+      <div class="svc-card-top">
+        <div><div class="svc-name">${s.name}</div>${s.staff_name?`<div class="svc-staff">👤 ${s.staff_name}</div>`:''}</div>
+        ${badgeHtml(s.status)}
+      </div>
+      <span class="svc-code" onclick="navigator.clipboard.writeText('${s.service_code}');toast('Code copied!','s')" title="Click to copy">${s.service_code}</span>
+      <div class="svc-meta">
+        <span>⏱ ${s.time_interval} min/person</span>
+        <span>🎫 ${s.ticket_prefix}###</span>
+        ${s.max_users?`<span>👥 Max ${s.max_users}</span>`:'<span>👥 Unlimited</span>'}
+      </div>
+      <div class="svc-actions">
+        <button class="btn bp bsm" onclick='selectQueue(${JSON.stringify(s)})'>📋 Manage Queue</button>
+        <button class="btn bg bsm" onclick='deleteSvc("${s.id}","${s.name}")'>🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── Select queue to manage ────────────────────────────────────
+function selectQueue(svc){
+  activeSvc=svc; calledEntry=null;
+  showPanel('queue');
+  document.getElementById('no-svc-sel').style.display='none';
+  document.getElementById('queue-view').style.display='block';
+  document.getElementById('q-svc-name').textContent=svc.name;
+  document.getElementById('q-code').textContent=svc.service_code;
+  document.getElementById('q-staff').textContent=svc.staff_name||'—';
+  document.getElementById('status-sel').value=svc.status;
+  document.getElementById('q-svc-badge').textContent=svc.status;
+  document.getElementById('q-svc-badge').className=`badge b-${svc.status}`;
+  loadQueue(); subscribeQueue();
+}
+
+async function loadQueue(){
+  const {data}=await db.from('queue_entries').select('*,profiles(full_name,email,is_online)').eq('service_id',activeSvc.id).in('status',['waiting','called','serving']).order('ticket_number',{ascending:true});
+  const entries=data||[];
+  calledEntry=entries.find(e=>e.status==='called')||null;
+  renderQueueTable(entries); renderCalledBanner();
+}
+
+function renderQueueTable(entries){
+  const tb=document.getElementById('live-tbody');
+  if(!entries.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--s400)">Queue is empty</td></tr>`;return;}
+  tb.innerHTML=entries.map((e,i)=>{
+    const name=e.profiles?.full_name||e.guest_name||'Guest';
+    const online=e.user_id?(e.profiles?.is_online?`<span class="dot-on"></span>`:`<span class="dot-off"></span>`):'—';
+    const eta=e.estimated_time?fmtTime(e.estimated_time):'—';
+    const method=e.join_method==='sms'?'📱 SMS':e.join_method==='app'?'📲 App':'🌐 Web';
+    const acts=`<div style="display:flex;gap:.35rem">
+      ${e.status==='called'?`<button class="btn bs bsm" onclick="markById('${e.id}','completed')">Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button>`:`<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`}
+    </div>`;
+    return `<tr><td style="color:var(--s400);font-size:.8rem">${i+1}</td><td><span class="ticket-tag">${e.ticket_label}</span></td><td>${name}${!e.user_id?` <span style="font-size:.7rem;color:var(--s400)">(guest)</span>`:''}</td><td>${method}</td><td>${badgeHtml(e.status)}</td><td>${online}</td><td style="font-size:.8rem">${eta}</td><td>${acts}</td></tr>`;
+  }).join('');
+}
+
+function renderCalledBanner(){
+  const b=document.getElementById('called-banner');
+  if(!calledEntry){b.style.display='none';return;}
+  const name=calledEntry.profiles?.full_name||calledEntry.guest_name||'Guest';
+  document.getElementById('cb-ticket').textContent=calledEntry.ticket_label;
+  document.getElementById('cb-name').textContent=name;
+  b.style.display='flex';
+}
+
+async function callNext(){
+  const btn=document.getElementById('call-btn'); btn.disabled=true;
+  try{
+    const {data:next}=await db.from('queue_entries').select('*').eq('service_id',activeSvc.id).eq('status','waiting').order('ticket_number',{ascending:true}).limit(1).maybeSingle();
+    if(!next){toast('No one waiting in queue.','i');return;}
+    await db.from('queue_entries').update({status:'called',called_at:new Date().toISOString()}).eq('id',next.id);
+    await loadQueue(); toast(`Calling ${next.ticket_label}`,'s');
+  }catch(e){toast(e.message,'e');}finally{btn.disabled=false;}
+}
+
+async function markEntry(status){if(calledEntry)await markById(calledEntry.id,status);}
+async function markById(id,status){
+  const upd={status};
+  if(['completed','no_show','cancelled'].includes(status)) upd.completed_at=new Date().toISOString();
+  await db.from('queue_entries').update(upd).eq('id',id);
+  if(['completed','no_show'].includes(status))calledEntry=null;
+  await loadQueue(); toast(`Marked as ${status}`,'s');
+}
+
+function copyCode(){if(!activeSvc)return;navigator.clipboard.writeText(activeSvc.service_code);toast('Service code copied!','s');}
+async function changeStatus(){
+  const status=document.getElementById('status-sel').value;
+  await db.from('services').update({status}).eq('id',activeSvc.id);
+  activeSvc.status=status;
+  document.getElementById('q-svc-badge').textContent=status;
+  document.getElementById('q-svc-badge').className=`badge b-${status}`;
+  toast(`Queue ${status}`,'i'); await loadServices();
+}
+
+function switchTab(t){
+  document.getElementById('t-live').classList.toggle('active',t==='live');
+  document.getElementById('t-history').classList.toggle('active',t==='history');
+  document.getElementById('pane-live').style.display=t==='live'?'block':'none';
+  document.getElementById('pane-history').style.display=t==='history'?'block':'none';
+  if(t==='history') loadHistory();
+}
+async function loadHistory(){
+  const {data}=await db.from('queue_entries').select('*,profiles(full_name)').eq('service_id',activeSvc.id).in('status',['completed','no_show','cancelled']).order('ticket_number',{ascending:false}).limit(100);
+  const tb=document.getElementById('hist-tbody');
+  if(!data?.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--s400)">No history yet</td></tr>`;return;}
+  tb.innerHTML=data.map(e=>{
+    const name=e.profiles?.full_name||e.guest_name||'Guest';
+    const method=e.join_method==='sms'?'📱 SMS':'🌐 Web';
+    return `<tr><td><span class="ticket-tag">${e.ticket_label}</span></td><td>${name}</td><td>${method}</td><td>${badgeHtml(e.status)}</td><td>${fmtTime(e.joined_at)}</td><td>${fmtTime(e.completed_at)}</td></tr>`;
+  }).join('');
+}
+
+function subscribeQueue(){
+  if(channel)channel.unsubscribe();
+  channel=db.channel(`org-q:${activeSvc.id}`).on('postgres_changes',{event:'*',schema:'public',table:'queue_entries',filter:`service_id=eq.${activeSvc.id}`},()=>loadQueue()).subscribe();
+}
+
+// ── Delete & Restore ──────────────────────────────────────────
+async function deleteSvc(id,name){
+  if(!confirm(`Delete "${name}"? It can be restored within 30 days.`))return;
+  await db.from('services').update({deleted_at:new Date().toISOString()}).eq('id',id);
+  toast(`"${name}" deleted. Restore from the trash.`,'i');
+  await loadServices();
+}
+async function loadRestore(){
+  const {data}=await db.from('services').select('*').eq('org_id',profile.id).not('deleted_at','is',null).order('deleted_at',{ascending:false});
+  const el=document.getElementById('restore-list');
+  if(!data?.length){el.innerHTML=`<div class="empty"><div style="font-size:3rem">🗑</div><h3>Nothing to restore</h3><p>Deleted services appear here for 30 days.</p></div>`;return;}
+  const now=Date.now();
+  const valid=data.filter(s=>now-new Date(s.deleted_at)<30*24*60*60*1000);
+  if(!valid.length){el.innerHTML=`<div class="empty"><h3>Nothing restorable</h3><p>All deleted services are older than 30 days.</p></div>`;return;}
+  el.innerHTML=valid.map(s=>`
+    <div class="restore-item">
+      <div class="ri-info">
+        <div class="ri-name">${s.name}</div>
+        <div class="ri-meta">Code: ${s.service_code} · Deleted ${new Date(s.deleted_at).toLocaleDateString()}</div>
+      </div>
+      <button class="btn bp bsm" onclick='restoreSvc("${s.id}","${s.name}")'>↩ Restore</button>
+    </div>`).join('');
+}
+async function restoreSvc(id,name){
+  await db.from('services').update({deleted_at:null}).eq('id',id);
+  toast(`"${name}" restored!`,'s'); await loadRestore(); await loadServices();
+}
+
+// ── Reports ───────────────────────────────────────────────────
+function populateReportSelect(){
+  const sel=document.getElementById('report-svc');
+  sel.innerHTML='<option value="">Select service…</option>'+services.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
+async function loadReport(){
+  const svcId=document.getElementById('report-svc').value;
+  if(!svcId){toast('Please select a service first.','e');return;}
+  const {data}=await db.from('queue_entries').select('*,profiles(full_name)').eq('service_id',svcId).order('ticket_number',{ascending:true});
+  reportData=data||[];
+  const tb=document.getElementById('report-tbody');
+  if(!reportData.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--s400)">No data for this service</td></tr>`;return;}
+  tb.innerHTML=reportData.map(e=>`<tr>
+    <td><span class="ticket-tag">${e.ticket_label}</span></td>
+    <td>${e.profiles?.full_name||e.guest_name||'Guest'}</td>
+    <td>${e.phone||'—'}</td>
+    <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
+    <td>${badgeHtml(e.status)}</td>
+    <td>${fmt(e.joined_at)}</td>
+    <td>${fmt(e.completed_at)}</td>
+    <td>${diffMin(e.joined_at,e.completed_at)}</td>
+  </tr>`).join('');
+}
+function downloadCSV(){
+  if(!reportData.length){toast('Load a report first.','e');return;}
+  const header='Ticket,Name,Phone,Method,Status,Joined,Completed,WaitMin\n';
+  const rows=reportData.map(e=>[e.ticket_label,e.profiles?.full_name||e.guest_name||'Guest',e.phone||'',e.join_method,e.status,fmt(e.joined_at),fmt(e.completed_at),diffMin(e.joined_at,e.completed_at)].join(',')).join('\n');
+  const blob=new Blob([header+rows],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`qcode-report-${Date.now()}.csv`; a.click();
+  toast('CSV downloaded!','s');
+}
+function downloadPDF(){
+  if(!reportData.length){toast('Load a report first.','e');return;}
+  const win=window.open('','_blank');
+  const rows=reportData.map(e=>`<tr><td>${e.ticket_label}</td><td>${e.profiles?.full_name||e.guest_name||'Guest'}</td><td>${e.join_method}</td><td>${e.status}</td><td>${fmt(e.joined_at)}</td><td>${fmt(e.completed_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
+  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:Arial,sans-serif;padding:2rem}h1{color:#0a1628}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #cbd5e1;padding:.5rem .75rem;text-align:left}th{background:#f1f5f9;font-size:.8rem}</style></head><body><h1>QCode Queue Report</h1><p style="color:#64748b">Generated: ${new Date().toLocaleString()}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.close(); win.print();
+}
+
+// ── Create Service ────────────────────────────────────────────
+function openCreateModal(){formFields=[];renderFormFields();openModal('modal-create');}
+function addFormField(){
+  const type=document.getElementById('fb-type').value;
+  const label=document.getElementById('fb-label').value.trim();
+  if(!label){toast('Enter a field label first.','e');return;}
+  formFields.push({id:'f'+Date.now(),label,type,required:false});
+  document.getElementById('fb-label').value='';
+  renderFormFields();
+}
+function removeField(id){formFields=formFields.filter(f=>f.id!==id);renderFormFields();}
+function renderFormFields(){
+  const el=document.getElementById('fb-fields');
+  if(!formFields.length){el.innerHTML=`<p style="font-size:.8rem;color:var(--s400);text-align:center;padding:.5rem">No fields added yet</p>`;return;}
+  const icons={text:'📝',textarea:'📄',select:'📋',file:'📁'};
+  el.innerHTML=formFields.map(f=>`
+    <div class="fb-field">
+      <span style="font-size:1.25rem">${icons[f.type]||'📝'}</span>
+      <div class="fb-field-info"><div class="fb-field-label">${f.label}</div><div class="fb-field-type">${f.type}</div></div>
+      <button class="btn bd bsm" onclick="removeField('${f.id}')">✕</button>
+    </div>`).join('');
+}
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+async function createService(){
+  const name=document.getElementById('m-name').value.trim();
+  const staff=document.getElementById('m-staff').value.trim();
+  const desc=document.getElementById('m-desc').value.trim();
+  const prefix=document.getElementById('m-prefix').value.trim().toUpperCase();
+  const interval=parseInt(document.getElementById('m-interval').value)||5;
+  const max=document.getElementById('m-max').value?parseInt(document.getElementById('m-max').value):null;
+  const errEl=document.getElementById('m-err'); errEl.style.display='none';
+  if(!name||!prefix){errEl.textContent='Service name and ticket prefix are required.';errEl.style.display='block';return;}
+  try{
+    const {data:svc,error}=await db.from('services').insert({org_id:profile.id,name,staff_name:staff||null,description:desc||null,service_code:genCode(),ticket_prefix:prefix,ticket_counter:0,time_interval:interval,max_users:max,status:'open',user_info_form:JSON.stringify(formFields)}).select().single();
+    if(error)throw error;
+    toast(`Service created! Code: ${svc.service_code}`,'s',6000);
+    closeModal('modal-create'); await loadServices();
+  }catch(e){errEl.textContent=e.message;errEl.style.display='block';}
+}
+
+// ── Account ───────────────────────────────────────────────────
+async function updateAccount(){
+  const phone=document.getElementById('acc-phone').value.trim();
+  await db.from('profiles').update({phone:phone||null}).eq('id',profile.id);
+  toast('Account updated!','s');
+}
+async function doLogout(){
+  await db.from('profiles').update({is_online:false}).eq('id',profile.id);
+  await db.auth.signOut(); window.location.href='../index.html';
+}
+
+init();
+</script>
+</body>
+</html>

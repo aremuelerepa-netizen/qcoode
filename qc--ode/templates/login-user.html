@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Login — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--q-navy:#0a1628;--q-blue:#1a3a6b;--q-accent:#2563eb;--q-cyan:#06b6d4;--slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-300:#cbd5e1;--slate-500:#64748b;--slate-700:#334155;--slate-900:#0f172a;--red:#ef4444;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--r:.625rem;--shadow-lg:0 16px 48px rgba(10,22,40,.20);--t:.2s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-body);min-height:100vh;background:linear-gradient(135deg,var(--q-navy),var(--q-blue) 55%,#0f172a);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+    h1{font-family:var(--font-head);letter-spacing:-.02em}
+    a{color:var(--q-accent);text-decoration:none}
+    .wrap{width:100%;max-width:420px}
+    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
+    .logo-q{color:var(--q-cyan)}
+    .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:var(--shadow-lg)}
+    .title{font-size:1.5rem;color:var(--q-navy);margin-bottom:.375rem}
+    .sub{font-size:.9rem;color:var(--slate-500);margin-bottom:2rem}
+    .form-group{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+    .label{font-size:.85rem;font-weight:600;color:var(--slate-700)}
+    .input{padding:.8rem 1rem;background:var(--slate-50);border:1.5px solid var(--slate-300);border-radius:var(--r);font-family:var(--font-body);font-size:.9rem;color:var(--slate-900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+    .input:focus{outline:none;border-color:var(--q-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+    .input::placeholder{color:var(--slate-300)}
+    .err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
+    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--font-body);font-size:1rem;font-weight:700;cursor:pointer;background:var(--q-accent);color:#fff;transition:all var(--t)}
+    .btn:hover:not(:disabled){background:#1d4ed8}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--slate-500)}
+    .back{display:block;text-align:center;margin-top:1rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+    .divider{display:flex;align-items:center;gap:.875rem;margin:1.5rem 0;color:var(--slate-300);font-size:.8rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--slate-200)}
+    .alt-login{display:block;width:100%;padding:.875rem;border-radius:var(--r);border:1.5px solid var(--slate-300);background:#fff;font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--slate-700);cursor:pointer;text-align:center;transition:all var(--t);text-decoration:none}
+    .alt-login:hover{border-color:var(--q-accent);color:var(--q-accent)}
+    .lang-row{display:flex;justify-content:flex-end;margin-bottom:1rem}
+    .lang-sel{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:var(--r);padding:.3rem .6rem;font-size:.8rem;cursor:pointer}
+    .lang-sel option{background:var(--q-navy)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="lang-row">
+    <select class="lang-sel" onchange="localStorage.setItem('qcode_lang',this.value);location.reload()">
+      <option value="en">🌐 EN</option><option value="fr">FR</option>
+      <option value="ar">AR</option><option value="es">ES</option><option value="pt">PT</option>
+    </select>
+  </div>
+  <a href="../index.html" class="logo">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+    <span><span class="logo-q">Q</span>Code</span>
+  </a>
+  <div class="card">
+    <h1 class="title">Welcome back</h1>
+    <p class="sub">Sign in to your QCode user account</p>
+    <div id="err" class="err"></div>
+    <div class="form-group">
+      <label class="label">Email Address</label>
+      <input id="email" class="input" type="email" placeholder="you@example.com"/>
+    </div>
+    <div class="form-group">
+      <label class="label">Password</label>
+      <input id="password" class="input" type="password" placeholder="••••••••"/>
+    </div>
+    <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
+    <div class="divider">or</div>
+    <a href="register-user.html" class="alt-login">Create a free account →</a>
+    <div class="sw">Are you an organization? <a href="login-org.html">Org login →</a></div>
+  </div>
+  <a href="../index.html" class="back">← Back to home</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co', SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Redirect if already logged in
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();
+  if(!session) return;
+  const {data:p}=await db.from('profiles').select('role').eq('id',session.user.id).single();
+  if(p?.role==='user') window.location.href='../dashboard/user.html';
+  else if(p?.role==='organization') window.location.href='../dashboard/org.html';
+  else if(p?.role==='super_admin') window.location.href='../admin/index.html';
+})();
+
+async function doLogin(){
+  const err=document.getElementById('err'); err.style.display='none';
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  const btn=document.getElementById('btn');
+  if(!email||!password){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Signing in…';
+  try{
+    const {data,error}=await db.auth.signInWithPassword({email,password});
+    if(error) throw error;
+    await db.from('profiles').update({is_online:true}).eq('id',data.user.id);
+    const {data:p}=await db.from('profiles').select('role,approval_status,preferred_lang').eq('id',data.user.id).single();
+    if(p?.preferred_lang) localStorage.setItem('qcode_lang',p.preferred_lang);
+    if(p?.role==='organization'){
+      if(p.approval_status==='pending'){ err.textContent='Your organization is pending admin approval.'; err.style.display='block'; await db.auth.signOut(); btn.disabled=false; btn.textContent='Sign In'; return; }
+      if(p.approval_status==='suspended'){ err.textContent='Your account has been suspended. Contact support.'; err.style.display='block'; await db.auth.signOut(); btn.disabled=false; btn.textContent='Sign In'; return; }
+      window.location.href='../dashboard/org.html';
+    } else if(p?.role==='super_admin'){ window.location.href='../admin/index.html'; }
+    else { window.location.href='../dashboard/user.html'; }
+  }catch(e){
+    err.textContent=e.message?.includes('Invalid')?'Invalid email or password.':(e.message||'Login failed.');
+    err.style.display='block'; btn.disabled=false; btn.textContent='Sign In';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+</script>
+</body>
+</html>

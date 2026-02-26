@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Super Admin — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s700:#334155;--s900:#0f172a;--green:#22c55e;--gl:#dcfce7;--amber:#f59e0b;--al:#fef3c7;--red:#ef4444;--rl:#fee2e2;--purple:#8b5cf6;--pl:#ede9fe;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--rl2:1rem;--sh:0 1px 3px rgba(10,22,40,.08);--shm:0 4px 16px rgba(10,22,40,.10);--shl:0 12px 40px rgba(10,22,40,.15);--t:.18s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fb);background:var(--s50);color:var(--s900);min-height:100vh;display:flex;flex-direction:column}
+    h1,h2,h3{font-family:var(--fh);line-height:1.2;letter-spacing:-.02em;color:var(--navy)}
+    a{text-decoration:none;color:var(--accent)}
+
+    /* TOPBAR */
+    .topbar{background:var(--navy);height:60px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0}
+    .tb-logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.1rem;font-weight:800;color:#fff;text-decoration:none}
+    .tb-logo span{color:var(--cyan)}
+    .admin-pill{background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4);color:var(--amber);font-size:.7rem;font-weight:700;padding:.2rem .625rem;border-radius:999px;text-transform:uppercase;letter-spacing:.08em}
+    .tb-right{margin-left:auto;display:flex;align-items:center;gap:.5rem}
+    .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fb);font-size:.825rem;font-weight:500;color:rgba(255,255,255,.7);transition:all var(--t)}
+    .tb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+    .tb-logout{color:#f87171!important}.tb-logout:hover{background:rgba(239,68,68,.15)!important}
+
+    /* LAYOUT */
+    .shell{display:flex;flex:1}
+    .sidebar{width:240px;background:#fff;border-right:1px solid var(--s200);padding:1.25rem;flex-shrink:0;display:flex;flex-direction:column;gap:.2rem}
+    .main{flex:1;padding:1.75rem;overflow-y:auto}
+    .sb-section{font-size:.68rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .625rem;margin-top:.75rem}
+    .sb-item{display:flex;align-items:center;gap:.625rem;padding:.625rem .875rem;border-radius:var(--r);font-size:.875rem;font-weight:500;color:var(--s700);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--t)}
+    .sb-item:hover{background:var(--s100);color:var(--navy)}.sb-item.active{background:rgba(37,99,235,.08);color:var(--accent);font-weight:600}
+    .sb-item .ico{width:20px;text-align:center}
+    .sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:999px;min-width:18px;text-align:center}
+    .panel{display:none}.panel.active{display:block}
+
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+    .stat{background:#fff;border:1px solid var(--s200);border-radius:var(--rl2);padding:1.5rem;border-top:3px solid var(--accent)}
+    .stat-n{font-family:var(--fh);font-size:2.25rem;font-weight:800;color:var(--accent);line-height:1}
+    .stat-l{font-size:.75rem;color:var(--s500);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+    .stat.green{border-top-color:var(--green)}.stat.green .stat-n{color:#15803d}
+    .stat.amber{border-top-color:var(--amber)}.stat.amber .stat-n{color:#92400e}
+    .stat.red{border-top-color:var(--red)}.stat.red .stat-n{color:var(--red)}
+    .stat.purple{border-top-color:var(--purple)}.stat.purple .stat-n{color:var(--purple)}
+
+    /* CARDS */
+    .card{background:#fff;border:1px solid var(--s200);border-radius:var(--rl2);padding:1.75rem;box-shadow:var(--sh);margin-bottom:1.5rem}
+    .card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
+
+    /* TABLE */
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    thead{border-bottom:2px solid var(--s200)}
+    th{text-align:left;padding:.75rem 1rem;font-size:.72rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.06em}
+    td{padding:.875rem 1rem;font-size:.875rem;border-bottom:1px solid var(--s100);color:var(--s700);vertical-align:middle}
+    tr:last-child td{border-bottom:none}tr:hover td{background:var(--s50)}
+
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700}
+    .b-pending{background:var(--al);color:#92400e}.b-approved{background:var(--gl);color:#15803d}
+    .b-suspended{background:var(--rl);color:var(--red)}.b-rejected{background:var(--rl);color:var(--red)}
+    .b-user{background:rgba(139,92,246,.1);color:var(--purple)}.b-organization{background:rgba(37,99,235,.1);color:var(--accent)}
+    .b-waiting{background:rgba(37,99,235,.1);color:var(--accent)}.b-completed{background:var(--s100);color:var(--s500)}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.5rem 1.125rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.8rem;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bp{background:var(--accent);color:#fff}.bp:hover:not(:disabled){background:#1d4ed8}
+    .bs{background:var(--green);color:#fff}.bs:hover:not(:disabled){filter:brightness(1.07)}
+    .bd{background:var(--red);color:#fff}.bd:hover:not(:disabled){filter:brightness(1.07)}
+    .bg{background:transparent;color:var(--s500);border:1.5px solid var(--s300)}.bg:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+    .bam{background:var(--amber);color:#fff}.bam:hover:not(:disabled){filter:brightness(1.07)}
+    .bsm{padding:.3rem .7rem;font-size:.75rem}
+    .btn-full{width:100%;display:flex}
+
+    /* FORMS */
+    .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1rem}
+    .lbl{font-size:.82rem;font-weight:600;color:var(--s700)}
+    .inp{padding:.7rem 1rem;background:var(--s50);border:1.5px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;color:var(--s900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+    .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+    select.inp{cursor:pointer}
+
+    /* ORG ROW */
+    .org-row{background:#fff;border:1.5px solid var(--s200);border-radius:var(--rl2);padding:1.25rem 1.5rem;margin-bottom:.875rem;transition:all var(--t)}
+    .org-row:hover{border-color:var(--s300);box-shadow:var(--shm)}
+    .org-row.pending{border-left:4px solid var(--amber)}
+    .org-row.suspended{border-left:4px solid var(--red);opacity:.75}
+    .or-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .or-name{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--navy)}
+    .or-meta{font-size:.78rem;color:var(--s500);margin-top:.25rem;line-height:1.6}
+    .or-doc{display:inline-flex;align-items:center;gap:.375rem;font-size:.78rem;color:var(--accent);margin-top:.375rem}
+    .or-acts{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+
+    /* REJECT MODAL */
+    .overlay{position:fixed;inset:0;z-index:300;background:rgba(10,22,40,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;animation:fadeIn .15s ease}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal{background:#fff;border-radius:1.25rem;padding:2rem;width:100%;max-width:480px;box-shadow:var(--shl);animation:slideUp .2s cubic-bezier(.16,1,.3,1)}
+    @keyframes slideUp{from{opacity:0;transform:translateY(1rem)}to{opacity:1;transform:translateY(0)}}
+    .modal-title{font-size:1.2rem;margin-bottom:1.25rem}
+    .modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem}
+
+    /* FILTER BAR */
+    .filter-bar{display:flex;gap:.625rem;margin-bottom:1.25rem;flex-wrap:wrap}
+    .filter-btn{padding:.4rem 1rem;border-radius:999px;border:1.5px solid var(--s300);background:#fff;font-family:var(--fb);font-size:.8rem;font-weight:500;color:var(--s700);cursor:pointer;transition:all var(--t)}
+    .filter-btn:hover{border-color:var(--accent);color:var(--accent)}.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+    /* CHART */
+    .chart-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+    .donut-wrap{text-align:center;padding:1.5rem}
+    .donut-val{font-family:var(--fh);font-size:2.5rem;font-weight:800;line-height:1}
+    .donut-lbl{font-size:.8rem;color:var(--s500);margin-top:.25rem;text-transform:uppercase;letter-spacing:.06em}
+    .bar-chart{display:flex;flex-direction:column;gap:.625rem}
+    .bar-row{display:flex;align-items:center;gap:.875rem}
+    .bar-label{font-size:.8rem;color:var(--s700);width:80px;text-align:right;flex-shrink:0}
+    .bar-track{flex:1;height:28px;background:var(--s100);border-radius:.25rem;overflow:hidden;position:relative}
+    .bar-fill{height:100%;border-radius:.25rem;transition:width .6s ease;display:flex;align-items:center;padding-left:.5rem}
+    .bar-val{font-size:.75rem;font-weight:700;color:#fff}
+
+    /* EMPTY / LOADING */
+    .empty{text-align:center;padding:3rem;color:var(--s500)}.empty h3{color:var(--s700);margin-bottom:.375rem}
+    .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--s500)}
+    .spin{width:20px;height:20px;border:2.5px solid var(--s200);border-top-color:var(--accent);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* TOAST */
+    #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+    .toast{padding:.75rem 1.125rem;border-radius:.5rem;box-shadow:var(--shl);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+    .t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#15803d}
+    .t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
+    .t-i{background:#eff6ff;border-left:3px solid var(--accent);color:#1d4ed8}
+    @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:translateX(0)}}
+
+    @media(max-width:768px){.shell{flex-direction:column}.sidebar{width:100%;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--s200)}.main{padding:1rem}.chart-wrap{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:480px){.stats{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../index.html" class="tb-logo">
+    <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+    <span>Q</span>Code
+  </a>
+  <div class="admin-pill">⚡ Super Admin</div>
+  <div class="tb-right">
+    <span id="admin-name" style="font-size:.825rem;color:rgba(255,255,255,.6)"></span>
+    <button class="tb-btn tb-logout" onclick="doLogout()">↩ Logout</button>
+  </div>
+</div>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-section">Overview</div>
+    <button class="sb-item active" onclick="show('analytics')" id="nav-analytics"><span class="ico">📊</span> Analytics</button>
+    <button class="sb-item" onclick="show('orgs')" id="nav-orgs">
+      <span class="ico">🏢</span> Organizations <span class="sb-badge" id="pending-count">0</span>
+    </button>
+    <div class="sb-section">Users & Queues</div>
+    <button class="sb-item" onclick="show('users')"  id="nav-users"><span class="ico">👥</span> All Users</button>
+    <button class="sb-item" onclick="show('queues')" id="nav-queues"><span class="ico">📋</span> All Queues</button>
+    <div class="sb-section">System</div>
+    <button class="sb-item" onclick="show('logs')"   id="nav-logs"><span class="ico">📝</span> Audit Log</button>
+    <button class="sb-item" onclick="show('sms')"    id="nav-sms"><span class="ico">📱</span> SMS Joins</button>
+  </div>
+
+  <div class="main">
+
+    <!-- ANALYTICS -->
+    <div class="panel active" id="panel-analytics">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+        <div><h1>System Analytics</h1><p style="color:var(--s500);margin-top:.25rem">Platform-wide overview</p></div>
+        <button class="btn bp" onclick="refreshAll()">↺ Refresh</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="a-orgs">—</div><div class="stat-l">Total Orgs</div></div>
+        <div class="stat green"><div class="stat-n" id="a-approved">—</div><div class="stat-l">Approved</div></div>
+        <div class="stat amber"><div class="stat-n" id="a-pending">—</div><div class="stat-l">Pending</div></div>
+        <div class="stat"><div class="stat-n" id="a-users">—</div><div class="stat-l">Total Users</div></div>
+        <div class="stat green"><div class="stat-n" id="a-served">—</div><div class="stat-l">Total Served</div></div>
+        <div class="stat purple"><div class="stat-n" id="a-sms">—</div><div class="stat-l">SMS Joins</div></div>
+        <div class="stat red"><div class="stat-n" id="a-noshow">—</div><div class="stat-l">No-Shows</div></div>
+        <div class="stat amber"><div class="stat-n" id="a-today">—</div><div class="stat-l">Joined Today</div></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="card">
+          <div class="card-title">Queue Status Breakdown</div>
+          <div class="bar-chart" id="status-chart"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Join Method Breakdown</div>
+          <div class="bar-chart" id="method-chart"><div class="loading"><div class="spin"></div></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top 5 Most Active Services (Today)<span style="font-size:.78rem;font-weight:400;color:var(--s500)">by queue entries</span></div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Service</th><th>Org</th><th>Code</th><th>Total Entries</th><th>Waiting</th><th>Completed</th></tr></thead>
+          <tbody id="top-services"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ORGANIZATIONS -->
+    <div class="panel" id="panel-orgs">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+        <div><h1>Organizations</h1><p style="color:var(--s500);margin-top:.25rem">Approve, reject, or suspend organizations</p></div>
+        <button class="btn bp" onclick="loadOrgs()">↺ Refresh</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterOrgs('all',this)">All</button>
+        <button class="filter-btn" onclick="filterOrgs('pending',this)">⏳ Pending</button>
+        <button class="filter-btn" onclick="filterOrgs('approved',this)">✓ Approved</button>
+        <button class="filter-btn" onclick="filterOrgs('suspended',this)">🚫 Suspended</button>
+      </div>
+      <div id="orgs-list"><div class="loading"><div class="spin"></div> Loading…</div></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="panel" id="panel-users">
+      <div style="margin-bottom:1.5rem"><h1>All Users</h1><p style="color:var(--s500);margin-top:.25rem">View and manage registered users</p></div>
+      <div class="card">
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <input id="user-search" class="inp" style="max-width:280px" placeholder="Search by name or email…" oninput="filterUsers()"/>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Lang</th><th>Joined</th><th>Online</th><th>Actions</th></tr></thead>
+          <tbody id="users-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--s400)">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ALL QUEUES -->
+    <div class="panel" id="panel-queues">
+      <div style="margin-bottom:1.5rem"><h1>All Queues</h1><p style="color:var(--s500);margin-top:.25rem">Live view across every organization</p></div>
+      <div class="card">
+        <div class="filter-bar" style="margin-bottom:1rem">
+          <select id="q-org-filter" class="inp" style="max-width:280px" onchange="loadAllQueues()">
+            <option value="">All Organizations</option>
+          </select>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Ticket</th><th>Organization</th><th>Service</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>ETA</th></tr></thead>
+          <tbody id="queues-tbody"><tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--s400)">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- AUDIT LOG -->
+    <div class="panel" id="panel-logs">
+      <div style="margin-bottom:1.5rem"><h1>Audit Log</h1><p style="color:var(--s500)">All admin actions</p></div>
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Action</th><th>Target</th><th>Type</th><th>Details</th><th>Time</th></tr></thead>
+          <tbody id="logs-tbody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--s400)">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- SMS JOINS -->
+    <div class="panel" id="panel-sms">
+      <div style="margin-bottom:1.5rem"><h1>SMS Joins</h1><p style="color:var(--s500)">All queue entries made via SMS</p></div>
+      <div class="card">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Phone</th><th>Service Code</th><th>Ticket</th><th>Status</th><th>Time</th></tr></thead>
+          <tbody id="sms-tbody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--s400)">Loading…</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- REJECT MODAL -->
+<div id="reject-modal" class="overlay" style="display:none">
+  <div class="modal">
+    <h2 class="modal-title">Reject Organization</h2>
+    <div class="fg"><label class="lbl">Reason for rejection (will be visible to org)</label><textarea id="reject-reason" class="inp" rows="4" placeholder="e.g. Documents are incomplete or unclear. Please resubmit with a valid business certificate."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="document.getElementById('reject-modal').style.display='none'">Cancel</button>
+      <button class="btn bd" onclick="confirmReject()">Reject Organization</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function toast(msg,type='i',ms=4000){const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
+function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function badgeHtml(s){const m={pending:'b-pending',approved:'b-approved',suspended:'b-suspended',rejected:'b-rejected',waiting:'b-waiting',completed:'b-completed',user:'b-user',organization:'b-organization'};return `<span class="badge ${m[s]||''}">${s}</span>`;}
+
+let adminProfile=null, allOrgs=[], allUsers=[], rejectTargetId=null;
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){window.location.href='../auth/login-user.html';return;}
+  const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
+  if(!p||p.role!=='super_admin'){window.location.href='../index.html';return;}
+  adminProfile=p;
+  document.getElementById('admin-name').textContent=p.full_name||p.email;
+  await loadAnalytics();
+  await loadOrgs();
+}
+
+// ── Panel nav ─────────────────────────────────────────────────
+function show(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='users')loadUsers();
+  if(name==='queues')loadAllQueues();
+  if(name==='logs')loadLogs();
+  if(name==='sms')loadSmsJoins();
+}
+async function refreshAll(){await loadAnalytics();toast('Refreshed','s');}
+
+// ── ANALYTICS ────────────────────────────────────────────────
+async function loadAnalytics(){
+  const [{count:orgs},{count:approved},{count:pending},{count:users}]=await Promise.all([
+    db.from('profiles').select('*',{count:'exact',head:true}).eq('role','organization'),
+    db.from('profiles').select('*',{count:'exact',head:true}).eq('role','organization').eq('approval_status','approved'),
+    db.from('profiles').select('*',{count:'exact',head:true}).eq('role','organization').eq('approval_status','pending'),
+    db.from('profiles').select('*',{count:'exact',head:true}).eq('role','user'),
+  ]);
+  const {data:entries}=await db.from('queue_entries').select('status,join_method,joined_at');
+  const {count:smsCount}=await db.from('sms_joins').select('*',{count:'exact',head:true});
+  const today=new Date().toDateString();
+  const todayEntries=(entries||[]).filter(e=>new Date(e.joined_at).toDateString()===today).length;
+  const served=(entries||[]).filter(e=>e.status==='completed').length;
+  const noshow=(entries||[]).filter(e=>e.status==='no_show').length;
+  document.getElementById('a-orgs').textContent=orgs||0;
+  document.getElementById('a-approved').textContent=approved||0;
+  document.getElementById('a-pending').textContent=pending||0;
+  document.getElementById('a-users').textContent=users||0;
+  document.getElementById('a-served').textContent=served;
+  document.getElementById('a-sms').textContent=smsCount||0;
+  document.getElementById('a-noshow').textContent=noshow;
+  document.getElementById('a-today').textContent=todayEntries;
+  document.getElementById('pending-count').textContent=pending||0;
+
+  // Status chart
+  const statuses=['waiting','called','serving','completed','no_show','cancelled'];
+  const colors={waiting:'#2563eb',called:'#f59e0b',serving:'#22c55e',completed:'#64748b',no_show:'#ef4444',cancelled:'#94a3b8'};
+  const total=(entries||[]).length||1;
+  document.getElementById('status-chart').innerHTML=statuses.map(s=>{
+    const cnt=(entries||[]).filter(e=>e.status===s).length;
+    const pct=Math.round(cnt/total*100);
+    return `<div class="bar-row"><span class="bar-label">${s.replace('_',' ')}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colors[s]}"><span class="bar-val">${cnt}</span></div></div></div>`;
+  }).join('');
+
+  // Method chart
+  const methods=['web','sms','app'];
+  const mColors={web:'#2563eb',sms:'#06b6d4',app:'#8b5cf6'};
+  document.getElementById('method-chart').innerHTML=methods.map(m=>{
+    const cnt=(entries||[]).filter(e=>e.join_method===m).length;
+    const pct=Math.round(cnt/total*100);
+    return `<div class="bar-row"><span class="bar-label">${m.toUpperCase()}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${mColors[m]}"><span class="bar-val">${cnt}</span></div></div></div>`;
+  }).join('');
+
+  // Top services
+  const {data:svcs}=await db.from('services').select('*,profiles(org_name),queue_entries(status)').eq('profiles.approval_status','approved').is('deleted_at',null);
+  const ranked=(svcs||[]).map(s=>({...s,total:(s.queue_entries||[]).length,waiting:(s.queue_entries||[]).filter(e=>e.status==='waiting').length,completed:(s.queue_entries||[]).filter(e=>e.status==='completed').length})).sort((a,b)=>b.total-a.total).slice(0,5);
+  document.getElementById('top-services').innerHTML=ranked.length?ranked.map(s=>`<tr><td><strong>${s.name}</strong></td><td>${s.profiles?.org_name||'—'}</td><td><span style="font-family:var(--fh);font-weight:700;color:var(--accent)">${s.service_code}</span></td><td>${s.total}</td><td>${s.waiting}</td><td>${s.completed}</td></tr>`).join(''):`<tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--s400)">No data</td></tr>`;
+}
+
+// ── ORGS ─────────────────────────────────────────────────────
+async function loadOrgs(){
+  const {data}=await db.from('profiles').select('*').eq('role','organization').order('created_at',{ascending:false});
+  allOrgs=data||[];
+  document.getElementById('pending-count').textContent=allOrgs.filter(o=>o.approval_status==='pending').length;
+  renderOrgs(allOrgs);
+}
+let orgFilter='all';
+function filterOrgs(f,btn){
+  orgFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered=f==='all'?allOrgs:allOrgs.filter(o=>o.approval_status===f);
+  renderOrgs(filtered);
+}
+function renderOrgs(orgs){
+  const el=document.getElementById('orgs-list');
+  if(!orgs.length){el.innerHTML=`<div class="empty"><h3>No organizations found</h3></div>`;return;}
+  el.innerHTML=orgs.map(o=>`
+    <div class="org-row ${o.approval_status}">
+      <div class="or-top">
+        <div>
+          <div class="or-name">${o.org_name||'Unnamed'} ${badgeHtml(o.approval_status)}</div>
+          <div class="or-meta">
+            📧 ${o.email} &nbsp;·&nbsp; 📞 ${o.phone||'—'} &nbsp;·&nbsp; 📍 ${o.company_address||'—'}
+            &nbsp;·&nbsp; Registered: ${new Date(o.created_at).toLocaleDateString()}
+          </div>
+          ${o.document_url?`<a href="${o.document_url}" target="_blank" class="or-doc">📄 View Verification Document ↗</a>`:'<span style="font-size:.75rem;color:var(--s400);margin-top:.375rem;display:inline-block">⚠ No document uploaded</span>'}
+          ${o.rejection_reason?`<div style="font-size:.78rem;color:var(--red);margin-top:.375rem">Rejection note: ${o.rejection_reason}</div>`:''}
+        </div>
+        <div class="or-acts">
+          ${o.approval_status==='pending'?`
+            <button class="btn bs bsm" onclick="approveOrg('${o.id}','${o.org_name}')">✓ Approve</button>
+            <button class="btn bd bsm" onclick="openReject('${o.id}')">✕ Reject</button>
+          `:''}
+          ${o.approval_status==='approved'?`<button class="btn bam bsm" onclick="suspendOrg('${o.id}','${o.org_name}')">🚫 Suspend</button>`:''}
+          ${o.approval_status==='suspended'?`<button class="btn bs bsm" onclick="approveOrg('${o.id}','${o.org_name}')">↩ Reinstate</button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function approveOrg(id,name){
+  await db.from('profiles').update({approval_status:'approved',rejection_reason:null}).eq('id',id);
+  await logAction('APPROVE_ORG',id,'organization',{org_name:name});
+  toast(`✓ ${name} approved!`,'s'); await loadOrgs();
+}
+function openReject(id){rejectTargetId=id;document.getElementById('reject-reason').value='';document.getElementById('reject-modal').style.display='flex';}
+async function confirmReject(){
+  const reason=document.getElementById('reject-reason').value.trim();
+  if(!reason){toast('Please enter a rejection reason.','e');return;}
+  const org=allOrgs.find(o=>o.id===rejectTargetId);
+  await db.from('profiles').update({approval_status:'suspended',rejection_reason:reason}).eq('id',rejectTargetId);
+  await logAction('REJECT_ORG',rejectTargetId,'organization',{reason,org_name:org?.org_name});
+  document.getElementById('reject-modal').style.display='none';
+  toast(`Organization rejected.`,'i'); await loadOrgs();
+}
+async function suspendOrg(id,name){
+  if(!confirm(`Suspend "${name}"? They will not be able to log in.`))return;
+  await db.from('profiles').update({approval_status:'suspended'}).eq('id',id);
+  await logAction('SUSPEND_ORG',id,'organization',{org_name:name});
+  toast(`${name} suspended.`,'i'); await loadOrgs();
+}
+
+// ── USERS ─────────────────────────────────────────────────────
+async function loadUsers(){
+  const {data}=await db.from('profiles').select('*').eq('role','user').order('created_at',{ascending:false});
+  allUsers=data||[];
+  renderUsers(allUsers);
+}
+function filterUsers(){
+  const q=document.getElementById('user-search').value.toLowerCase();
+  renderUsers(allUsers.filter(u=>(u.full_name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)));
+}
+function renderUsers(users){
+  const tb=document.getElementById('users-tbody');
+  if(!users.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--s400)">No users found</td></tr>`;return;}
+  tb.innerHTML=users.map(u=>`<tr>
+    <td>${u.full_name||'—'}</td>
+    <td>${u.email}</td>
+    <td>${u.phone||'—'}</td>
+    <td>${u.preferred_lang||'en'}</td>
+    <td>${new Date(u.created_at).toLocaleDateString()}</td>
+    <td><span style="font-size:.75rem;color:${u.is_online?'#15803d':'#94a3b8'}">${u.is_online?'● Online':'● Offline'}</span></td>
+    <td><button class="btn bd bsm" onclick="banUser('${u.id}','${u.full_name||u.email}')">Ban</button></td>
+  </tr>`).join('');
+}
+async function banUser(id,name){
+  if(!confirm(`Ban "${name}"? This will delete their account.`))return;
+  await db.from('profiles').delete().eq('id',id);
+  await logAction('BAN_USER',id,'user',{name});
+  toast(`${name} banned.`,'i'); await loadUsers();
+}
+
+// ── ALL QUEUES ────────────────────────────────────────────────
+async function loadAllQueues(){
+  const orgId=document.getElementById('q-org-filter').value;
+  let query=db.from('queue_entries').select('*,profiles(full_name,email),services(name,service_code,org_id,profiles(org_name))').order('joined_at',{ascending:false}).limit(200);
+  const {data}=await query;
+  const tb=document.getElementById('queues-tbody');
+  const entries=(data||[]).filter(e=>!orgId||e.services?.org_id===orgId);
+  if(!entries.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--s400)">No entries found</td></tr>`;return;}
+  tb.innerHTML=entries.map(e=>`<tr>
+    <td><strong style="font-family:var(--fh);color:var(--accent)">${e.ticket_label}</strong></td>
+    <td>${e.services?.profiles?.org_name||'—'}</td>
+    <td>${e.services?.name||'—'}</td>
+    <td>${e.profiles?.full_name||e.guest_name||'Guest'}</td>
+    <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
+    <td>${badgeHtml(e.status)}</td>
+    <td style="font-size:.8rem">${fmt(e.joined_at)}</td>
+    <td style="font-size:.8rem">${e.estimated_time?new Date(e.estimated_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'}</td>
+  </tr>`).join('');
+
+  // Populate org filter
+  const {data:orgs}=await db.from('profiles').select('id,org_name').eq('role','organization').eq('approval_status','approved');
+  const sel=document.getElementById('q-org-filter');
+  if(sel.options.length<2){(orgs||[]).forEach(o=>{const opt=document.createElement('option');opt.value=o.id;opt.textContent=o.org_name;sel.appendChild(opt);});}
+}
+
+// ── AUDIT LOG ────────────────────────────────────────────────
+async function loadLogs(){
+  const {data}=await db.from('admin_logs').select('*,profiles(full_name)').order('created_at',{ascending:false}).limit(100);
+  const tb=document.getElementById('logs-tbody');
+  if(!data?.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--s400)">No logs yet</td></tr>`;return;}
+  tb.innerHTML=data.map(l=>`<tr>
+    <td><strong>${l.action}</strong></td>
+    <td style="font-size:.8rem">${l.target_id?.slice(0,8)||'—'}</td>
+    <td>${l.target_type||'—'}</td>
+    <td style="font-size:.78rem;color:var(--s500)">${JSON.stringify(l.details||{})}</td>
+    <td style="font-size:.78rem">${fmt(l.created_at)}</td>
+  </tr>`).join('');
+}
+async function logAction(action,targetId,targetType,details){
+  await db.from('admin_logs').insert({admin_id:adminProfile.id,action,target_id:targetId,target_type:targetType,details}).catch(()=>{});
+}
+
+// ── SMS JOINS ────────────────────────────────────────────────
+async function loadSmsJoins(){
+  const {data}=await db.from('sms_joins').select('*,queue_entries(ticket_label,status)').order('created_at',{ascending:false}).limit(100);
+  const tb=document.getElementById('sms-tbody');
+  if(!data?.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--s400)">No SMS joins yet</td></tr>`;return;}
+  tb.innerHTML=data.map(s=>`<tr>
+    <td>${s.phone}</td>
+    <td><strong style="font-family:var(--fh)">${s.service_code}</strong></td>
+    <td>${s.queue_entries?.ticket_label||'—'}</td>
+    <td>${s.queue_entries?badgeHtml(s.queue_entries.status):'—'}</td>
+    <td style="font-size:.8rem">${fmt(s.created_at)}</td>
+  </tr>`).join('');
+}
+
+async function doLogout(){await db.auth.signOut();window.location.href='../index.html';}
+init();
+</script>
+</body>
+</html>

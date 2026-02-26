@@ -1,0 +1,5 @@
+flask>=3.0.0
+supabase>=2.0.0
+africastalking>=1.2.7
+python-dotenv>=1.0.0
+gunicorn>=21.0.0

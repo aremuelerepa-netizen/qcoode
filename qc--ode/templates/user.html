@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>My Dashboard — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s700:#334155;--s900:#0f172a;--green:#22c55e;--gl:#dcfce7;--amber:#f59e0b;--al:#fef3c7;--red:#ef4444;--rl:#fee2e2;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--rl2:1rem;--sh:0 1px 4px rgba(10,22,40,.08);--shm:0 4px 16px rgba(10,22,40,.10);--shl:0 12px 40px rgba(10,22,40,.15);--t:.18s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fb);background:var(--s50);color:var(--s900);min-height:100vh;display:flex;flex-direction:column}
+    h1,h2,h3{font-family:var(--fh);line-height:1.2;letter-spacing:-.02em;color:var(--navy)}
+    .topbar{background:var(--navy);height:60px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;flex-shrink:0;position:sticky;top:0;z-index:100}
+    .tb-logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.15rem;font-weight:800;color:#fff;text-decoration:none}
+    .tb-logo span{color:var(--cyan)}
+    .tb-right{margin-left:auto;display:flex;align-items:center;gap:.625rem}
+    .tb-name{font-size:.825rem;color:rgba(255,255,255,.6);padding:.3rem .75rem;background:rgba(255,255,255,.08);border-radius:var(--r)}
+    .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fb);font-size:.825rem;font-weight:500;color:rgba(255,255,255,.7);transition:all var(--t)}
+    .tb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+    .tb-logout{color:#f87171!important}.tb-logout:hover{background:rgba(239,68,68,.15)!important}
+    .shell{display:flex;flex:1}
+    .sidebar{width:240px;background:#fff;border-right:1px solid var(--s200);padding:1.25rem;flex-shrink:0;display:flex;flex-direction:column;gap:.2rem}
+    .main{flex:1;padding:1.75rem;overflow-y:auto}
+    .sb-section{font-size:.68rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.1em;padding:.5rem .625rem;margin-top:.625rem}
+    .sb-item{display:flex;align-items:center;gap:.625rem;padding:.625rem .875rem;border-radius:var(--r);font-size:.875rem;font-weight:500;color:var(--s700);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--t)}
+    .sb-item:hover{background:var(--s100);color:var(--navy)}.sb-item.active{background:rgba(37,99,235,.08);color:var(--accent);font-weight:600}
+    .panel{display:none}.panel.active{display:block}
+    .profile-card{background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--rl2);padding:1.75rem;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap}
+    .avatar{width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:1.4rem;font-weight:800;flex-shrink:0;border:2.5px solid rgba(255,255,255,.3)}
+    .pf-name{font-family:var(--fh);font-size:1.1rem;font-weight:700;margin-bottom:.2rem}
+    .pf-email{font-size:.8rem;opacity:.65}
+    .pf-stats{margin-left:auto;text-align:right}
+    .pf-stat-n{font-family:var(--fh);font-size:1.5rem;font-weight:800}
+    .pf-stat-l{font-size:.7rem;opacity:.6;text-transform:uppercase;letter-spacing:.06em}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem 1.25rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .bp{background:var(--accent);color:#fff}.bp:hover:not(:disabled){background:#1d4ed8}
+    .bs{background:var(--green);color:#fff}.bs:hover:not(:disabled){filter:brightness(1.07)}
+    .bd{background:var(--red);color:#fff}.bd:hover:not(:disabled){filter:brightness(1.07)}
+    .bg{background:transparent;color:var(--s500);border:1.5px solid var(--s300)}.bg:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+    .bsm{padding:.325rem .75rem;font-size:.78rem}
+    .btn-full{width:100%;display:flex}
+    .btn-lg{padding:.875rem 2rem;font-size:1rem}
+    .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+    .lbl{font-size:.82rem;font-weight:600;color:var(--s700)}.hint{font-size:.76rem;color:var(--s500)}
+    .inp{padding:.75rem 1rem;background:var(--s50);border:1.5px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.9rem;color:var(--s900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+    .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+    .inp::placeholder{color:var(--s300)}
+    select.inp{cursor:pointer}
+    .code-inp{text-transform:uppercase;letter-spacing:.12em;font-family:var(--fh);font-weight:700;font-size:1.1rem}
+    .inp-row{display:flex;gap:.625rem}.inp-row .inp{flex:1}
+    .ferr{font-size:.8rem;color:var(--red);margin-top:.3rem;display:none}
+    .card{background:#fff;border:1px solid var(--s200);border-radius:var(--rl2);padding:1.75rem;box-shadow:var(--sh);margin-bottom:1.25rem}
+    .card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:1.25rem}
+    .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:999px;font-size:.72rem;font-weight:700}
+    .b-waiting{background:rgba(37,99,235,.1);color:var(--accent)}.b-called{background:var(--al);color:#92400e}
+    .b-serving{background:var(--gl);color:#15803d}.b-completed{background:var(--s100);color:var(--s500)}
+    .b-no_show{background:var(--rl);color:var(--red)}.b-cancelled{background:var(--s100);color:var(--s500)}
+    .b-open{background:var(--gl);color:#15803d}.b-paused{background:var(--al);color:#92400e}.b-closed{background:var(--rl);color:var(--red)}
+    .ticket-display{background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:var(--rl2);color:#fff;text-align:center;padding:2.5rem 2rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
+    .td-bg{position:absolute;inset:0;opacity:.04;background:repeating-linear-gradient(-45deg,#fff,#fff 1px,transparent 1px,transparent 10px)}
+    .td-inner{position:relative}
+    .td-svc{font-size:.75rem;opacity:.6;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.25rem}
+    .td-lbl{font-size:.72rem;opacity:.6;text-transform:uppercase;letter-spacing:.1em}
+    .td-num{font-family:var(--fh);font-size:5rem;font-weight:800;line-height:1;margin:.2rem 0}
+    .td-pos{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.15);border-radius:999px;padding:.375rem 1rem;font-size:.875rem;margin-top:1rem}
+    .td-eta{display:inline-flex;align-items:center;gap:.375rem;background:rgba(6,182,212,.2);border:1px solid rgba(6,182,212,.3);border-radius:999px;padding:.375rem 1rem;font-size:.825rem;margin-top:.625rem;color:var(--cyan)}
+    .status-box{border-radius:var(--rl2);padding:1.25rem 1.5rem;margin-bottom:1.25rem;border:2px solid transparent;transition:all .3s ease;display:flex;align-items:center;gap:1rem}
+    .sb-waiting{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.15)}
+    .sb-called{background:rgba(34,197,94,.08);border-color:var(--green);animation:pulseBorder 1.5s ease infinite}
+    .sb-serving{background:var(--al);border-color:var(--amber)}
+    @keyframes pulseBorder{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 10px rgba(34,197,94,0)}}
+    .sb-icon{font-size:2rem;flex-shrink:0}
+    .sb-title{font-family:var(--fh);font-size:1rem;color:var(--navy)}
+    .sb-desc{font-size:.825rem;color:var(--s500);margin-top:.2rem;line-height:1.5}
+    .stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
+    .sp{background:var(--s50);border:1px solid var(--s200);border-radius:var(--r);padding:1rem;text-align:center}
+    .sp-n{font-family:var(--fh);font-size:1.75rem;font-weight:800;color:var(--accent);line-height:1}
+    .sp-l{font-size:.72rem;color:var(--s500);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
+    .found-preview{background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.2);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1rem}
+    .found-name{font-weight:700;color:var(--navy)}
+    .found-meta{font-size:.78rem;color:var(--s500);margin-top:.25rem;display:flex;gap:1rem;flex-wrap:wrap}
+    .custom-form{background:var(--s50);border:1px solid var(--s200);border-radius:var(--rl2);padding:1.25rem;margin-bottom:1.25rem}
+    .custom-form h3{font-size:.9rem;margin-bottom:1rem;color:var(--navy)}
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    thead{border-bottom:2px solid var(--s200)}
+    th{text-align:left;padding:.75rem 1rem;font-size:.72rem;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.06em}
+    td{padding:.875rem 1rem;font-size:.875rem;border-bottom:1px solid var(--s100);color:var(--s700)}
+    tr:last-child td{border-bottom:none}tr:hover td{background:var(--s50)}
+    .ticket-tag{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--accent)}
+    .nearby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+    .nb-card{background:#fff;border:1px solid var(--s200);border-radius:var(--rl2);padding:1.25rem;cursor:pointer;transition:all var(--t)}
+    .nb-card:hover{border-color:var(--accent);box-shadow:var(--shm)}
+    .nb-name{font-weight:700;color:var(--navy);margin-bottom:.25rem}
+    .nb-meta{font-size:.78rem;color:var(--s500);line-height:1.6}
+    .nb-code{font-family:var(--fh);font-size:1.1rem;font-weight:800;color:var(--accent);letter-spacing:.1em;margin-top:.5rem}
+    .empty{text-align:center;padding:3rem 2rem;color:var(--s500)}.empty h3{color:var(--s700);margin-bottom:.375rem}
+    .spin{width:20px;height:20px;border:2.5px solid var(--s200);border-top-color:var(--accent);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--s500)}
+    #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+    .toast{padding:.75rem 1.125rem;border-radius:.5rem;box-shadow:var(--shl);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+    .t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#15803d}
+    .t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
+    .t-i{background:#eff6ff;border-left:3px solid var(--accent);color:#1d4ed8}
+    .t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
+    @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:translateX(0)}}
+    @media(max-width:860px){.shell{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--s200);flex-direction:row;flex-wrap:wrap;padding:.75rem}}
+    @media(max-width:640px){.main{padding:1rem}.td-num{font-size:3.5rem}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../index.html" class="tb-logo"><svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg><span>Q</span>Code</a>
+  <div class="tb-right">
+    <span class="tb-name" id="tb-name">—</span>
+    <select style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:var(--r);padding:.3rem .5rem;font-size:.75rem;cursor:pointer" onchange="changeLang(this.value)" id="lang-sel">
+      <option value="en">🌐 EN</option><option value="fr">FR</option><option value="ar">AR</option><option value="es">ES</option><option value="pt">PT</option>
+    </select>
+    <button class="tb-btn tb-logout" onclick="doLogout()">↩ Logout</button>
+  </div>
+</div>
+<div class="shell">
+  <div class="sidebar">
+    <div class="sb-section">My Queue</div>
+    <button class="sb-item active" onclick="show('join')"   id="nav-join">  <span>🎫</span> Join Queue</button>
+    <button class="sb-item"        onclick="show('active')" id="nav-active"><span>📡</span> Active Queue</button>
+    <div class="sb-section">History</div>
+    <button class="sb-item" onclick="show('history')" id="nav-history"><span>🕐</span> My History</button>
+    <button class="sb-item" onclick="show('nearby')"  id="nav-nearby"> <span>🗺</span> Open Services</button>
+    <div class="sb-section">Account</div>
+    <button class="sb-item" onclick="show('account')" id="nav-account"><span>👤</span> Account</button>
+  </div>
+  <div class="main">
+    <!-- JOIN -->
+    <div class="panel active" id="panel-join">
+      <div style="margin-bottom:1.5rem"><h1>Join a Queue</h1><p style="color:var(--s500);margin-top:.25rem">Enter the service code given to you</p></div>
+      <div class="card">
+        <div class="card-title">🎫 Service Code</div>
+        <div id="step-code">
+          <div class="inp-row">
+            <input id="code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8"/>
+            <button class="btn bp" onclick="findService()">Find</button>
+          </div>
+          <span id="code-err" class="ferr"></span>
+        </div>
+        <div id="step-found" style="display:none;margin-top:1.25rem">
+          <div class="found-preview">
+            <div class="found-name" id="found-name"></div>
+            <div class="found-meta"><span id="found-staff-meta"></span><span id="found-eta-meta"></span><span id="found-waiting-meta"></span></div>
+          </div>
+          <div id="custom-form-wrap" style="display:none" class="custom-form"><h3>📋 Please fill in the required information</h3><div id="custom-form-fields"></div></div>
+          <button class="btn bs btn-full btn-lg" onclick="confirmJoin()">✓ Join This Queue</button>
+          <button class="btn bg btn-full" onclick="cancelFind()" style="margin-top:.625rem">Cancel</button>
+        </div>
+      </div>
+      <div class="card" style="background:linear-gradient(135deg,rgba(6,182,212,.06),rgba(37,99,235,.04));border-color:rgba(6,182,212,.2)">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="font-size:2rem">📱</div>
+          <div><div style="font-weight:700;color:var(--navy);margin-bottom:.25rem">Join by SMS — no internet needed</div>
+          <div style="font-size:.825rem;color:var(--s500);line-height:1.5">Text your service code to <strong id="sms-num" style="color:var(--accent)">+0000000000</strong> to get your ticket instantly.</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- ACTIVE -->
+    <div class="panel" id="panel-active">
+      <div style="margin-bottom:1.5rem"><h1>Active Queue</h1><p style="color:var(--s500);margin-top:.25rem">Your real-time position and wait time</p></div>
+      <div id="no-active-queue" class="card"><div class="empty"><div style="font-size:3rem;margin-bottom:.75rem">⏰</div><h3>Not in any queue</h3><p>Use "Join Queue" to enter a service code and join.</p></div></div>
+      <div id="active-queue-view" style="display:none">
+        <div style="background:var(--navy);border-radius:var(--rl2);padding:1.125rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+          <div><div style="font-family:var(--fh);font-size:1.05rem;font-weight:700;color:#fff" id="a-svc-name">—</div><div style="font-size:.78rem;color:rgba(255,255,255,.55);margin-top:.125rem" id="a-org-name">—</div></div>
+          <span class="badge" id="a-svc-status"></span>
+        </div>
+        <div class="status-box sb-waiting" id="status-box">
+          <div class="sb-icon" id="sb-icon">⏳</div>
+          <div><div class="sb-title" id="sb-title">Waiting in queue</div><div class="sb-desc" id="sb-desc">Your position updates automatically. Stay nearby.</div></div>
+        </div>
+        <div class="ticket-display">
+          <div class="td-bg"></div>
+          <div class="td-inner">
+            <div class="td-svc" id="td-svc-name"></div>
+            <div class="td-lbl">Your Ticket</div>
+            <div class="td-num" id="td-num">—</div>
+            <div><span class="td-pos">Position <strong id="td-pos" style="margin-left:.375rem">—</strong></span></div>
+            <div><span class="td-eta" id="td-eta">⏱ Calculating ETA…</span></div>
+          </div>
+        </div>
+        <div class="stat-pair">
+          <div class="sp"><div class="sp-n" id="sp-ahead">—</div><div class="sp-l">Ahead of You</div></div>
+          <div class="sp"><div class="sp-n" id="sp-waiting">—</div><div class="sp-l">Total Waiting</div></div>
+        </div>
+        <button class="btn bd btn-full btn-lg" id="leave-btn" onclick="leaveQueue()">✕ Leave Queue</button>
+      </div>
+    </div>
+    <!-- HISTORY -->
+    <div class="panel" id="panel-history">
+      <div style="margin-bottom:1.5rem"><h1>My History</h1><p style="color:var(--s500);margin-top:.25rem">Every queue you have ever joined</p></div>
+      <div class="card"><div class="tbl-wrap"><table>
+        <thead><tr><th>Ticket</th><th>Service</th><th>Organization</th><th>Method</th><th>Status</th><th>Joined</th><th>Wait (min)</th></tr></thead>
+        <tbody id="hist-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--s400)">Loading…</td></tr></tbody>
+      </table></div></div>
+    </div>
+    <!-- NEARBY -->
+    <div class="panel" id="panel-nearby">
+      <div style="margin-bottom:1.5rem"><h1>Open Services</h1><p style="color:var(--s500);margin-top:.25rem">All live queues you can join right now</p></div>
+      <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
+    </div>
+    <!-- ACCOUNT -->
+    <div class="panel" id="panel-account">
+      <div style="margin-bottom:1.5rem"><h1>My Account</h1></div>
+      <div class="profile-card" id="profile-card"></div>
+      <div class="card" style="max-width:520px">
+        <div class="card-title">Settings</div>
+        <div class="fg"><label class="lbl">Full Name</label><input id="acc-name" class="inp" type="text"/></div>
+        <div class="fg"><label class="lbl">Phone Number</label><input id="acc-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/><span class="hint">For SMS queue updates</span></div>
+        <div class="fg"><label class="lbl">Preferred Language</label>
+          <select id="acc-lang" class="inp">
+            <option value="en">English</option><option value="fr">Français</option><option value="ar">العربية</option><option value="es">Español</option><option value="pt">Português</option>
+          </select>
+        </div>
+        <button class="btn bp" onclick="saveAccount()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toasts"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
+const SMS_NUMBER='+1234567890';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+let curLang=localStorage.getItem('qcode_lang')||'en';
+function changeLang(l){curLang=l;localStorage.setItem('qcode_lang',l);document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';}
+function toast(msg,type='i',ms=4500){const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ',w:'⚠'}[type]}</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
+function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function diffMin(a,b){if(!a||!b)return'—';return Math.round((new Date(b)-new Date(a))/60000);}
+function badgeHtml(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed'};return`<span class="badge ${m[s]||''}">${s.replace('_',' ')}</span>`;}
+let profile=null,activeEntry=null,activeSvc=null,channel=null,foundSvc=null;
+async function init(){
+  const {data:{session}}=await db.auth.getSession();
+  if(!session){window.location.href='../auth/login-user.html';return;}
+  const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
+  if(!p||p.role!=='user'){window.location.href='../auth/login-org.html';return;}
+  profile=p;
+  if(p.preferred_lang){curLang=p.preferred_lang;changeLang(p.preferred_lang);document.getElementById('lang-sel').value=p.preferred_lang;}
+  document.getElementById('tb-name').textContent=p.full_name||p.email;
+  document.getElementById('sms-num').textContent=SMS_NUMBER;
+  document.getElementById('acc-name').value=p.full_name||'';
+  document.getElementById('acc-phone').value=p.phone||'';
+  document.getElementById('acc-lang').value=p.preferred_lang||'en';
+  const initials=(p.full_name||p.email).split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const {count:tq}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('user_id',p.id);
+  document.getElementById('profile-card').innerHTML=`<div class="avatar">${initials}</div><div><div class="pf-name">${p.full_name||p.email}</div><div class="pf-email">${p.email}</div>${p.phone?`<div class="pf-email">📞 ${p.phone}</div>`:''}</div><div class="pf-stats"><div class="pf-stat-n">${tq||0}</div><div class="pf-stat-l">Total Queues</div></div>`;
+  const stored=sessionStorage.getItem('activeEntry');
+  if(stored){try{const {entry,service}=JSON.parse(stored);sessionStorage.removeItem('activeEntry');activeEntry=entry;activeSvc=service;await showActiveQueue();}catch{}}
+  await loadHistory();
+}
+function show(name){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+name).classList.add('active');document.getElementById('nav-'+name).classList.add('active');if(name==='history')loadHistory();if(name==='nearby')loadNearby();}
+async function findService(){
+  const code=document.getElementById('code-in').value.trim().toUpperCase();
+  const err=document.getElementById('code-err');err.style.display='none';
+  if(!code){err.textContent='Please enter a service code.';err.style.display='block';return;}
+  try{
+    const {data:svc}=await db.from('services').select('*,profiles(org_name,approval_status)').eq('service_code',code).single();
+    if(!svc){err.textContent='No service found with that code.';err.style.display='block';return;}
+    if(svc.profiles?.approval_status!=='approved'){err.textContent='This organization is not yet approved.';err.style.display='block';return;}
+    if(svc.status==='closed'){err.textContent='This queue is closed.';err.style.display='block';return;}
+    if(svc.status==='paused'){err.textContent='Queue is paused. Try again soon.';err.style.display='block';return;}
+    foundSvc=svc;
+    const {count:waiting}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',svc.id).eq('status','waiting');
+    const etaMins=(waiting+1)*(svc.time_interval||5);
+    document.getElementById('found-name').textContent=svc.name;
+    document.getElementById('found-staff-meta').textContent=svc.staff_name?`👤 ${svc.staff_name}`:'';
+    document.getElementById('found-eta-meta').textContent=`⏱ ~${etaMins} min wait`;
+    document.getElementById('found-waiting-meta').textContent=`👥 ${waiting} waiting`;
+    document.getElementById('step-code').style.display='none';
+    document.getElementById('step-found').style.display='block';
+    let fields=[];try{fields=JSON.parse(svc.user_info_form||'[]');}catch{}
+    if(fields.length){
+      document.getElementById('custom-form-wrap').style.display='block';
+      document.getElementById('custom-form-fields').innerHTML=fields.map(f=>`<div class="fg"><label class="lbl">${f.label}${f.required?' *':''}</label>${f.type==='textarea'?`<textarea id="cf-${f.id}" class="inp" rows="3"></textarea>`:f.type==='select'?`<select id="cf-${f.id}" class="inp"><option value="">Select…</option>${(f.options||[]).map(o=>`<option>${o}</option>`).join('')}</select>`:f.type==='file'?`<input id="cf-${f.id}" type="file" class="inp" style="padding:.5rem"/>`:f.type==='number'?`<input id="cf-${f.id}" class="inp" type="number"/>`:`<input id="cf-${f.id}" class="inp" type="text"/>`}</div>`).join('');
+    }
+  }catch(e){err.textContent='Error finding service.';err.style.display='block';}
+}
+function cancelFind(){foundSvc=null;document.getElementById('step-found').style.display='none';document.getElementById('step-code').style.display='block';document.getElementById('code-in').value='';document.getElementById('custom-form-wrap').style.display='none';}
+async function confirmJoin(){
+  if(!foundSvc)return;
+  let formData={};
+  try{const fields=JSON.parse(foundSvc.user_info_form||'[]');for(const f of fields){const el=document.getElementById('cf-'+f.id);if(!el)continue;if(f.required&&!el.value){toast(`"${f.label}" is required.`,'e');return;}formData[f.id]={label:f.label,value:el.value};}}catch{}
+  try{
+    const {data:ex}=await db.from('queue_entries').select('id').eq('service_id',foundSvc.id).eq('user_id',profile.id).in('status',['waiting','called','serving']).maybeSingle();
+    if(ex){toast('You are already in this queue.','e');return;}
+    const {data:s}=await db.from('services').select('ticket_counter,ticket_prefix,time_interval').eq('id',foundSvc.id).single();
+    const n=s.ticket_counter+1;
+    await db.from('services').update({ticket_counter:n}).eq('id',foundSvc.id);
+    const label=`${s.ticket_prefix}${String(n).padStart(3,'0')}`;
+    const {count:ahead}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',foundSvc.id).eq('status','waiting');
+    const eta=new Date(Date.now()+(ahead+1)*(s.time_interval||5)*60000);
+    const {data:entry}=await db.from('queue_entries').insert({service_id:foundSvc.id,user_id:profile.id,ticket_label:label,ticket_number:n,status:'waiting',estimated_time:eta.toISOString(),join_method:'web',custom_form_data:JSON.stringify(formData)}).select().single();
+    activeEntry=entry;activeSvc=foundSvc;
+    cancelFind();await showActiveQueue();show('active');toast("You've joined the queue!",'s');
+  }catch(e){toast(e.message||'Failed to join.','e');}
+}
+async function showActiveQueue(){
+  document.getElementById('no-active-queue').style.display='none';
+  document.getElementById('active-queue-view').style.display='block';
+  document.getElementById('a-svc-name').textContent=activeSvc?.name||'—';
+  document.getElementById('a-org-name').textContent=activeSvc?.profiles?.org_name||'';
+  document.getElementById('td-svc-name').textContent=activeSvc?.name||'';
+  await refreshPosition();subscribeQueue();
+}
+async function refreshPosition(){
+  if(!activeEntry||!activeSvc)return;
+  try{
+    const {data:me}=await db.from('queue_entries').select('status,estimated_time').eq('id',activeEntry.id).single();
+    if(!me||['completed','cancelled','no_show'].includes(me.status)){document.getElementById('no-active-queue').style.display='block';document.getElementById('active-queue-view').style.display='none';activeEntry=null;return;}
+    activeEntry={...activeEntry,...me};
+    const {count:ahead}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',activeSvc.id).eq('status','waiting').lt('ticket_number',activeEntry.ticket_number);
+    const {count:total}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',activeSvc.id).eq('status','waiting');
+    const pos=(ahead||0)+1;
+    document.getElementById('td-num').textContent=activeEntry.ticket_label;
+    document.getElementById('td-pos').textContent=pos;
+    document.getElementById('sp-ahead').textContent=Math.max(0,pos-1);
+    document.getElementById('sp-waiting').textContent=total||0;
+    if(me.estimated_time){const etaDate=new Date(me.estimated_time);const mins=Math.max(0,Math.round((etaDate-Date.now())/60000));document.getElementById('td-eta').textContent=`⏱ ~${mins} min — ${fmtTime(me.estimated_time)}`;}
+    const box=document.getElementById('status-box'),icon=document.getElementById('sb-icon'),title=document.getElementById('sb-title'),desc=document.getElementById('sb-desc');
+    box.className='status-box';
+    if(me.status==='waiting'){box.classList.add('sb-waiting');if(pos===1){icon.textContent='🔔';title.textContent="You're next — get ready!";desc.textContent='You will be called very soon. Please stay close by.';}else if(pos<=3){icon.textContent='⏰';title.textContent='Nearly your turn';desc.textContent='Only a few people ahead of you.';}else{icon.textContent='⏳';title.textContent='Waiting in queue';desc.textContent='Your position updates automatically. Feel free to wait comfortably.';}}
+    else if(me.status==='called'){box.classList.add('sb-called');icon.textContent='📢';title.textContent="You're being called!";desc.textContent='Please proceed to the service counter immediately!';}
+    else if(me.status==='serving'){box.classList.add('sb-serving');icon.textContent='✅';title.textContent='Being served';desc.textContent='You are currently at the service counter.';}
+    const sbadge=document.getElementById('a-svc-status');sbadge.textContent=activeSvc.status;sbadge.className=`badge b-${activeSvc.status}`;
+  }catch(e){console.error(e);}
+}
+async function leaveQueue(){
+  if(!activeEntry||!confirm('Are you sure you want to leave this queue?'))return;
+  document.getElementById('leave-btn').disabled=true;
+  try{await db.from('queue_entries').update({status:'cancelled',completed_at:new Date().toISOString()}).eq('id',activeEntry.id);activeEntry=null;activeSvc=null;if(channel){channel.unsubscribe();channel=null;}document.getElementById('no-active-queue').style.display='block';document.getElementById('active-queue-view').style.display='none';toast('You have left the queue.','i');}catch(e){toast(e.message,'e');}
+  document.getElementById('leave-btn').disabled=false;
+}
+function subscribeQueue(){
+  if(channel)channel.unsubscribe();
+  if(!activeSvc)return;
+  channel=db.channel(`user-q:${activeSvc.id}`)
+    .on('postgres_changes',{event:'*',schema:'public',table:'queue_entries',filter:`service_id=eq.${activeSvc.id}`},async(payload)=>{await refreshPosition();if(payload.new?.user_id===profile?.id&&payload.new?.status==='called')toast('📢 You are being called! Go to the counter NOW.','w',9000);})
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'services',filter:`id=eq.${activeSvc?.id}`},(payload)=>{if(activeSvc)activeSvc.status=payload.new.status;const b=document.getElementById('a-svc-status');b.textContent=payload.new.status;b.className=`badge b-${payload.new.status}`;if(payload.new.status==='closed')toast('This queue has been closed.','w');})
+    .subscribe();
+}
+async function loadHistory(){
+  const {data}=await db.from('queue_entries').select('*,services(name,profiles(org_name))').eq('user_id',profile.id).order('joined_at',{ascending:false}).limit(50);
+  const tb=document.getElementById('hist-tbody');
+  if(!data?.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--s400)">No history yet. Join your first queue!</td></tr>`;return;}
+  tb.innerHTML=data.map(e=>`<tr><td><span class="ticket-tag">${e.ticket_label}</span></td><td>${e.services?.name||'—'}</td><td>${e.services?.profiles?.org_name||'—'}</td><td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td><td>${badgeHtml(e.status)}</td><td style="font-size:.8rem">${fmt(e.joined_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
+}
+async function loadNearby(){
+  const {data:svcs}=await db.from('services').select('*,profiles(org_name,approval_status)').eq('status','open').is('deleted_at',null).order('created_at',{ascending:false}).limit(30);
+  const grid=document.getElementById('nearby-grid');
+  const valid=(svcs||[]).filter(s=>s.profiles?.approval_status==='approved');
+  if(!valid.length){grid.innerHTML=`<div class="empty"><h3>No open services right now</h3><p>Check back later or ask for a service code.</p></div>`;return;}
+  const counts={};
+  await Promise.all(valid.map(async s=>{const {count}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',s.id).eq('status','waiting');counts[s.id]=count||0;}));
+  grid.innerHTML=valid.map(s=>`<div class="nb-card" onclick="prefillCode('${s.service_code}')"><div class="nb-name">${s.name}</div><div class="nb-meta">🏢 ${s.profiles?.org_name||'—'}<br>👥 ${counts[s.id]} waiting · ⏱ ${s.time_interval} min/person${s.staff_name?`<br>👤 ${s.staff_name}`:''}${s.max_users?`<br>📋 Max ${s.max_users}`:''}</div><div class="nb-code">${s.service_code}</div></div>`).join('');
+}
+function prefillCode(code){show('join');document.getElementById('code-in').value=code;findService();}
+async function saveAccount(){
+  const name=document.getElementById('acc-name').value.trim(),phone=document.getElementById('acc-phone').value.trim(),lang=document.getElementById('acc-lang').value;
+  await db.from('profiles').update({full_name:name||null,phone:phone||null,preferred_lang:lang}).eq('id',profile.id);
+  profile.full_name=name;changeLang(lang);document.getElementById('lang-sel').value=lang;document.getElementById('tb-name').textContent=name||profile.email;toast('Account saved!','s');
+}
+async function doLogout(){if(channel)channel.unsubscribe();await db.from('profiles').update({is_online:false}).eq('id',profile.id);await db.auth.signOut();window.location.href='../index.html';}
+document.getElementById('code-in').addEventListener('keydown',e=>{if(e.key==='Enter')findService();});
+init();
+</script>
+</body>
+</html>

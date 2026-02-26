@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register Organization — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--q-navy:#0a1628;--q-blue:#1a3a6b;--q-accent:#2563eb;--q-cyan:#06b6d4;--slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;--slate-500:#64748b;--slate-700:#334155;--slate-900:#0f172a;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--r:.625rem;--rl:1rem;--shadow-lg:0 16px 48px rgba(10,22,40,.20);--t:.2s cubic-bezier(.4,0,.2,1)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-body);min-height:100vh;background:linear-gradient(135deg,var(--q-navy) 0%,var(--q-blue) 60%,#0f172a 100%);display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+    h1,h2,h3{font-family:var(--font-head);letter-spacing:-.02em}
+    a{color:var(--q-accent);text-decoration:none}
+    .page{width:100%;max-width:680px;margin:2rem auto}
+    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
+    .logo-q{color:var(--q-cyan)}
+    .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:var(--shadow-lg)}
+    .card-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--slate-200)}
+    .card-title{font-size:1.5rem;color:var(--q-navy)}
+    .card-sub{font-size:.9rem;color:var(--slate-500);margin-top:.375rem}
+    .pending-notice{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(245,158,11,.04));border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:2rem;display:flex;gap:.875rem}
+    .pending-notice .icon{font-size:1.5rem;flex-shrink:0}
+    .pending-notice p{font-size:.8rem;color:#92400e;line-height:1.5}
+    .pending-notice strong{display:block;color:#78350f;margin-bottom:.25rem}
+    .section-label{font-family:var(--font-head);font-size:.75rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;margin-top:1.75rem;padding-bottom:.5rem;border-bottom:2px solid var(--slate-100)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .form-group{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+    .label{font-size:.85rem;font-weight:600;color:var(--slate-700)}.hint{font-size:.78rem;color:var(--slate-500);margin-top:.2rem}
+    .input{padding:.8rem 1rem;background:var(--slate-50);border:1.5px solid var(--slate-300);border-radius:var(--r);font-family:var(--font-body);font-size:.9rem;color:var(--slate-900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+    .input:focus{outline:none;border-color:var(--q-accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
+    .input::placeholder{color:var(--slate-300)}
+    .upload-zone{border:2px dashed var(--slate-300);border-radius:var(--rl);padding:2rem;text-align:center;cursor:pointer;transition:all var(--t);background:var(--slate-50)}
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--q-accent);background:rgba(37,99,235,.04)}
+    .upload-icon{font-size:2.5rem;margin-bottom:.75rem}
+    .upload-title{font-weight:600;color:var(--slate-700);margin-bottom:.25rem}
+    .upload-sub{font-size:.8rem;color:var(--slate-500)}
+    .upload-preview{display:flex;align-items:center;gap:.75rem;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);border-radius:var(--r);padding:.875rem 1rem;margin-top:1rem;display:none}
+    .upload-preview .fname{font-size:.875rem;font-weight:600;color:#15803d;flex:1}
+    .upload-preview .fsize{font-size:.75rem;color:var(--slate-500)}
+    .err-msg{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
+    .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--font-body);font-size:1rem;font-weight:700;cursor:pointer;transition:all var(--t)}
+    .btn-primary{background:var(--q-accent);color:#fff}.btn-primary:hover:not(:disabled){background:#1d4ed8;transform:translateY(-1px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .progress{display:flex;gap:.5rem;margin-bottom:2rem}
+    .prog-step{flex:1;height:4px;border-radius:2px;background:var(--slate-200);transition:background .4s}
+    .prog-step.done{background:var(--green)}.prog-step.active{background:var(--q-accent)}
+    .switch{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--slate-500)}
+    select.input{cursor:pointer}
+    @media(max-width:580px){.grid2{grid-template-columns:1fr}.card{padding:1.75rem}.page{margin:.5rem auto}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <a href="../index.html" class="logo">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+    <span><span class="logo-q">Q</span>Code</span>
+  </a>
+
+  <div class="card">
+    <div class="progress">
+      <div class="prog-step active" id="p1"></div>
+      <div class="prog-step" id="p2"></div>
+      <div class="prog-step" id="p3"></div>
+    </div>
+
+    <div class="card-header">
+      <h1 class="card-title">Register Your Organization</h1>
+      <p class="card-sub">Submit your details and verification document. Your account will be reviewed and approved by QCode admin before going live.</p>
+    </div>
+
+    <div class="pending-notice">
+      <div class="icon">⏳</div>
+      <p><strong>Approval Required</strong>After registering, your account will be <em>pending</em> until a QCode admin reviews and approves your organization. You'll be notified by email.</p>
+    </div>
+
+    <div id="err" class="err-msg"></div>
+
+    <!-- SECTION 1: Company Info -->
+    <div class="section-label">🏢 Company Information</div>
+    <div class="grid2">
+      <div class="form-group">
+        <label class="label">Organization Name *</label>
+        <input id="org-name" class="input" type="text" placeholder="e.g. City Medical Centre"/>
+      </div>
+      <div class="form-group">
+        <label class="label">Industry / Type *</label>
+        <select id="org-type" class="input">
+          <option value="">Select type…</option>
+          <option>Healthcare / Hospital</option>
+          <option>Government / Public Service</option>
+          <option>Banking / Finance</option>
+          <option>Education</option>
+          <option>Retail / Commercial</option>
+          <option>Non-Profit / NGO</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="label">Company Address *</label>
+      <input id="org-address" class="input" type="text" placeholder="Full address including city and country"/>
+    </div>
+    <div class="grid2">
+      <div class="form-group">
+        <label class="label">Phone Number *</label>
+        <input id="org-phone" class="input" type="tel" placeholder="+1 234 567 8900"/>
+        <span class="hint">Include country code</span>
+      </div>
+      <div class="form-group">
+        <label class="label">Website (optional)</label>
+        <input id="org-website" class="input" type="url" placeholder="https://example.com"/>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Account -->
+    <div class="section-label">🔐 Account Credentials</div>
+    <div class="form-group">
+      <label class="label">Email Address *</label>
+      <input id="email" class="input" type="email" placeholder="admin@yourorg.com"/>
+    </div>
+    <div class="grid2">
+      <div class="form-group">
+        <label class="label">Password *</label>
+        <input id="password" class="input" type="password" placeholder="Min. 8 characters"/>
+      </div>
+      <div class="form-group">
+        <label class="label">Confirm Password *</label>
+        <input id="confirm" class="input" type="password" placeholder="Repeat password"/>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Document Upload -->
+    <div class="section-label">📄 Verification Document</div>
+    <p style="font-size:.85rem;color:var(--slate-500);margin-bottom:1rem;line-height:1.6">Upload a business registration certificate, license, or government-issued document to verify your organization. Accepted: PDF, JPG, PNG (max 10MB).</p>
+
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('doc-file').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+      <input type="file" id="doc-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="fileSelected(event)"/>
+      <div class="upload-icon">📁</div>
+      <div class="upload-title">Click to upload or drag &amp; drop</div>
+      <div class="upload-sub">PDF, JPG, PNG · Max 10MB</div>
+    </div>
+    <div class="upload-preview" id="upload-preview">
+      <span style="font-size:1.5rem">📄</span>
+      <span class="fname" id="file-name">—</span>
+      <span class="fsize" id="file-size">—</span>
+      <button onclick="clearFile()" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1.1rem">✕</button>
+    </div>
+
+    <button id="submit-btn" class="btn btn-primary" onclick="doRegister()" style="margin-top:2rem" disabled>
+      Submit Registration
+    </button>
+
+    <div class="switch">Already registered? <a href="login-org.html">Sign in →</a></div>
+    <div class="switch" style="margin-top:.5rem"><a href="../index.html" style="color:var(--slate-400);font-size:.8rem">← Back to home</a></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let selectedFile = null;
+
+// Enable submit when form has content
+function checkForm(){
+  const filled = ['org-name','org-type','org-address','org-phone','email','password','confirm'].every(id => document.getElementById(id).value.trim());
+  document.getElementById('submit-btn').disabled = !filled;
+}
+document.querySelectorAll('.input').forEach(el => el.addEventListener('input', checkForm));
+
+// File handling
+function fileSelected(e){ handleFile(e.target.files[0]); }
+function dragOver(e){ e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function dragLeave(){ document.getElementById('upload-zone').classList.remove('drag'); }
+function dropFile(e){ e.preventDefault(); dragLeave(); handleFile(e.dataTransfer.files[0]); }
+function handleFile(file){
+  if (!file) return;
+  if (file.size > 10*1024*1024){ alert('File too large. Max 10MB.'); return; }
+  selectedFile = file;
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-size').textContent = (file.size/1024/1024).toFixed(2) + ' MB';
+  document.getElementById('upload-preview').style.display = 'flex';
+  checkForm();
+}
+function clearFile(){ selectedFile = null; document.getElementById('doc-file').value=''; document.getElementById('upload-preview').style.display='none'; }
+
+// Progress bar
+function setProgress(step){ for(let i=1;i<=3;i++){ const el=document.getElementById('p'+i); el.className='prog-step'+(i<step?' done':i===step?' active':''); } }
+
+async function doRegister(){
+  const errEl = document.getElementById('err'); errEl.style.display='none';
+  const orgName  = document.getElementById('org-name').value.trim();
+  const orgType  = document.getElementById('org-type').value;
+  const address  = document.getElementById('org-address').value.trim();
+  const phone    = document.getElementById('org-phone').value.trim();
+  const website  = document.getElementById('org-website').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirm  = document.getElementById('confirm').value;
+  const btn      = document.getElementById('submit-btn');
+
+  if (!orgName||!orgType||!address||!phone||!email||!password) { errEl.textContent='Please fill in all required fields.'; errEl.style.display='block'; return; }
+  if (password.length < 8) { errEl.textContent='Password must be at least 8 characters.'; errEl.style.display='block'; return; }
+  if (password !== confirm) { errEl.textContent='Passwords do not match.'; errEl.style.display='block'; return; }
+
+  btn.disabled=true; btn.textContent='Creating account…'; setProgress(1);
+
+  try {
+    // Step 1: Create auth user
+    const { data: auth, error: authErr } = await db.auth.signUp({ email, password });
+    if (authErr) throw authErr;
+    setProgress(2);
+
+    // Step 2: Upload document if provided
+    let docUrl = null;
+    if (selectedFile) {
+      btn.textContent='Uploading document…';
+      const filePath = `${auth.user.id}/${Date.now()}-${selectedFile.name}`;
+      const { data: upload, error: upErr } = await db.storage.from('org-documents').upload(filePath, selectedFile);
+      if (upErr) throw new Error('Document upload failed: ' + upErr.message);
+      const { data: urlData } = db.storage.from('org-documents').getPublicUrl(filePath);
+      docUrl = urlData?.publicUrl;
+    }
+    setProgress(3);
+
+    // Step 3: Insert profile
+    btn.textContent='Saving profile…';
+    const { error: profErr } = await db.from('profiles').insert({
+      id: auth.user.id, role: 'organization',
+      email, org_name: orgName,
+      company_address: `${address} | ${orgType}${website ? ' | '+website : ''}`,
+      phone, document_url: docUrl,
+      approval_status: 'pending',
+    });
+    if (profErr) throw profErr;
+
+    // Success — show pending message
+    document.querySelector('.card').innerHTML = `
+      <div style="text-align:center;padding:2rem 1rem">
+        <div style="font-size:4rem;margin-bottom:1.5rem">⏳</div>
+        <h2 style="font-family:var(--font-head);font-size:1.75rem;color:var(--q-navy);margin-bottom:1rem">Registration Submitted!</h2>
+        <p style="color:var(--slate-500);line-height:1.7;margin-bottom:2rem">Your organization <strong>${orgName}</strong> has been registered. A QCode admin will review your details and verification document. You'll receive an email once approved.</p>
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:1.25rem;margin-bottom:2rem">
+          <p style="font-size:.875rem;color:#92400e">⚠️ Your account is <strong>pending approval</strong>. You cannot log in until approved by QCode admin.</p>
+        </div>
+        <a href="../index.html" style="display:inline-flex;align-items:center;gap:.5rem;padding:.875rem 2rem;background:var(--q-accent);color:#fff;border-radius:var(--r);font-weight:600;text-decoration:none">← Back to Home</a>
+      </div>`;
+  } catch(e) {
+    errEl.textContent = e.message || 'Registration failed. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled=false; btn.textContent='Submit Registration';
+    setProgress(1);
+  }
+}
+</script>
+</body>
+</html>

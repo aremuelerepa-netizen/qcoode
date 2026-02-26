@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Your Ticket — QCode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s200:#e2e8f0;--s500:#64748b;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--shl:0 16px 48px rgba(10,22,40,.2)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem}
+    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.2rem;font-weight:800;color:#fff;text-decoration:none;margin-bottom:2.5rem}
+    .logo span{color:var(--cyan)}
+    .card{background:#fff;border-radius:1.5rem;padding:2.5rem;width:100%;max-width:420px;box-shadow:var(--shl);text-align:center}
+    .live-dot{display:inline-flex;align-items:center;gap:.375rem;font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.5rem;padding:.3rem .75rem;background:rgba(34,197,94,.08);border-radius:999px}
+    .live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s ease infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .called-box{display:none;background:linear-gradient(135deg,#15803d,var(--green));border-radius:1rem;padding:1.25rem 1.5rem;margin-bottom:1.5rem;animation:pulse 1.5s ease infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 14px rgba(34,197,94,0)}}
+    .called-box h2{font-family:var(--fh);color:#fff;font-size:1.25rem;margin-bottom:.25rem}
+    .called-box p{color:rgba(255,255,255,.85);font-size:.875rem}
+    .svc-lbl{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
+    .svc-name{font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:.25rem}
+    .org-name{font-size:.8rem;color:var(--s500);margin-bottom:2rem}
+    .ticket-lbl{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em}
+    .ticket-num{font-family:var(--fh);font-size:5.5rem;font-weight:800;color:var(--navy);line-height:1;margin:.2rem 0 1.75rem}
+    .pill-row{display:flex;flex-direction:column;align-items:center;gap:.625rem;margin-bottom:1.75rem}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;padding:.5rem 1.25rem;font-size:.875rem;font-weight:600}
+    .pill-pos{background:rgba(37,99,235,.08);border:1.5px solid rgba(37,99,235,.2);color:var(--accent)}
+    .pill-eta{background:rgba(6,182,212,.08);border:1.5px solid rgba(6,182,212,.25);color:#0e7490}
+    .divider{height:1px;background:var(--s200);margin:1.5rem 0}
+    .stats-pair{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:1.25rem}
+    .sp{background:#f8fafc;border:1px solid #e2e8f0;border-radius:.625rem;padding:1rem}
+    .sp-n{font-family:var(--fh);font-size:1.75rem;font-weight:800;color:var(--accent);line-height:1}
+    .sp-l{font-size:.7rem;color:var(--s500);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
+    .last-upd{font-size:.7rem;color:#94a3b8;margin-bottom:1.5rem}
+    .btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.75rem 1.5rem;border-radius:var(--r);font-family:var(--fb);font-size:.875rem;font-weight:600;cursor:pointer;width:100%;text-decoration:none;border:none;transition:all .18s}
+    .bp{background:var(--accent);color:#fff;margin-bottom:.625rem}.bp:hover{background:#1d4ed8}
+    .bg{background:transparent;color:var(--s500);border:1.5px solid #e2e8f0}.bg:hover{border-color:var(--red);color:var(--red)}
+    .cta{background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(6,182,212,.04));border:1px solid rgba(37,99,235,.15);border-radius:1rem;padding:1.25rem;margin-top:1.5rem}
+    .cta h3{font-family:var(--fh);font-size:.9rem;color:var(--navy);margin-bottom:.375rem}
+    .cta p{font-size:.78rem;color:var(--s500);margin-bottom:.875rem;line-height:1.5}
+    #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+    .toast{padding:.75rem 1.125rem;border-radius:.5rem;box-shadow:var(--shl);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+    .t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
+    @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:translateX(0)}}
+  </style>
+</head>
+<body>
+<a href="../index.html" class="logo">
+  <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+  <span>Q</span>Code
+</a>
+<div class="card">
+  <div class="live-dot">Live Tracking</div>
+  <div id="called-box" class="called-box"><h2>📢 You're Being Called!</h2><p>Please proceed to the service counter now.</p></div>
+  <div class="svc-lbl">Service</div>
+  <div class="svc-name" id="svc-name">—</div>
+  <div class="org-name" id="org-name">—</div>
+  <div class="ticket-lbl">Your Ticket</div>
+  <div class="ticket-num" id="ticket-num">—</div>
+  <div class="pill-row">
+    <span class="pill pill-pos">Position <strong id="pos-num" style="margin-left:.375rem">—</strong></span>
+    <span class="pill pill-eta">⏱ ETA: <strong id="eta-str" style="margin-left:.375rem">Calculating…</strong></span>
+  </div>
+  <div class="divider"></div>
+  <div class="stats-pair">
+    <div class="sp"><div class="sp-n" id="stat-ahead">—</div><div class="sp-l">Ahead of You</div></div>
+    <div class="sp"><div class="sp-n" id="stat-total">—</div><div class="sp-l">Total Waiting</div></div>
+  </div>
+  <div class="last-upd">Updated: <span id="last-upd">—</span></div>
+  <button class="btn bg" onclick="leaveQueue()">✕ Leave Queue</button>
+  <div class="cta">
+    <h3>Want alerts &amp; history?</h3>
+    <p>Create a free account to track all queues, get called notifications, and never miss your turn.</p>
+    <a href="../auth/register-user.html" class="btn bp">Create Free Account →</a>
+  </div>
+</div>
+<div id="toasts"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+function toast(msg,type='w',ms=8000){const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>⚠</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+let entry=null,service=null,channel=null;
+async function init(){
+  const stored=sessionStorage.getItem('guestEntry');
+  if(!stored){window.location.href='../index.html';return;}
+  try{const p=JSON.parse(stored);entry=p.entry;service=p.service;}catch{window.location.href='../index.html';return;}
+  document.getElementById('ticket-num').textContent=entry.ticket_label;
+  document.getElementById('svc-name').textContent=service.name||'—';
+  document.getElementById('org-name').textContent=service.profiles?.org_name||'';
+  await refreshPosition();subscribeQueue();setInterval(refreshPosition,30000);
+}
+async function refreshPosition(){
+  try{
+    const {data:me}=await db.from('queue_entries').select('status,estimated_time').eq('id',entry.id).single();
+    if(!me)return;entry={...entry,...me};
+    document.getElementById('called-box').style.display=me.status==='called'?'block':'none';
+    if(['completed','no_show','cancelled'].includes(me.status)){
+      sessionStorage.removeItem('guestEntry');
+      document.querySelector('.card').innerHTML=`<div style="padding:1rem"><div style="font-size:3rem;margin-bottom:1rem">${me.status==='completed'?'✅':'❌'}</div><h2 style="font-family:Syne,sans-serif;color:#0a1628;margin-bottom:.75rem">${me.status==='completed'?'You were served!':me.status==='no_show'?'Marked as no-show':'Queue left'}</h2><p style="color:#64748b;margin-bottom:2rem;line-height:1.6">Ticket ${entry.ticket_label} is closed. Create an account to track future queues.</p><a href="../auth/register-user.html" style="display:block;padding:.875rem;background:#2563eb;color:#fff;border-radius:.625rem;font-weight:600;text-decoration:none;text-align:center;margin-bottom:.75rem">Create Free Account</a><a href="../index.html" style="display:block;padding:.875rem;color:#64748b;border:1.5px solid #e2e8f0;border-radius:.625rem;font-weight:600;text-decoration:none;text-align:center">← Back to Home</a></div>`;
+      return;
+    }
+    const {count:ahead}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',service.id).eq('status','waiting').lt('ticket_number',entry.ticket_number);
+    const {count:total}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',service.id).eq('status','waiting');
+    const pos=(ahead||0)+1;
+    document.getElementById('pos-num').textContent=pos;
+    document.getElementById('stat-ahead').textContent=Math.max(0,pos-1);
+    document.getElementById('stat-total').textContent=total||0;
+    if(me.estimated_time){const etaDate=new Date(me.estimated_time);const mins=Math.max(0,Math.round((etaDate-Date.now())/60000));document.getElementById('eta-str').textContent=`~${mins} min (${fmtTime(me.estimated_time)})`;}
+    document.getElementById('last-upd').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }catch(e){console.error(e);}
+}
+function subscribeQueue(){
+  if(channel)channel.unsubscribe();
+  channel=db.channel(`guest:${service.id}`)
+    .on('postgres_changes',{event:'*',schema:'public',table:'queue_entries',filter:`service_id=eq.${service.id}`},async(payload)=>{
+      await refreshPosition();
+      if(payload.new?.id===entry.id&&payload.new?.status==='called')toast('📢 You are being called! Please go to the counter now.','w',10000);
+    }).subscribe();
+}
+async function leaveQueue(){
+  if(!confirm('Leave this queue?'))return;
+  try{await db.from('queue_entries').update({status:'cancelled',completed_at:new Date().toISOString()}).eq('id',entry.id);}catch{}
+  sessionStorage.removeItem('guestEntry');window.location.href='../index.html';
+}
+init();
+</script>
+</body>
+</html>
