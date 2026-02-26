@@ -48,8 +48,8 @@
     <div class="fg"><label class="lbl">Password</label><input id="password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
     <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
     <div class="divider">or</div>
-    <a href="login-org.html" class="btn btn-org" style="display:flex;align-items:center;justify-content:center;text-decoration:none;padding:1rem;border-radius:var(--r);font-weight:700;font-size:1rem">Sign in as Organization →</a>
-    <div class="sw">Don't have an account? <a href="register-user.html">Create one →</a></div>
+    <a href="login-org" class="btn btn-org" style="display:flex;align-items:center;justify-content:center;text-decoration:none;padding:1rem;border-radius:var(--r);font-weight:700;font-size:1rem">Sign in as Organization →</a>
+    <div class="sw">Don't have an account? <a href="register-user">Create one →</a></div>
   </div>
   <a href="../index.html" class="back">← Back to home</a>
 </div>
@@ -91,7 +91,7 @@ async function doLogin() {
     // Save lang preference
     if (data.preferred_lang) localStorage.setItem('qcode_lang', data.preferred_lang);
     btn.textContent = '✓ Redirecting…';
-    window.location.href = data.redirect || '/dashboard/user';
+    window.location.href = data.redirect || '/user';
 
   } catch(e) {
     showErr('Network error. Please try again.');
@@ -112,7 +112,7 @@ async function checkSession() {
     const res  = await fetch('/api/auth/me');
     const data = await res.json();
     if (data.logged_in) {
-      window.location.href = data.role === 'user' ? '/dashboard/user' :
+      window.location.href = data.role === 'user' ? '/user' :
                              data.role === 'organization' ? '/dashboard/org' : '/admin';
     }
   } catch(e) {}
