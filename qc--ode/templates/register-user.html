@@ -53,8 +53,8 @@
     <div class="fg"><label class="lbl">Password *</label><input id="password" class="inp" type="password" placeholder="Minimum 8 characters"/></div>
     <div class="fg"><label class="lbl">Confirm Password *</label><input id="confirm" class="inp" type="password" placeholder="Repeat password"/></div>
     <button id="btn" class="btn" onclick="register()">Create Account</button>
-    <div class="sw">Already have an account? <a href="login-user.html">Sign in →</a></div>
-    <div class="sw" style="margin-top:.375rem"><a href="register-org.html" style="color:#94a3b8;font-size:.8rem">Registering an organization? →</a></div>
+    <div class="sw">Already have an account? <a href="login-user">Sign in →</a></div>
+    <div class="sw" style="margin-top:.375rem"><a href="register-org" style="color:#94a3b8;font-size:.8rem">Registering an organization? →</a></div>
   </div>
   <a href="../index.html" class="back">← Back to home</a>
 </div>
@@ -99,7 +99,7 @@ async function register() {
     ok.textContent  = data.message || 'Account created! Redirecting to login…';
     ok.style.display = 'block';
     btn.textContent  = '✓ Account created!';
-    setTimeout(() => { window.location.href = '/auth/login-user'; }, 2500);
+    setTimeout(() => { window.location.href = '/login-user'; }, 2500);
 
   } catch(e) {
     showErr('Network error. Please check your connection and try again.');
