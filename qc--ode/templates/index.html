@@ -365,7 +365,7 @@
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+{% raw %}<script>
 // ╔═══════════════════════════════════════╗
 // ║  REPLACE YOUR SUPABASE CREDENTIALS   ║
 // ╚═══════════════════════════════════════╝
@@ -396,7 +396,7 @@ function changeLang(l){
 
 function toast(msg, type='info', ms=4500){
   const t = document.createElement('div'); t.className=`toast t-${type}`;
-  t.innerHTML=`<span>${{success:'✓',error:'✕',info:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;
+  const icons={success:'✓',error:'✕',info:'ℹ'};t.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
   document.getElementById('toasts').appendChild(t);
   setTimeout(()=>t.remove(), ms);
 }
@@ -524,6 +524,6 @@ async function joinAsGuest(){
 document.getElementById('code-in').addEventListener('keydown', e => { if(e.key==='Enter') findService(); });
 loadStats();
 initAuth();
-</script>
+</script>{% endraw %}
 </body>
 </html>
