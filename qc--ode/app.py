@@ -9,6 +9,40 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = os.environ.get("APP_SECRET", "super-secret-key")
 
+# --- PAGE ROUTES ---
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/register-user")
+def register_user():
+    return render_template("register-user.html")
+
+@app.route("/register-org")
+def register_org():
+    return render_template("register-org.html")
+
+@app.route("/login-user")
+def login_user():
+    return render_template("login-user.html")
+
+@app.route("/login-org")
+def login_org():
+    return render_template("login-org.html")
+
+@app.route("/dashboard-user")
+def dashboard_user():
+    return render_template("user.html")
+
+@app.route("/dashboard-org")
+def dashboard_org():
+    return render_template("org.html")
+
+@app.route("/guest-ticket")
+def guest_ticket():
+    return render_template("guest.html")
+
 # --- CONFIGURATION ---
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") # Use Service Role for atomic DB ops
@@ -155,11 +189,7 @@ def admin_dashboard():
     if not session.get('is_super_admin'):
         return redirect("/")
     return render_template("super_admin.html")
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
+    
 if __name__ == "__main__":
     # In production, this is ignored by Gunicorn
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
