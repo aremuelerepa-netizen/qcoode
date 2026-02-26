@@ -389,7 +389,7 @@
 <div id="toasts"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+{% raw %}<script>
 // ╔═══════════════════════════════════════╗
 // ║  REPLACE YOUR SUPABASE CREDENTIALS   ║
 // ╚═══════════════════════════════════════╝
@@ -400,7 +400,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ── Helpers ───────────────────────────────────────────────────
 function toast(msg, type='i', ms=4000){
   const el=document.createElement('div'); el.className=`toast t-${type}`;
-  el.innerHTML=`<span>${{s:'✓',e:'✕',i:'ℹ'}[type]||'ℹ'}</span><span>${msg}</span>`;
+  const icons={s:'✓',e:'✕',i:'ℹ'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
   document.getElementById('toasts').appendChild(el);
   setTimeout(()=>el.remove(),ms);
 }
@@ -712,6 +712,6 @@ async function doLogout(){
 }
 
 init();
-</script>
+</script>{% endraw %}
 </body>
 </html>
