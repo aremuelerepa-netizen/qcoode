@@ -924,6 +924,24 @@ def api_suspend_org():
     db_update("profiles", {"id": org_id}, {"approval_status": "suspended"})
     return jsonify({"success": True}), 200
 
+@app.route("/api/admin/analytics", methods=["GET"])
+def admin_analytics():
+    try:
+        orgs = supabase.table("profiles").select("*", count="exact").eq("role", "organization").execute()
+        approved = supabase.table("profiles").select("*", count="exact").eq("role", "organization").eq("approval_status", "approved").execute()
+        pending = supabase.table("profiles").select("*", count="exact").eq("role", "organization").eq("approval_status", "pending").execute()
+        users = supabase.table("profiles").select("*", count="exact").eq("role", "user").execute()
+
+        return jsonify({
+            "total_orgs": orgs.count,
+            "approved_orgs": approved.count,
+            "pending_orgs": pending.count,
+            "total_users": users.count
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # ─────────────────────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────────────────────
