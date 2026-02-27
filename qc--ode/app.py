@@ -32,6 +32,29 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
 # ─────────────────────────────────────────────
 # HEADERS
 # ─────────────────────────────────────────────
+@app.route('/api/auth/me', methods=['GET'])
+def get_current_user():
+    # Extract the token from the 'Authorization' header
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"error": "No token provided"}), 401
+
+    try:
+        # Remove 'Bearer ' prefix
+        token = auth_header.split(" ")[1]
+        
+        # Verify user with Supabase
+        user_response = supabase.auth.get_user(token)
+        if not user_response.user:
+            return jsonify({"error": "User not found"}), 401
+
+        # Fetch the profile data from your database
+        profile = supabase.table('profiles').select('*').eq('id', user_response.user.id).single().execute()
+        
+        return jsonify(profile.data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 401
+        
 def service_headers():
     return {
         "apikey": SUPABASE_KEY,
