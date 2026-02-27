@@ -1,9 +1,14 @@
 """
-QCode Backend — Complete & Fixed
-- Routes match HTML fetch() calls exactly
-- Super admin login bypasses Supabase (uses env vars)
-- Org registration handles both JSON and multipart
-- All dashboard APIs included
+QCode Backend — Final Production Version
+=========================================
+KEY FIXES vs previous versions:
+1. Uses Supabase Admin API (POST /auth/v1/admin/users) to create accounts
+   - Bypasses email confirmation requirement entirely
+   - Bypasses Supabase free-tier email rate limit (3/hour)
+   - Users can log in immediately after registering
+2. Super admin login uses env vars only — no Supabase call at all
+3. All routes match HTML fetch() calls exactly (/api/auth/X)
+4. Port binding uses $PORT env var for Render compatibility
 """
 
 import os
@@ -21,7 +26,7 @@ load_dotenv()
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.secret_key = os.getenv("APP_SECRET", "change-this-in-production")
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"]   = True
+app.config["SESSION_COOKIE_SECURE"]   = os.getenv("FLASK_ENV") == "production"
 CORS(app, supports_credentials=True)
 
 # ─────────────────────────────────────────────
@@ -29,19 +34,21 @@ CORS(app, supports_credentials=True)
 # ─────────────────────────────────────────────
 SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
-SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
+SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")  # service role key
 
-# Super-admin credentials stored in env (never in DB)
-SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com")
-SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123")
+SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
 
 if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
-    raise RuntimeError("Missing Supabase environment variables.")
+    raise RuntimeError(
+        "Missing required env vars: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_KEY"
+    )
 
 # ─────────────────────────────────────────────
 # HEADERS
 # ─────────────────────────────────────────────
-def service_headers():
+def _h_service():
+    """Service role key — bypasses RLS, used for all DB reads/writes."""
     return {
         "apikey":        SUPABASE_KEY,
         "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -49,7 +56,8 @@ def service_headers():
         "Prefer":        "return=representation",
     }
 
-def anon_headers():
+def _h_anon():
+    """Anon key — used only for signin."""
     return {
         "apikey":        SUPABASE_ANON_KEY,
         "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
@@ -59,19 +67,41 @@ def anon_headers():
 # ─────────────────────────────────────────────
 # SUPABASE AUTH HELPERS
 # ─────────────────────────────────────────────
-def sb_signup(email, password):
+
+def admin_create_user(email, password):
+    """
+    Create a user via the Admin API.
+    - email_confirm: true  → no confirmation email sent, user can log in immediately
+    - Uses service role key (SUPABASE_KEY), NOT the anon key
+    - No rate limit unlike the public /auth/v1/signup endpoint
+    Returns: { "id": "uuid", ... } on success
+             { "message": "...", "code": ... } on failure
+    """
     r = requests.post(
-        f"{SUPABASE_URL}/auth/v1/signup",
-        headers=anon_headers(),
-        json={"email": email, "password": password},
+        f"{SUPABASE_URL}/auth/v1/admin/users",
+        headers={
+            "apikey":        SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Content-Type":  "application/json",
+        },
+        json={
+            "email":         email,
+            "password":      password,
+            "email_confirm": True,   # <-- key: skips confirmation, no email sent
+        },
         timeout=15
     )
     return r.json()
 
 def sb_signin(email, password):
+    """
+    Sign in via password grant.
+    Returns: { "access_token": "...", "user": { "id": "uuid" } } on success
+             { "error": "...", "error_description": "..." } on failure
+    """
     r = requests.post(
         f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
-        headers=anon_headers(),
+        headers=_h_anon(),
         json={"email": email, "password": password},
         timeout=15
     )
@@ -81,7 +111,10 @@ def sb_signout(token):
     try:
         requests.post(
             f"{SUPABASE_URL}/auth/v1/logout",
-            headers={"apikey": SUPABASE_ANON_KEY, "Authorization": f"Bearer {token}"},
+            headers={
+                "apikey":        SUPABASE_ANON_KEY,
+                "Authorization": f"Bearer {token}",
+            },
             timeout=5
         )
     except Exception:
@@ -90,10 +123,11 @@ def sb_signout(token):
 # ─────────────────────────────────────────────
 # DATABASE HELPERS
 # ─────────────────────────────────────────────
+
 def db_insert(table, data):
     r = requests.post(
         f"{SUPABASE_URL}/rest/v1/{table}",
-        headers=service_headers(),
+        headers=_h_service(),
         json=data,
         timeout=15
     )
@@ -103,7 +137,7 @@ def db_select(table, filters=None, single=False):
     params = {"select": "*"}
     if filters:
         params.update(filters)
-    h = service_headers()
+    h = dict(_h_service())
     if single:
         h["Accept"] = "application/vnd.pgrst.object+json"
     r = requests.get(
@@ -118,13 +152,13 @@ def db_update(table, match, data):
     params = {k: f"eq.{v}" for k, v in match.items()}
     r = requests.patch(
         f"{SUPABASE_URL}/rest/v1/{table}",
-        headers=service_headers(),
+        headers=_h_service(),
         params=params, json=data, timeout=15
     )
     return r.ok
 
 def db_count(table, filters=None):
-    h = {**service_headers(), "Prefer": "count=exact"}
+    h = {**_h_service(), "Prefer": "count=exact"}
     params = {"select": "id"}
     if filters:
         params.update(filters)
@@ -142,12 +176,13 @@ def get_profile(user_id):
 
 # ─────────────────────────────────────────────
 # PAGE ROUTES
+# Support both /X and /auth/X and /dashboard/X
 # ─────────────────────────────────────────────
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# Auth pages — support both /auth/X and /X paths
 @app.route("/register-user")
 @app.route("/auth/register-user")
 def register_user_page():
@@ -168,7 +203,6 @@ def login_user_page():
 def login_org_page():
     return render_template("login-org.html")
 
-# Dashboard pages
 @app.route("/user")
 @app.route("/dashboard/user")
 def user_dashboard():
@@ -186,12 +220,14 @@ def guest_dashboard():
 
 @app.route("/super-admin")
 @app.route("/admin")
-def super_admin():
+def super_admin_page():
     return render_template("super_admin.html")
 
 # ─────────────────────────────────────────────
-# SESSION CHECK  (called by all HTML pages on load)
+# SESSION CHECK
+# Every HTML page calls GET /api/auth/me on load
 # ─────────────────────────────────────────────
+
 @app.route("/api/auth/me", methods=["GET"])
 def api_me():
     if not session.get("user_id"):
@@ -203,44 +239,41 @@ def api_me():
         "email":      session.get("email"),
         "full_name":  session.get("full_name"),
         "org_name":   session.get("org_name"),
-        "redirect":   session.get("redirect", "/"),
     }), 200
 
 # ─────────────────────────────────────────────
 # REGISTER USER
-# HTML calls: POST /api/auth/register-user
+# HTML: POST /api/auth/register-user  (JSON)
 # ─────────────────────────────────────────────
+
 @app.route("/api/auth/register-user", methods=["POST"])
-@app.route("/api/register-user", methods=["POST"])          # fallback
+@app.route("/api/register-user",      methods=["POST"])
 def register_user():
     data      = request.get_json() or {}
     full_name = (data.get("full_name") or "").strip()
-    email     = (data.get("email") or "").strip().lower()
-    password  = data.get("password") or ""
-    phone     = (data.get("phone") or "").strip()
+    email     = (data.get("email")     or "").strip().lower()
+    password  = (data.get("password")  or "")
+    phone     = (data.get("phone")     or "").strip()
 
     if not full_name or not email or not password:
         return jsonify({"error": "Name, email and password are required."}), 400
     if len(password) < 8:
         return jsonify({"error": "Password must be at least 8 characters."}), 400
 
-    # Call Supabase signup
-    # NOTE: signup returns user at TOP LEVEL — NOT under "user" key
-    signup = sb_signup(email, password)
-    uid    = signup.get("id")   # <-- correct: top-level "id"
+    # Use Admin API — no email sent, no rate limit, no confirmation needed
+    result = admin_create_user(email, password)
+    uid    = result.get("id")
 
     if not uid:
-        msg = (signup.get("msg")
-               or signup.get("error_description")
-               or signup.get("message")
-               or "Registration failed.")
-        if "already registered" in str(msg).lower():
-            msg = "An account with this email already exists. Please log in."
-        if "rate limit" in str(msg).lower():
-            msg = "Too many sign-ups. Please wait a few minutes and try again."
-        return jsonify({"error": msg}), 400
+        msg = (result.get("message")
+               or result.get("msg")
+               or result.get("error_description")
+               or str(result))
+        if "already been registered" in msg.lower() or "already exists" in msg.lower():
+            return jsonify({"error": "An account with this email already exists. Please log in."}), 400
+        return jsonify({"error": f"Registration failed: {msg}"}), 400
 
-    # Save profile row (service role key bypasses RLS)
+    # Save profile row
     ins = db_insert("profiles", {
         "id":              uid,
         "role":            "user",
@@ -255,52 +288,51 @@ def register_user():
 
     return jsonify({
         "success": True,
-        "message": "Account created! Please check your email to confirm, then log in."
+        "message": "Account created! You can now log in."
     }), 201
 
 # ─────────────────────────────────────────────
 # REGISTER ORG
-# HTML calls: POST /api/auth/register-org  (multipart/form-data)
+# HTML: POST /api/auth/register-org  (multipart/form-data)
 # ─────────────────────────────────────────────
+
 @app.route("/api/auth/register-org", methods=["POST"])
-@app.route("/api/register-org", methods=["POST"])           # fallback
+@app.route("/api/register-org",      methods=["POST"])
 def register_org():
-    # Accept BOTH multipart (with file) and plain JSON
-    if request.content_type and "multipart" in request.content_type:
-        org_name = (request.form.get("org_name")   or "").strip()
-        email    = (request.form.get("email")       or "").strip().lower()
-        password = (request.form.get("password")    or "")
-        phone    = (request.form.get("org_phone")   or "").strip()
-        address  = (request.form.get("org_address") or "").strip()
-        org_type = (request.form.get("org_type")    or "").strip()
+    ct = (request.content_type or "").lower()
+    if "multipart" in ct or "form" in ct:
+        org_name = (request.form.get("org_name")    or "").strip()
+        email    = (request.form.get("email")        or "").strip().lower()
+        password = (request.form.get("password")     or "")
+        phone    = (request.form.get("org_phone")    or "").strip()
+        address  = (request.form.get("org_address")  or "").strip()
+        org_type = (request.form.get("org_type")     or "").strip()
     else:
         d        = request.get_json() or {}
-        org_name = (d.get("org_name")   or "").strip()
-        email    = (d.get("email")      or "").strip().lower()
-        password = (d.get("password")   or "")
-        phone    = (d.get("org_phone")  or "").strip()
-        address  = (d.get("org_address")or "").strip()
-        org_type = (d.get("org_type")   or "").strip()
+        org_name = (d.get("org_name")    or "").strip()
+        email    = (d.get("email")       or "").strip().lower()
+        password = (d.get("password")    or "")
+        phone    = (d.get("org_phone")   or "").strip()
+        address  = (d.get("org_address") or "").strip()
+        org_type = (d.get("org_type")    or "").strip()
 
     if not org_name or not email or not password:
         return jsonify({"error": "Organization name, email and password are required."}), 400
     if len(password) < 8:
         return jsonify({"error": "Password must be at least 8 characters."}), 400
 
-    # Signup — uid is at TOP LEVEL (not under "user")
-    signup = sb_signup(email, password)
-    uid    = signup.get("id")
+    # Admin API — bypasses rate limit and email confirmation
+    result = admin_create_user(email, password)
+    uid    = result.get("id")
 
     if not uid:
-        msg = (signup.get("msg")
-               or signup.get("error_description")
-               or signup.get("message")
-               or "Registration failed.")
-        if "already registered" in str(msg).lower():
-            msg = "An account with this email already exists."
-        if "rate limit" in str(msg).lower():
-            msg = "Supabase email rate limit hit. Please wait 1 hour and try again, or use a different email."
-        return jsonify({"error": msg}), 400
+        msg = (result.get("message")
+               or result.get("msg")
+               or result.get("error_description")
+               or str(result))
+        if "already been registered" in msg.lower() or "already exists" in msg.lower():
+            return jsonify({"error": "An account with this email already exists."}), 400
+        return jsonify({"error": f"Registration failed: {msg}"}), 400
 
     address_full = " | ".join(filter(None, [org_type, address])) or None
 
@@ -321,41 +353,44 @@ def register_org():
     return jsonify({
         "success":  True,
         "org_name": org_name,
-        "message":  f"Registration submitted! '{org_name}' is pending admin approval."
+        "message":  (
+            f"Registration submitted! '{org_name}' is pending admin approval. "
+            "You will be contacted once your account is reviewed."
+        )
     }), 201
 
 # ─────────────────────────────────────────────
 # LOGIN USER
-# HTML calls: POST /api/auth/login
+# HTML: POST /api/auth/login  (JSON)
 # ─────────────────────────────────────────────
+
 @app.route("/api/auth/login", methods=["POST"])
-@app.route("/api/login-user", methods=["POST"])             # fallback
+@app.route("/api/login-user", methods=["POST"])
 def login_user():
     data     = request.get_json() or {}
-    email    = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
+    email    = (data.get("email")    or "").strip().lower()
+    password = (data.get("password") or "")
 
     if not email or not password:
         return jsonify({"error": "Email and password are required."}), 400
 
-    # ── Supabase signin — token IS nested under "user" in signin (unlike signup)
     signin = sb_signin(email, password)
     token  = signin.get("access_token")
 
     if not token:
-        msg = (signin.get("error_description")
+        raw = (signin.get("error_description")
                or signin.get("msg")
                or signin.get("message")
-               or "Invalid email or password.")
-        if "email not confirmed" in str(msg).lower():
-            msg = "Please confirm your email address first. Check your inbox for a confirmation link."
-        if "invalid login" in str(msg).lower():
-            msg = "Incorrect email or password."
-        return jsonify({"error": msg}), 401
+               or signin.get("error")
+               or "Login failed.")
+        if "invalid" in raw.lower() or "credentials" in raw.lower():
+            raw = "Incorrect email or password."
+        elif "not confirmed" in raw.lower():
+            raw = "Account not confirmed. Please contact support."
+        return jsonify({"error": raw}), 401
 
-    user_obj = signin.get("user") or {}   # signin nests under "user"
-    uid      = user_obj.get("id")
-
+    # signin nests the user object under "user" key (unlike admin_create_user)
+    uid = (signin.get("user") or {}).get("id")
     if not uid:
         return jsonify({"error": "Could not retrieve user info."}), 401
 
@@ -368,7 +403,7 @@ def login_user():
 
     if status == "suspended":
         sb_signout(token)
-        return jsonify({"error": "This account has been suspended."}), 403
+        return jsonify({"error": "This account has been suspended. Contact support."}), 403
 
     session.permanent = True
     session["user_id"]   = uid
@@ -391,22 +426,22 @@ def login_user():
     }), 200
 
 # ─────────────────────────────────────────────
-# LOGIN ORG  (also handles super-admin login)
-# HTML calls: POST /api/auth/login-org
+# LOGIN ORG  (also handles super admin)
+# HTML: POST /api/auth/login-org  (JSON)
 # ─────────────────────────────────────────────
+
 @app.route("/api/auth/login-org", methods=["POST"])
-@app.route("/api/login-org", methods=["POST"])              # fallback
+@app.route("/api/login-org",      methods=["POST"])
 def login_org():
     data     = request.get_json() or {}
-    email    = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
+    email    = (data.get("email")    or "").strip().lower()
+    password = (data.get("password") or "")
 
     if not email or not password:
         return jsonify({"error": "Email and password are required."}), 400
 
-    # ── SUPER ADMIN: bypass Supabase entirely, use env vars ──
-    if (email == SUPER_ADMIN_EMAIL.lower()
-            and password == SUPER_ADMIN_PASSWORD):
+    # ── Super Admin: hardcoded env-var check, zero Supabase calls ──
+    if email == SUPER_ADMIN_EMAIL and password == SUPER_ADMIN_PASSWORD:
         session.permanent = True
         session["user_id"]   = "super-admin"
         session["role"]      = "super_admin"
@@ -419,24 +454,23 @@ def login_org():
             "redirect": "/super-admin",
         }), 200
 
-    # ── Regular org login ──────────────────────────────────
+    # ── Regular org login ──────────────────────
     signin = sb_signin(email, password)
     token  = signin.get("access_token")
 
     if not token:
-        msg = (signin.get("error_description")
+        raw = (signin.get("error_description")
                or signin.get("msg")
                or signin.get("message")
-               or "Invalid email or password.")
-        if "email not confirmed" in str(msg).lower():
-            msg = "Please confirm your email address first. Check your inbox."
-        if "invalid login" in str(msg).lower():
-            msg = "Incorrect email or password."
-        return jsonify({"error": msg}), 401
+               or signin.get("error")
+               or "Login failed.")
+        if "invalid" in raw.lower() or "credentials" in raw.lower():
+            raw = "Incorrect email or password."
+        elif "not confirmed" in raw.lower():
+            raw = "Account not confirmed. Please contact support."
+        return jsonify({"error": raw}), 401
 
-    user_obj = signin.get("user") or {}
-    uid      = user_obj.get("id")
-
+    uid = (signin.get("user") or {}).get("id")
     if not uid:
         return jsonify({"error": "Could not retrieve user info."}), 401
 
@@ -449,12 +483,12 @@ def login_org():
 
     if role != "organization":
         sb_signout(token)
-        return jsonify({"error": "This login is for organizations only."}), 403
+        return jsonify({"error": "This page is for organizations only. Use the user login instead."}), 403
 
     if status == "pending":
         sb_signout(token)
         return jsonify({
-            "error": "Your organization is pending admin approval. You will be notified by email once approved."
+            "error": "Your organization is pending admin approval. You will be notified once approved."
         }), 403
 
     if status == "suspended":
@@ -462,11 +496,11 @@ def login_org():
         return jsonify({"error": "This account has been suspended. Contact support."}), 403
 
     session.permanent = True
-    session["user_id"]  = uid
-    session["role"]     = "organization"
-    session["email"]    = profile.get("email", "")
-    session["org_name"] = profile.get("org_name", "")
-    session["full_name"]= profile.get("org_name", "")
+    session["user_id"]   = uid
+    session["role"]      = "organization"
+    session["email"]     = profile.get("email", "")
+    session["org_name"]  = profile.get("org_name", "")
+    session["full_name"] = profile.get("org_name", "")
 
     db_update("profiles", {"id": uid}, {"is_online": True})
 
@@ -478,9 +512,11 @@ def login_org():
 
 # ─────────────────────────────────────────────
 # LOGOUT
-# HTML calls: POST /api/auth/logout
+# HTML: POST /api/auth/logout
 # ─────────────────────────────────────────────
-@app.route("/api/logout", methods=["POST"])                 # fallback
+
+@app.route("/api/auth/logout", methods=["POST"])
+@app.route("/api/logout",      methods=["POST"])
 def logout():
     uid = session.get("user_id")
     if uid and uid != "super-admin":
@@ -491,6 +527,7 @@ def logout():
 # ─────────────────────────────────────────────
 # USER DASHBOARD API
 # ─────────────────────────────────────────────
+
 @app.route("/api/user/profile", methods=["GET"])
 def api_user_profile():
     uid = session.get("user_id")
@@ -505,11 +542,11 @@ def api_user_profile_update():
     uid = session.get("user_id")
     if not uid:
         return jsonify({"error": "Not logged in"}), 401
-    d = request.get_json() or {}
+    d   = request.get_json() or {}
     upd = {}
-    if "full_name"      in d: upd["full_name"]      = d["full_name"] or None
-    if "phone"          in d: upd["phone"]           = d["phone"] or None
-    if "preferred_lang" in d: upd["preferred_lang"]  = d["preferred_lang"]
+    if "full_name"      in d: upd["full_name"]     = d["full_name"] or None
+    if "phone"          in d: upd["phone"]          = d["phone"] or None
+    if "preferred_lang" in d: upd["preferred_lang"] = d["preferred_lang"]
     if upd:
         db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
@@ -530,7 +567,7 @@ def api_find_service():
         return jsonify({"error": f"'{svc['name']}' queue is closed."}), 400
     if svc["status"] == "paused":
         return jsonify({"error": f"'{svc['name']}' queue is paused. Try again soon."}), 400
-    waiting          = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
+    waiting              = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
     svc["waiting_count"] = waiting
     svc["org_name"]      = org.get("org_name", "")
     svc["eta_minutes"]   = (waiting + 1) * (svc.get("time_interval") or 5)
@@ -552,20 +589,25 @@ def api_join_queue():
     if svc["status"] != "open":
         return jsonify({"error": f"Queue is {svc['status']}."}), 400
     already = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}", "user_id": f"eq.{uid}",
-        "status": "in.(waiting,called,serving)"
+        "service_id": f"eq.{svc_id}",
+        "user_id":    f"eq.{uid}",
+        "status":     "in.(waiting,called,serving)",
     })
     if already:
         return jsonify({"error": "You are already in this queue.", "entry": already[0]}), 409
     n     = (svc.get("ticket_counter") or 0) + 1
-    label = f"{svc.get('ticket_prefix','Q')}{str(n).zfill(3)}"
+    label = f"{svc.get('ticket_prefix', 'Q')}{str(n).zfill(3)}"
     db_update("services", {"id": svc_id}, {"ticket_counter": n})
     pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
     eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos * (svc.get("time_interval") or 5))).isoformat()
     res   = db_insert("queue_entries", {
-        "service_id": svc_id, "user_id": uid,
-        "ticket_label": label, "ticket_number": n,
-        "status": "waiting", "estimated_time": eta_t, "join_method": "web",
+        "service_id":       svc_id,
+        "user_id":          uid,
+        "ticket_label":     label,
+        "ticket_number":    n,
+        "status":           "waiting",
+        "estimated_time":   eta_t,
+        "join_method":      "web",
         "custom_form_data": json.dumps(d.get("custom_form_data") or {}),
     })
     if not res["ok"]:
@@ -586,8 +628,9 @@ def api_queue_status(entry_id):
         return jsonify({"error": "Not found"}), 404
     entry = rows[0]
     ahead = db_count("queue_entries", {
-        "service_id": f"eq.{entry['service_id']}", "status": "eq.waiting",
-        "ticket_number": f"lt.{entry['ticket_number']}"
+        "service_id":    f"eq.{entry['service_id']}",
+        "status":        "eq.waiting",
+        "ticket_number": f"lt.{entry['ticket_number']}",
     })
     total = db_count("queue_entries", {"service_id": f"eq.{entry['service_id']}", "status": "eq.waiting"})
     svcs  = db_select("services", {"id": f"eq.{entry['service_id']}"})
@@ -609,8 +652,8 @@ def api_leave_queue(entry_id):
     if not rows or rows[0].get("user_id") != uid:
         return jsonify({"error": "Not found"}), 404
     db_update("queue_entries", {"id": entry_id}, {
-        "status": "cancelled",
-        "completed_at": datetime.now(timezone.utc).isoformat()
+        "status":       "cancelled",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
     })
     return jsonify({"success": True}), 200
 
@@ -619,7 +662,7 @@ def api_user_history():
     uid = session.get("user_id")
     if not uid:
         return jsonify({"error": "Not logged in"}), 401
-    rows = db_select("queue_entries", {"user_id": f"eq.{uid}", "order": "joined_at.desc", "limit": "50"})
+    rows      = db_select("queue_entries", {"user_id": f"eq.{uid}", "order": "joined_at.desc", "limit": "50"})
     svc_cache = {}
     for row in rows:
         sid = row.get("service_id")
@@ -635,7 +678,7 @@ def api_user_history():
 
 @app.route("/api/user/open-services", methods=["GET"])
 def api_open_services():
-    svcs = db_select("services", {"status": "eq.open", "deleted_at": "is.null", "order": "created_at.desc", "limit": "30"})
+    svcs   = db_select("services", {"status": "eq.open", "deleted_at": "is.null", "order": "created_at.desc", "limit": "30"})
     result = []
     for svc in svcs:
         org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
@@ -649,6 +692,7 @@ def api_open_services():
 # ─────────────────────────────────────────────
 # ORG DASHBOARD API
 # ─────────────────────────────────────────────
+
 @app.route("/api/org/profile", methods=["GET"])
 def api_org_profile():
     uid = session.get("user_id")
@@ -726,7 +770,8 @@ def api_org_delete_service(svc_id):
     if not uid or session.get("role") != "organization":
         return jsonify({"error": "Unauthorized"}), 403
     db_update("services", {"id": svc_id}, {
-        "deleted_at": datetime.now(timezone.utc).isoformat(), "status": "closed"
+        "deleted_at": datetime.now(timezone.utc).isoformat(),
+        "status":     "closed",
     })
     return jsonify({"success": True}), 200
 
@@ -754,7 +799,7 @@ def api_org_queue(svc_id):
     entries = db_select("queue_entries", {
         "service_id": f"eq.{svc_id}",
         "status":     "in.(waiting,called,serving)",
-        "order":      "ticket_number.asc"
+        "order":      "ticket_number.asc",
     })
     for e in entries:
         if e.get("user_id"):
@@ -772,14 +817,17 @@ def api_org_call_next(svc_id):
     if not uid or session.get("role") != "organization":
         return jsonify({"error": "Unauthorized"}), 403
     waiting = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}", "status": "eq.waiting",
-        "order": "ticket_number.asc", "limit": "1"
+        "service_id": f"eq.{svc_id}",
+        "status":     "eq.waiting",
+        "order":      "ticket_number.asc",
+        "limit":      "1",
     })
     if not waiting:
         return jsonify({"error": "No one waiting"}), 404
     entry = waiting[0]
     db_update("queue_entries", {"id": entry["id"]}, {
-        "status": "called", "called_at": datetime.now(timezone.utc).isoformat()
+        "status":    "called",
+        "called_at": datetime.now(timezone.utc).isoformat(),
     })
     entry["status"] = "called"
     return jsonify({"success": True, "entry": entry}), 200
@@ -807,13 +855,14 @@ def api_org_report(svc_id):
         "service_id": f"eq.{svc_id}",
         "status":     "in.(completed,no_show,cancelled)",
         "order":      "ticket_number.desc",
-        "limit":      "200"
+        "limit":      "200",
     })
     return jsonify(entries), 200
 
 # ─────────────────────────────────────────────
 # ADMIN API
 # ─────────────────────────────────────────────
+
 def require_admin(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
@@ -860,7 +909,10 @@ def api_reject_org():
     reason = (d.get("reason") or "").strip()
     if not org_id or not reason:
         return jsonify({"error": "org_id and reason required"}), 400
-    db_update("profiles", {"id": org_id}, {"approval_status": "suspended", "rejection_reason": reason})
+    db_update("profiles", {"id": org_id}, {
+        "approval_status":  "suspended",
+        "rejection_reason": reason,
+    })
     return jsonify({"success": True}), 200
 
 @app.route("/api/admin/suspend-org", methods=["POST"])
@@ -875,6 +927,7 @@ def api_suspend_org():
 # ─────────────────────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────────────────────
+
 @app.route("/health")
 def health():
     return jsonify({
@@ -886,6 +939,7 @@ def health():
 # ─────────────────────────────────────────────
 # RUN
 # ─────────────────────────────────────────────
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=False)
