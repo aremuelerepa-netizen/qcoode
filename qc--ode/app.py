@@ -199,7 +199,32 @@ def login():
         "redirect": f"/dashboard/{profile['role']}"
     })
 
+@app.route("/api/auth/register-org", methods=["POST"])
+def register_org():
+    data = request.get_json()
 
+    org_name = data.get("org_name")
+    email = data.get("email")
+    password = data.get("password")
+
+    if not org_name or not email or not password:
+        return jsonify({"error": "Missing fields"}), 400
+
+    signup = sb_signup(email, password)
+    user_id = signup.get("id")
+
+    if not user_id:
+        return jsonify({"error": "Signup failed"}), 400
+
+    db_insert("profiles", {
+        "id": user_id,
+        "role": "org",
+        "full_name": org_name,
+        "email": email,
+        "approval_status": "approved"
+    })
+
+    return jsonify({"success": True}), 201
 @app.route("/api/logout", methods=["POST"])
 def logout():
     session.clear()
