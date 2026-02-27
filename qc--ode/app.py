@@ -124,15 +124,15 @@ def login_user_page():
 def login_org_page():
     return render_template("login-org.html")
 
-@app.route("/dashboard/user")
+@app.route("/user")
 def user_dashboard():
     return render_template("user.html")
 
-@app.route("/dashboard/org")
+@app.route("/org")
 def org_dashboard():
     return render_template("org.html")
 
-@app.route("/dashboard/guest")
+@app.route("/guest")
 def guest_dashboard():
     return render_template("guest.html")
 
@@ -143,7 +143,7 @@ def super_admin():
 # ─────────────────────────────────────────────
 # AUTH API
 # ─────────────────────────────────────────────
-@app.route("/api/auth/register-user", methods=["POST"])
+@app.route("/api/register-user", methods=["POST"])
 def register_user():
     data = request.get_json()
     full_name = data.get("full_name")
@@ -170,7 +170,7 @@ def register_user():
     return jsonify({"success": True}), 201
 
 
-@app.route("/api/auth/login", methods=["POST"])
+@app.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -200,7 +200,7 @@ def login():
     })
 
 
-@app.route("/api/auth/logout", methods=["POST"])
+@app.route("/api/logout", methods=["POST"])
 def logout():
     session.clear()
     return jsonify({"success": True})
