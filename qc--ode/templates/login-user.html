@@ -113,8 +113,7 @@ async function checkSession() {
     const data = await res.json();
     if (data.logged_in) {
       window.location.href = data.role === 'user' ? '/user' :
-                             data.role === 'organization' ? '/dashboard/org' : '/admin';
-    }
+                             
   } catch(e) {}
 }
 
