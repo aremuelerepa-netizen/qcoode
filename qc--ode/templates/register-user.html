@@ -32,7 +32,7 @@
 </head>
 <body>
 <div class="wrap">
-  <a href="../index.html" class="logo">
+  <a href="../" class="logo">
     <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
     <span>Q<span style="color:#fff">Code</span></span>
   </a>
@@ -56,7 +56,7 @@
     <div class="sw">Already have an account? <a href="login-user">Sign in →</a></div>
     <div class="sw" style="margin-top:.375rem"><a href="register-org" style="color:#94a3b8;font-size:.8rem">Registering an organization? →</a></div>
   </div>
-  <a href="../index.html" class="back">← Back to home</a>
+  <a href="../" class="back">← Back to home</a>
 </div>
 <script>
 async function register() {
@@ -81,7 +81,7 @@ async function register() {
   btn.textContent = 'Creating account…';
 
   try {
-    const res  = await fetch('/api/auth/register-user', {
+    const res  = await fetch('/api/register-user', {
       method:  'POST',
       headers: {'Content-Type': 'application/json'},
       body:    JSON.stringify({ full_name: name, email, phone, password, preferred_lang: lang }),
