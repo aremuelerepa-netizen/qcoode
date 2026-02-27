@@ -222,7 +222,7 @@ def login():
         "redirect": f"/{profile['role']}"
     })
 
-@app.route("/api/auth/register-org", methods=["POST"])
+@app.route("/api/register-org", methods=["POST"])
 def register_org():
     data = request.get_json()
 
