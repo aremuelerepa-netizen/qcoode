@@ -112,12 +112,14 @@ async function checkSession() {
     const res  = await fetch('/api/auth/me');
     const data = await res.json();
     if (data.logged_in) {
-      window.location.href = data.role === 'user' ? '/user' :
+     window.location.href = data.role === 'user' ? '/user' : 
+                               data.role === 'organization' ? '/org' : '/';
+}
                              
   } catch(e) {}
 }
-
-document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 checkSession();
 </script>
 </body>
