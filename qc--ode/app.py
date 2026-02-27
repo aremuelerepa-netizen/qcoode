@@ -34,7 +34,7 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
 # ─────────────────────────────────────────────
 
 @app.route('/api/login', methods=['POST'])
-def login():
+def login_api():
     data = request.json
     email = data.get('email')
     password = data.get('password')
