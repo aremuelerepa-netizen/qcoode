@@ -136,7 +136,7 @@
 <body>
 
 <div class="topbar">
-  <a href="../index.html" class="tb-logo">
+  <a href="/" class="tb-logo">
     <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
     <span>Q</span>Code
   </a>
@@ -298,7 +298,7 @@ let adminProfile=null, allOrgs=[], allUsers=[], rejectTargetId=null;
 // ── INIT ─────────────────────────────────────────────────────
 async function init(){
   const {data:{session}}=await db.auth.getSession();
-  if(!session){window.location.href='../auth/login-user.html';return;}
+  if(!session){window.location.href='../login-user';return;}
   const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
   if(!p||p.role!=='super_admin'){window.location.href='../index.html';return;}
   adminProfile=p;
