@@ -154,7 +154,7 @@ def register_user():
         return jsonify({"error": "Missing fields"}), 400
 
     signup = sb_signup(email, password)
-    user_id = signup.get("id")
+    user_id = signup.get("user", {}).get("id")
 
     if not user_id:
         return jsonify({"error": "Signup failed"}), 400
@@ -170,7 +170,7 @@ def register_user():
     return jsonify({"success": True}), 201
 
 
-@app.route("/api/login", methods=["POST"])
+@app.route("/api/login-user", methods=["POST"])
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -183,7 +183,7 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     user = signin.get("user")
-    user_id = user.get("id")
+    user_id = signin.get("user", {}).get("id")
 
     profile = db_select("profiles", {"id": f"eq.{user_id}"}, single=True)
 
@@ -196,7 +196,7 @@ def login():
     return jsonify({
         "success": True,
         "role": profile["role"],
-        "redirect": f"/dashboard/{profile['role']}"
+        "redirect": f"/{profile['role']}"
     })
 
 @app.route("/api/auth/register-org", methods=["POST"])
@@ -211,7 +211,7 @@ def register_org():
         return jsonify({"error": "Missing fields"}), 400
 
     signup = sb_signup(email, password)
-    user_id = signup.get("id")
+    user_id = signup.get("user", {}).get("id")
 
     if not user_id:
         return jsonify({"error": "Signup failed"}), 400
@@ -225,6 +225,50 @@ def register_org():
     })
 
     return jsonify({"success": True}), 201
+
+@app.route("/api/login-org", methods=["POST"])
+def login_org():
+    data = request.get_json()
+
+    email = data.get("email")
+    password = data.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Missing credentials"}), 400
+
+    # Authenticate with Supabase
+    signin = sb_signin(email, password)
+    token = signin.get("access_token")
+
+    if not token:
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    user = signin.get("user")
+    if not user:
+        return jsonify({"error": "User not found"}), 401
+
+    user_id = signin.get("user", {}).get("id")
+
+    # Fetch profile from your profiles table
+    profile = db_select("profiles", {"id": f"eq.{user_id}"}, single=True)
+
+    if not profile:
+        return jsonify({"error": "Profile not found"}), 404
+
+    # 🚨 CRITICAL: Ensure role is org
+    if profile["role"] != "org":
+        return jsonify({"error": "Access denied. Not an organization account."}), 403
+
+    # Set session
+    session["user_id"] = user_id
+    session["role"] = "org"
+
+    return jsonify({
+        "success": True,
+        "role": "org",
+        "redirect": "/org"
+    })
+    
 @app.route("/api/logout", methods=["POST"])
 def logout():
     session.clear()
