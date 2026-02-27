@@ -33,26 +33,6 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
 # HEADERS
 # ─────────────────────────────────────────────
 
-@app.route('/api/login', methods=['POST'])
-def login_api():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
-    
-    try:
-        # Authenticate with Supabase
-        auth_res = supabase.auth.sign_in_with_password({"email": email, "password": password})
-        
-        # Get profile to check role
-        profile = supabase.table('profiles').select('*').eq('id', auth_res.user.id).single().execute()
-        
-        return jsonify({
-            "session": auth_res.session,
-            "user": profile.data
-        }), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 401
-        
 @app.route('/api/auth/me', methods=['GET'])
 def get_current_user():
     # Extract the token from the 'Authorization' header
