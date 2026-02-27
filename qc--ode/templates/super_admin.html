@@ -291,27 +291,28 @@ function badgeHtml(s){const m={pending:'b-pending',approved:'b-approved',suspend
 let adminProfile=null, allOrgs=[], allUsers=[], rejectTargetId=null;
 
 // ── INIT ─────────────────────────────────────────────────────
-async function init(){
-  const {data:{session}}=await db.auth.getSession();
-  if(!session){window.location.href='../login-user';return;}
-  const {data:p}=await db.from('profiles').select('*').eq('id',session.user.id).single();
-  if(!p||p.role!=='super_admin'){window.location.href='../index.html';return;}
-  adminProfile=p;
-  document.getElementById('admin-name').textContent=p.full_name||p.email;
-  await loadAnalytics();
-  await loadOrgs();
+async function init() {
+  await loadAnalytics(); // Only load analytics at start
 }
-
 // ── Panel nav ─────────────────────────────────────────────────
-function show(name){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('panel-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  if(name==='users')loadUsers();
-  if(name==='queues')loadAllQueues();
-  if(name==='logs')loadLogs();
-  if(name==='sms')loadSmsJoins();
+function show(panel) {
+  // Hide all panels
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+
+  // Show selected panel and mark sidebar item active
+  document.getElementById('panel-' + panel).classList.add('active');
+  document.getElementById('nav-' + panel).classList.add('active');
+
+  // Lazy load only the panel that was clicked
+  switch (panel) {
+    case 'analytics': loadAnalytics(); break;
+    case 'orgs': loadOrgs(); break;
+    case 'users': loadUsers(); break;
+    case 'queues': loadAllQueues(); break;
+    case 'logs': loadLogs(); break;
+    case 'sms': loadSmsJoins(); break;
+  }
 }
 async function refreshAll(){await loadAnalytics();toast('Refreshed','s');}
 
@@ -451,12 +452,7 @@ function renderUsers(users){
     <td><button class="btn bd bsm" onclick="banUser('${u.id}','${u.full_name||u.email}')">Ban</button></td>
   </tr>`).join('');
 }
-async function banUser(id,name){
-  if(!confirm(`Ban "${name}"? This will delete their account.`))return;
-  await db.from('profiles').delete().eq('id',id);
-  await logAction('BAN_USER',id,'user',{name});
-  toast(`${name} banned.`,'i'); await loadUsers();
-}
+
 
 // ── ALL QUEUES ────────────────────────────────────────────────
 async function loadAllQueues(){
@@ -514,7 +510,7 @@ async function loadSmsJoins(){
   </tr>`).join('');
 }
 
-async function doLogout(){await db.auth.signOut();window.location.href='../index.html';}
+async function doLogout(){await db.auth.signOut();window.location.href='/';}
 init();
 </script>
 </body>
