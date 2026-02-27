@@ -283,12 +283,7 @@
 
 <div id="toasts"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-{% raw %}<script>
-const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_PUBLIC_KEY';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+<script>
 function toast(msg,type='i',ms=4000){const el=document.createElement('div');el.className=`toast t-${type}`;const icons={s:'✓',e:'✕',i:'ℹ'};el.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
 function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function badgeHtml(s){const m={pending:'b-pending',approved:'b-approved',suspended:'b-suspended',rejected:'b-rejected',waiting:'b-waiting',completed:'b-completed',user:'b-user',organization:'b-organization'};return `<span class="badge ${m[s]||''}">${s}</span>`;}
@@ -521,6 +516,6 @@ async function loadSmsJoins(){
 
 async function doLogout(){await db.auth.signOut();window.location.href='../index.html';}
 init();
-</script>{% endraw %}
+</script>
 </body>
 </html>
