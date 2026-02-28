@@ -207,7 +207,40 @@
       <div style="margin-bottom:1.5rem"><h1>Open Services</h1><p style="color:var(--s500);margin-top:.25rem">All live queues you can join right now</p></div>
       <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
-
+        
+<!-- FAQ WIDGET -->
+<div id="faq-widget">
+  <button id="faq-btn" onclick="toggleFAQ()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Ask AI
+  </button>
+  <div class="faq-panel hidden" id="faq-panel">
+    <div class="faq-hdr">
+      <div class="faq-hdr-left">
+        <div class="faq-av">🤖</div>
+        <div><div class="faq-title">QCode Assistant</div><div class="faq-sub">Powered by Llama AI · Always online</div></div>
+      </div>
+      <div class="faq-hdr-btns">
+        <button onclick="clearChat()" title="Clear">↺</button>
+        <button onclick="toggleFAQ()" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="faq-msgs" id="faq-msgs">
+      <div class="faq-msg ai"><div class="faq-bubble">👋 Hi! I'm your QCode Assistant. I can help with:<br><br>• Joining a queue with a service code<br>• Understanding your queue position &amp; time<br>• Organization registration &amp; approval<br>• SMS queue joining<br><br>What can I help with?</div></div>
+    </div>
+    <div class="faq-quickbtns">
+      <button onclick="quickQ('How do I join a queue?')">How to join</button>
+      <button onclick="quickQ('What is a service code?')">Service codes</button>
+      <button onclick="quickQ('How does SMS queue joining work?')">SMS joining</button>
+    </div>
+    <div class="faq-input-row">
+      <input type="text" id="faq-inp" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sendFAQ()" />
+      <button id="faq-send" onclick="sendFAQ()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
     <!-- ACCOUNT -->
     <div class="panel" id="panel-account">
       <div style="margin-bottom:1.5rem"><h1>My Account</h1></div>
@@ -475,6 +508,69 @@ async function saveAccount() {
   document.getElementById('tb-name').textContent = name || (profile && profile.email) || '—';
   toast('Account saved!', 's');
 }
+ // ── FAQ AI ──
+  const FAQ_SYS=`You are QCode Assistant, the helpful AI for QCode — a digital queue management platform used globally.
+QCode lets users join queues at organizations using a service code (e.g. QC-ABC123). Organizations create queue services. Guests can join without an account. Users can also join via SMS by texting the service code.
+Answer questions helpfully and concisely. Respond in the user's language if they write in another language.`;
+
+  function toggleFAQ(){
+    document.getElementById('faq-panel').classList.toggle('hidden');
+    if(!document.getElementById('faq-panel').classList.contains('hidden')){
+      document.getElementById('faq-inp')?.focus();
+    }
+  }
+
+  function quickQ(q){document.getElementById('faq-inp').value=q;sendFAQ();}
+
+  async function sendFAQ(){
+    const inp=document.getElementById('faq-inp');
+    const msg=inp.value.trim();
+    if(!msg) return;
+    inp.value='';
+
+    appendMsg('user',msg);
+    faqHistory.push({role:'user',content:msg});
+    if(faqHistory.length>20) faqHistory=faqHistory.slice(-20);
+
+    const typingId='t-'+Date.now();
+    appendMsg('ai','Thinking...','typing',typingId);
+    document.getElementById('faq-send').disabled=true;
+
+    try{
+      const res=await fetch(GROQ_API_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:faqHistory,system:FAQ_SYS})
+      });
+      const data=await res.json();
+      const reply=data.response||'Sorry, I could not get a response. Please try again.';
+      faqHistory.push({role:'assistant',content:reply});
+      document.getElementById(typingId)?.remove();
+      appendMsg('ai',reply);
+    }catch(e){
+      document.getElementById(typingId)?.remove();
+      appendMsg('ai','⚠️ AI assistant is temporarily unavailable. Please try again shortly.');
+    }finally{
+      document.getElementById('faq-send').disabled=false;
+      inp.focus();
+    }
+  }
+
+  function appendMsg(role,text,cls='',id=''){
+    const wrap=document.getElementById('faq-msgs');
+    const div=document.createElement('div');
+    div.className='faq-msg '+role;
+    if(id) div.id=id;
+    div.innerHTML=`<div class="faq-bubble${cls?' '+cls:''}">${text.replace(/\n/g,'<br>')}</div>`;
+    wrap.appendChild(div);
+    wrap.scrollTop=wrap.scrollHeight;
+    return div.id;
+  }
+
+  function clearChat(){
+    faqHistory=[];
+    document.getElementById('faq-msgs').innerHTML='<div class="faq-msg ai"><div class="faq-bubble">Chat cleared! How can I help you?</div></div>';
+  }
 
 async function doLogout() {
   clearInterval(pollTimer);
