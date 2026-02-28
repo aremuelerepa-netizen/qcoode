@@ -11,7 +11,7 @@
     h1{font-family:var(--fh);letter-spacing:-.02em}
     a{color:var(--accent);text-decoration:none}
     .wrap{width:100%;max-width:420px}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem}
+    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
     .logo span{color:var(--cyan)}
     .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:0 16px 48px rgba(10,22,40,.2)}
     .title{font-size:1.5rem;color:var(--navy);margin-bottom:.375rem}
@@ -23,62 +23,82 @@
     .inp::placeholder{color:var(--s300)}
     .err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
     .pending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#92400e;display:none;margin-bottom:1rem}
-    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all var(--t)}
+    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all var(--t);text-decoration:none}
     .btn:hover:not(:disabled){background:#1d4ed8}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--s500)}
-    .divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--s300);font-size:.8rem}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--s300)}
     .btn-org{background:transparent;border:1.5px solid var(--s300);color:var(--s700)}
     .btn-org:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:transparent}
-    .back{display:block;text-align:center;margin-top:.75rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+    .divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--s300);font-size:.8rem}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--s300)}
+    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--s500)}
+    .back{display:block;text-align:center;margin-top:.75rem;font-size:.8rem;color:rgba(255,255,255,.4);text-decoration:none}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="../index.html" class="logo">
-    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+  <a href="/" class="logo">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none">
+      <rect width="30" height="30" rx="8" fill="#2563eb"/>
+      <rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/>
+      <rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/>
+      <rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/>
+    </svg>
     <span>Q<span style="color:#fff">Code</span></span>
   </a>
+
   <div class="card">
     <h1 class="title">Welcome back</h1>
     <p class="sub">Sign in to your QCode account to track your queues.</p>
+
     <div id="err"     class="err"></div>
-    <div id="pending" class="pending">⏳ Your organization account is pending admin approval. You will be notified by email once approved.</div>
-    <div class="fg"><label class="lbl">Email Address</label><input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/></div>
-    <div class="fg"><label class="lbl">Password</label><input id="password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+    <div id="pending" class="pending">
+      ⏳ Your organization account is pending admin approval. You will be notified once approved.
+    </div>
+
+    <div class="fg">
+      <label class="lbl">Email Address</label>
+      <input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="fg">
+      <label class="lbl">Password</label>
+      <input id="password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+
     <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
+
     <div class="divider">or</div>
-    <a href="login-org" class="btn btn-org" style="display:flex;align-items:center;justify-content:center;text-decoration:none;padding:1rem;border-radius:var(--r);font-weight:700;font-size:1rem">Sign in as Organization →</a>
-    <div class="sw">Don't have an account? <a href="register-user">Create one →</a></div>
+    <a href="/login-org" class="btn btn-org">Sign in as Organization →</a>
+
+    <div class="sw">Don't have an account? <a href="/register-user">Create one →</a></div>
   </div>
-  <a href="../index.html" class="back">← Back to home</a>
+  <a href="/" class="back">← Back to home</a>
 </div>
+
 <script>
-async function doLogin() {
-  const err     = document.getElementById('err');
+async function doLogin(){
+  const errEl   = document.getElementById('err');
   const pending = document.getElementById('pending');
   const btn     = document.getElementById('btn');
-  err.style.display     = 'none';
+  errEl.style.display   = 'none';
   pending.style.display = 'none';
 
-  const email    = document.getElementById('email').value.trim();
+  const email    = document.getElementById('email').value.trim().toLowerCase();
   const password = document.getElementById('password').value;
 
-  if (!email || !password) { showErr('Email and password are required.'); return; }
+  if (!email || !password){ showErr('Email and password are required.'); return; }
 
   btn.disabled    = true;
   btn.textContent = 'Signing in…';
 
   try {
-    const res  = await fetch('/api/login-user', {
+    const res  = await fetch('/api/auth/login', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ email, password }),
     });
     const data = await res.json();
 
-    if (!res.ok) {
-      if (res.status === 403 && data.error && data.error.toLowerCase().includes('pending')) {
+    if (!res.ok){
+      if (res.status === 403 && data.error?.toLowerCase().includes('pending')){
         pending.style.display = 'block';
       } else {
         showErr(data.error || 'Invalid email or password.');
@@ -88,38 +108,61 @@ async function doLogin() {
       return;
     }
 
-    // Save lang preference
+    // Role check — this page is for users only
+    // Orgs that accidentally land here get sent to the right page
+    if (data.role === 'organization'){
+      window.location.href = '/org';
+      return;
+    }
+    if (data.role === 'super_admin'){
+      window.location.href = '/super-admin';
+      return;
+    }
+
     if (data.preferred_lang) localStorage.setItem('qcode_lang', data.preferred_lang);
     btn.textContent = '✓ Redirecting…';
     window.location.href = data.redirect || '/user';
 
-  } catch(e) {
+  } catch(e){
     showErr('Network error. Please try again.');
     btn.disabled    = false;
     btn.textContent = 'Sign In';
   }
 }
 
-function showErr(msg) {
+function showErr(msg){
   const el = document.getElementById('err');
   el.textContent   = msg;
   el.style.display = 'block';
 }
 
-// Check if already logged in
-async function checkSession() {
+// ─────────────────────────────────────────────────────────────
+// SESSION CHECK
+// Only redirect if ALREADY logged in — prevents the login page
+// from being the destination after a redirect loop.
+// We check for a special flag: if the URL has ?force=1 we skip
+// the session check so users can always reach the login page.
+// ─────────────────────────────────────────────────────────────
+async function checkSession(){
+  const force = new URLSearchParams(window.location.search).get('force');
+  if (force === '1') return; // allow reaching login even if logged in
+
   try {
     const res  = await fetch('/api/auth/me');
     const data = await res.json();
-    if (data.logged_in) {
-     window.location.href = data.role === 'user' ? '/user' : 
-                            data.role === 'organization' ? '/org' : '/';
+    if (!data.logged_in) return; // not logged in — show the form normally
+
+    // Already logged in → send them to their correct dashboard
+    const dest = data.role === 'organization' ? '/org'
+               : data.role === 'super_admin'  ? '/super-admin'
+               : '/user';
+    window.location.href = dest;
+  } catch(e){}
 }
-                             
-  } catch(e) {}
-}
-document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+document.getElementById('email').addEventListener('keydown',    e => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
 checkSession();
 </script>
 </body>
