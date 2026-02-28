@@ -1264,6 +1264,64 @@ def notify_org():
     print(f"[Notify] Org {data.get('org_id')} → {data.get('status')}")
     return jsonify({"sent": True})
 
+
+@app.route("/api/guest/join", methods=["POST"])
+def api_guest_join():
+    d          = request.get_json() or {}
+    svc_id     = d.get("service_id")
+    guest_name = (d.get("guest_name") or "").strip()
+
+    if not svc_id:
+        return jsonify({"error": "service_id required"}), 400
+    if not guest_name:
+        return jsonify({"error": "Guest name required"}), 400
+
+    svcs = db_select("services", {"id": f"eq.{svc_id}"})
+    if not svcs:
+        return jsonify({"error": "Service not found"}), 404
+    svc = svcs[0]
+    if svc["status"] != "open":
+        return jsonify({"error": f"Queue is {svc['status']}."}), 400
+
+    n     = (svc.get("ticket_counter") or 0) + 1
+    label = f"{svc.get('ticket_prefix', 'Q')}{str(n).zfill(3)}"
+    db_update("services", {"id": svc_id}, {"ticket_counter": n})
+
+    pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
+    eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos * (svc.get("time_interval") or 5))).isoformat()
+
+    res = db_insert("queue_entries", {
+        "service_id":     svc_id,
+        "user_id":        None,
+        "guest_name":     guest_name,
+        "ticket_label":   label,
+        "ticket_number":  n,
+        "status":         "waiting",
+        "estimated_time": eta_t,
+        "join_method":    "web",
+    })
+    if not res["ok"]:
+        return jsonify({"error": "Failed to join queue."}), 500
+
+    entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
+    entry["position"] = pos
+    entry["svc_name"] = svc["name"]
+    return jsonify({"success": True, "entry": entry}), 201
+
+
+# ─────────────────────────────────────────────
+# PUBLIC STATS — called from index.html stats bar
+# No auth required — returns approved orgs + total served
+# ─────────────────────────────────────────────
+
+@app.route("/api/public/stats", methods=["GET"])
+def api_public_stats():
+    return jsonify({
+        "approved_orgs":   db_count("profiles",     {"role": "eq.organization", "approval_status": "eq.approved"}),
+        "total_served":    db_count("queue_entries", {"status": "eq.completed"}),
+        "active_services": db_count("services",     {"status": "eq.open", "deleted_at": "is.null"}),
+    }), 200
+
 # ─────────────────────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────────────────────
