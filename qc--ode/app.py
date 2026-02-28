@@ -970,6 +970,334 @@ def admin_analytics():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/api/admin/reinstate-org", methods=["POST"])
+@require_admin
+def api_reinstate_org():
+    org_id = (request.get_json() or {}).get("org_id")
+    if not org_id:
+        return jsonify({"error": "org_id required"}), 400
+    db_update("profiles", {"id": org_id}, {"approval_status": "approved", "rejection_reason": None})
+    db_insert("admin_logs", {
+        "admin_id": session.get("user_id"), "action": "REINSTATE_ORG",
+        "target_id": org_id, "target_type": "organization",
+        "details": json.dumps({"action": "reinstated"}),
+    })
+    return jsonify({"success": True}), 200
+
+@app.route("/api/admin/ban-user", methods=["POST"])
+@require_admin
+def api_ban_user():
+    user_id = (request.get_json() or {}).get("user_id")
+    if not user_id:
+        return jsonify({"error": "user_id required"}), 400
+    db_update("profiles", {"id": user_id}, {"approval_status": "suspended"})
+    db_insert("admin_logs", {
+        "admin_id": session.get("user_id"), "action": "BAN_USER",
+        "target_id": user_id, "target_type": "user",
+        "details": json.dumps({"action": "banned"}),
+    })
+    return jsonify({"success": True}), 200
+
+@app.route("/api/admin/all-queues", methods=["GET"])
+@require_admin
+def api_admin_all_queues():
+    org_id = request.args.get("org_id", "")
+    filters = {"order": "joined_at.desc", "limit": "200"}
+    if org_id:
+        # Get service IDs for this org
+        svcs = db_select("services", {"org_id": f"eq.{org_id}"})
+        svc_ids = ",".join(s["id"] for s in svcs)
+        if svc_ids:
+            filters["service_id"] = f"in.({svc_ids})"
+        else:
+            return jsonify([]), 200
+    entries = db_select("queue_entries", filters)
+    # Enrich with service + org + user info
+    svc_cache  = {}
+    user_cache = {}
+    for e in entries:
+        sid = e.get("service_id")
+        if sid and sid not in svc_cache:
+            svcs = db_select("services", {"id": f"eq.{sid}"})
+            if svcs:
+                s = svcs[0]
+                org = db_select("profiles", {"id": f"eq.{s['org_id']}"}, single=True) or {}
+                svc_cache[sid] = {
+                    "svc_name": s.get("name", ""),
+                    "svc_code": s.get("service_code", ""),
+                    "org_name": org.get("org_name", ""),
+                }
+        if sid in svc_cache:
+            e.update(svc_cache[sid])
+        uid = e.get("user_id")
+        if uid and uid not in user_cache:
+            p = db_select("profiles", {"id": f"eq.{uid}"}, single=True) or {}
+            user_cache[uid] = p.get("full_name") or p.get("email") or "User"
+        if uid:
+            e["user_name"] = user_cache.get(uid, "User")
+        else:
+            e["user_name"] = e.get("guest_name") or "Guest"
+    return jsonify(entries), 200
+
+@app.route("/api/admin/all-services", methods=["GET"])
+@require_admin
+def api_admin_all_services():
+    svcs = db_select("services", {"deleted_at": "is.null", "order": "created_at.desc"})
+    for s in svcs:
+        org = db_select("profiles", {"id": f"eq.{s['org_id']}"}, single=True) or {}
+        s["org_name"]    = org.get("org_name", "")
+        s["total"]       = db_count("queue_entries", {"service_id": f"eq.{s['id']}"})
+        s["waiting"]     = db_count("queue_entries", {"service_id": f"eq.{s['id']}", "status": "eq.waiting"})
+        s["completed"]   = db_count("queue_entries", {"service_id": f"eq.{s['id']}", "status": "eq.completed"})
+    return jsonify(svcs), 200
+
+@app.route("/api/admin/sms-joins", methods=["GET"])
+@require_admin
+def api_admin_sms_joins():
+    rows = db_select("sms_joins", {"order": "created_at.desc", "limit": "100"})
+    for r in rows:
+        eid = r.get("queue_entry_id")
+        if eid:
+            entries = db_select("queue_entries", {"id": f"eq.{eid}"})
+            if entries:
+                r["ticket_label"] = entries[0].get("ticket_label", "—")
+                r["entry_status"] = entries[0].get("status", "—")
+    return jsonify(rows), 200
+
+@app.route("/api/admin/logs", methods=["GET"])
+@require_admin
+def api_admin_logs():
+    return jsonify(db_select("admin_logs", {"order": "created_at.desc", "limit": "100"})), 200
+
+@app.route("/api/admin/log-action", methods=["POST"])
+@require_admin
+def api_admin_log_action():
+    d = request.get_json() or {}
+    db_insert("admin_logs", {
+        "admin_id":    session.get("user_id"),
+        "action":      d.get("action", ""),
+        "target_id":   d.get("target_id", ""),
+        "target_type": d.get("target_type", ""),
+        "details":     json.dumps(d.get("details") or {}),
+    })
+    return jsonify({"success": True}), 200
+
+
+# ════════════════════════════════════════════
+@app.route("/api/sms/receive", methods=["POST"])
+def receive_sms():
+    """
+    The Android SMS Gateway app forwards every received SMS here.
+
+    sms-gateway.me sends JSON like:
+    {
+      "deviceId": "...",
+      "message":  "QC-ABC123 John",
+      "phoneNumber": "+2348012345678",
+      "receivedAt": "2025-01-01T12:00:00Z"
+    }
+
+    Other Android gateway apps may use different field names —
+    all common variations are handled below.
+    """
+    if request.is_json:
+        payload = request.get_json() or {}
+    else:
+        payload = request.form.to_dict()
+
+    print(f"[SMS In] {payload}")
+
+    # Extract sender — covers sms-gateway.me + most other apps
+    from_phone = (
+        payload.get("phoneNumber") or   # sms-gateway.me
+        payload.get("from")        or   # generic
+        payload.get("From")        or   # Twilio-style
+        payload.get("sender")      or
+        payload.get("msisdn")      or
+        payload.get("mobile")      or
+        payload.get("phone")       or
+        "Unknown"
+    )
+
+    # Extract message body
+    message_body = (
+        payload.get("message")  or   # sms-gateway.me
+        payload.get("text")     or
+        payload.get("Text")     or
+        payload.get("Body")     or
+        payload.get("body")     or
+        payload.get("sms")      or
+        ""
+    ).strip()
+
+    if not message_body:
+        return "", 200
+
+    db = get_supabase()
+
+    # ── Parse service code ──
+    # Handles: QC-ABC123 | QC ABC123 | QCABC123 | just ABC123
+    code_match = re.search(r'\b(QC[-\s]?[A-Z0-9]{6})\b', message_body.upper())
+
+    if not code_match:
+        bare = re.search(r'\b([A-Z0-9]{6})\b', message_body.upper())
+        if bare:
+            service_code = "QC-" + bare.group(1)
+            name_part = re.sub(r'\b' + bare.group(1) + r'\b', '', message_body, flags=re.IGNORECASE).strip()
+        else:
+            _log_sms(db, from_phone, message_body, None, None, "invalid_code")
+            send_sms(from_phone, "Invalid code. Text your QCode service code e.g. QC-ABC123 to join a queue.")
+            return "", 200
+    else:
+        raw = code_match.group(1).replace(" ", "-")
+        service_code = raw if raw.startswith("QC-") else "QC-" + raw[-6:]
+        name_part = re.sub(r'\b' + re.escape(code_match.group(1)) + r'\b', '', message_body, flags=re.IGNORECASE).strip()
+
+    guest_name = name_part.title() if name_part else f"SMS User ({from_phone[-4:]})"
+
+    try:
+        svc = db.table("services") \
+            .select("*, organizations(company_name)") \
+            .eq("service_code", service_code) \
+            .eq("is_active", True).eq("is_deleted", False) \
+            .maybe_single().execute()
+
+        if not svc.data:
+            _log_sms(db, from_phone, message_body, service_code, None, "invalid_code")
+            send_sms(from_phone, f"Code {service_code} not found or inactive. Please check and try again.")
+            return "", 200
+
+        service = svc.data
+
+        q = db.table("queue_entries").select("*", count="exact") \
+            .eq("service_id", service["id"]).in_("status", ["waiting", "called"]).execute()
+        current = q.count or 0
+
+        if current >= service["max_users"]:
+            _log_sms(db, from_phone, message_body, service_code, None, "failed")
+            send_sms(from_phone, f"Sorry, {service['service_name']} queue is full. Try again later.")
+            return "", 200
+
+        queue_number = current + 1
+        wait_minutes = (queue_number - 1) * service["interval_minutes"]
+        est_time     = (datetime.utcnow() + timedelta(minutes=wait_minutes)).isoformat()
+
+        entry = db.table("queue_entries").insert({
+            "service_id":     service["id"],
+            "user_id":        None,
+            "guest_name":     guest_name,
+            "guest_phone":    from_phone,
+            "queue_number":   queue_number,
+            "estimated_time": est_time,
+            "status":         "waiting",
+            "join_method":    "sms"
+        }).execute()
+
+        entry_id = entry.data[0]["id"] if entry.data else None
+        _log_sms(db, from_phone, message_body, service_code, entry_id, "processed")
+
+        org_name = service.get("organizations", {}).get("company_name", "the organization")
+        reply = (
+            f"QCode Confirmed!\n"
+            f"Service: {service['service_name']} @ {org_name}\n"
+            f"Your number: #{queue_number}\n"
+            f"Est. time: {_format_time(est_time)}\n"
+            f"Wait: ~{wait_minutes} mins\n"
+            f"Stay nearby."
+        )
+        send_sms(from_phone, reply)
+        return "", 200
+
+    except Exception as e:
+        print(f"[SMS Error] {e}")
+        _log_sms(db, from_phone, message_body, service_code, None, "failed")
+        send_sms(from_phone, "Something went wrong. Please try again.")
+        return "", 200
+
+
+# ════════════════════════════════════════════
+# SEND SMS via Android Gateway
+# ════════════════════════════════════════════
+def send_sms(to_phone, message):
+    """
+    Tells the Android phone to send an SMS.
+
+    sms-gateway.me API:
+        POST http://<phone-ip>:8080/message
+        { "phoneNumbers": ["+234..."], "message": "Hello" }
+    with Basic Auth (login:password).
+
+    Falls back to a cloud SMS API if ANDROID_GW_URL is not set.
+    If neither is configured, just prints to console (good for dev testing).
+    """
+
+    # ── Option 1: Android phone sends the SMS ──
+    if ANDROID_GW_URL:
+        try:
+            url  = ANDROID_GW_URL.rstrip("/") + "/message"
+            body = {"phoneNumbers": [to_phone], "message": message}
+            if ANDROID_GW_DEVICE:
+                body["simNumber"] = ANDROID_GW_DEVICE
+
+            auth = None
+            if ANDROID_GW_LOGIN and ANDROID_GW_PASSWORD:
+                auth = (ANDROID_GW_LOGIN, ANDROID_GW_PASSWORD)
+
+            resp = requests.post(url, json=body, auth=auth, timeout=10)
+            print(f"[SMS Sent via Android] To: {to_phone} | {resp.status_code} | {resp.text[:80]}")
+            return
+        except Exception as e:
+            print(f"[Android GW Error] {e} — trying fallback...")
+
+    # ── Option 2: Cloud SMS API fallback ──
+    if FALLBACK_SMS_URL:
+        try:
+            payload = {
+                FALLBACK_KEY_FLD:   FALLBACK_SMS_KEY,
+                FALLBACK_PHONE_FLD: to_phone,
+                FALLBACK_MSG_FLD:   message,
+                "sender":           SMS_SENDER_ID,
+            }
+            resp = requests.post(FALLBACK_SMS_URL, data=payload, timeout=10)
+            print(f"[SMS Sent via Fallback API] To: {to_phone} | {resp.status_code}")
+            return
+        except Exception as e:
+            print(f"[Fallback SMS Error] {e}")
+
+    # ── No gateway configured — print to console ──
+    print(f"\n[SMS Reply — no gateway, console only]\nTo: {to_phone}\n{message}\n")
+
+
+# ── HELPERS ──
+def _log_sms(db, from_phone, message_body, service_code, entry_id, status):
+    try:
+        db.table("sms_logs").insert({
+            "from_phone":     from_phone,
+            "message_body":   message_body,
+            "service_code":   service_code,
+            "queue_entry_id": entry_id,
+            "status":         status,
+            "received_at":    datetime.utcnow().isoformat()
+        }).execute()
+    except Exception as e:
+        print(f"[Log Error] {e}")
+
+def _format_time(iso_string):
+    try:
+        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
+        return dt.strftime("%I:%M %p")
+    except:
+        return iso_string
+
+
+@app.route("/api/notify/org", methods=["POST"])
+def notify_org():
+    data = request.get_json()
+    print(f"[Notify] Org {data.get('org_id')} → {data.get('status')}")
+    return jsonify({"sent": True})
+
+
 # ─────────────────────────────────────────────
 # HEALTH CHECK
 # ─────────────────────────────────────────────
