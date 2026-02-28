@@ -331,7 +331,7 @@
 </footer>
 
 <div id="toasts"></div>
-
+{% raw %}
 <script>
 // ═══════════════════════════════════════════════════════════════
 // ALL DATA FROM FLASK API — ZERO SUPABASE JS
@@ -543,6 +543,6 @@ document.getElementById('code-in').addEventListener('keydown', e => {
 // ── INIT ──────────────────────────────────────────────────────
 checkSession();   // check who is logged in, update nav
 loadStats();      // fetch live org/served/queue counts
-</script>
+</script>{% endraw %}
 </body>
 </html>
