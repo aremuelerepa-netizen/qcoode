@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    /* ── TOKENS ─────────────────────────────────────────── */
     :root{
       --q-navy:#0a1628;--q-blue:#1a3a6b;--q-accent:#2563eb;--q-bright:#3b82f6;
       --q-cyan:#06b6d4;--q-gold:#f59e0b;
@@ -25,12 +24,10 @@
     body{font-family:var(--font-body);background:var(--slate-50);color:var(--slate-900);line-height:1.6;overflow-x:hidden}
     h1,h2,h3,h4{font-family:var(--font-head);line-height:1.1;letter-spacing:-.025em}
     a{text-decoration:none;color:var(--q-accent);transition:color var(--t)}
-
-    /* ── NAVBAR ─────────────────────────────────────────── */
     nav{position:fixed;top:0;left:0;right:0;z-index:200;transition:background var(--t),box-shadow var(--t)}
     nav.scrolled{background:rgba(10,22,40,.97);backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(255,255,255,.08)}
     .nav-wrap{max-width:1280px;margin:0 auto;padding:0 2rem;height:68px;display:flex;align-items:center;justify-content:space-between}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.03em}
+    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--font-head);font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.03em;text-decoration:none}
     .logo-q{color:var(--q-cyan)}
     .logo-badge{font-size:.6rem;font-weight:700;background:var(--q-gold);color:#000;padding:.15rem .4rem;border-radius:.25rem;text-transform:uppercase;letter-spacing:.08em;margin-left:.25rem;align-self:flex-start;margin-top:.25rem}
     .nav-links{display:flex;align-items:center;gap:.25rem}
@@ -42,8 +39,6 @@
     .lang-sel option{background:var(--q-navy);color:#fff}
     .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.5rem}
     .hamburger span{width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
-
-    /* ── HERO ───────────────────────────────────────────── */
     .hero{min-height:100vh;background:var(--q-navy);position:relative;display:flex;align-items:center;overflow:hidden}
     .hero-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
     .hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35}
@@ -63,12 +58,8 @@
     .btn-lg{padding:1rem 2.25rem;font-size:1rem}
     .btn-full{width:100%;display:flex}
     .btn-success{background:var(--green);color:#fff}.btn-success:hover{filter:brightness(1.07)}
-    .btn-danger{background:var(--red);color:#fff}.btn-danger:hover{filter:brightness(1.07)}
-    .btn-ghost{background:transparent;color:var(--slate-500);border:1.5px solid var(--slate-300)}.btn-ghost:hover{border-color:var(--q-accent);color:var(--q-accent)}
     .btn-sm{padding:.375rem .875rem;font-size:.8rem}
     .btn:disabled{opacity:.5;cursor:not-allowed}
-
-    /* ── JOIN CARD ───────────────────────────────────────── */
     .join-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:var(--rxl);padding:2.5rem;backdrop-filter:blur(24px)}
     .join-card-title{font-family:var(--font-head);font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:.375rem}
     .join-card-sub{font-size:.875rem;color:rgba(255,255,255,.55);margin-bottom:1.75rem;line-height:1.5}
@@ -77,10 +68,10 @@
     .inp::placeholder{color:rgba(255,255,255,.3)}
     .inp:focus{outline:none;border-color:var(--q-accent);box-shadow:0 0 0 3px rgba(37,99,235,.25);background:rgba(255,255,255,.1)}
     .inp.code-inp{text-transform:uppercase;letter-spacing:.15em;font-family:var(--font-head);font-weight:700;font-size:1.1rem;flex:1}
-    .ferr{font-size:.8rem;color:#f87171;margin-top:.375rem;display:none}
+    .ferr{font-size:.8rem;color:#f87171;margin-top:.5rem;display:none;padding:.5rem .75rem;background:rgba(239,68,68,.1);border-radius:.375rem;border:1px solid rgba(239,68,68,.3)}
     .found-box{background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1.25rem}
     .found-name{font-weight:700;color:#fff;font-size:1rem}
-    .found-meta{font-size:.8rem;color:rgba(255,255,255,.6);margin-top:.25rem;display:flex;gap:1rem;flex-wrap:wrap}
+    .found-meta{font-size:.8rem;color:rgba(255,255,255,.6);margin-top:.375rem;display:flex;gap:.875rem;flex-wrap:wrap}
     .divider{display:flex;align-items:center;gap:.875rem;margin:1.25rem 0;color:rgba(255,255,255,.3);font-size:.8rem}
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.12)}
     .sms-info{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.25);border-radius:var(--r);padding:1rem 1.25rem;margin-top:1.25rem;display:flex;align-items:center;gap:.875rem}
@@ -90,17 +81,13 @@
     .create-acc{background:rgba(255,255,255,.05);border-radius:var(--r);padding:1rem 1.25rem;margin-top:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
     .create-acc p{font-size:.8rem;color:rgba(255,255,255,.6);margin:0}
     .create-acc strong{color:#fff}
-
-    /* ── STATS BAR ───────────────────────────────────────── */
     .stats-bar{background:var(--q-blue);padding:2.5rem 2rem}
     .stats-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center}
     .stat-item .num{font-family:var(--font-head);font-size:2.5rem;font-weight:800;color:#fff;line-height:1}
     .stat-item .lbl{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:.375rem;text-transform:uppercase;letter-spacing:.06em}
-
-    /* ── HOW IT WORKS ────────────────────────────────────── */
     .section{padding:6rem 2rem}
     .section-inner{max-width:1280px;margin:0 auto}
-    .section-tag{display:inline-flex;align-items:center;gap:.5rem;background:var(--q-accent);background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(6,182,212,.1));border:1px solid rgba(37,99,235,.2);border-radius:999px;padding:.375rem 1rem;font-size:.75rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+    .section-tag{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(37,99,235,.1),rgba(6,182,212,.1));border:1px solid rgba(37,99,235,.2);border-radius:999px;padding:.375rem 1rem;font-size:.75rem;font-weight:700;color:var(--q-accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
     .section-title{font-size:clamp(1.75rem,3vw,2.5rem);font-weight:800;color:var(--q-navy);margin-bottom:1rem}
     .section-sub{font-size:1.05rem;color:var(--slate-500);max-width:560px;line-height:1.7;margin-bottom:3rem}
     .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}
@@ -110,8 +97,6 @@
     .step-icon{font-size:1.75rem;margin-bottom:.75rem}
     .step h3{font-size:1.05rem;margin-bottom:.5rem;color:var(--q-navy)}
     .step p{font-size:.875rem;color:var(--slate-500);line-height:1.6}
-
-    /* ── FEATURES ────────────────────────────────────────── */
     .feats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
     .feat{background:#fff;border:1px solid var(--slate-200);border-radius:var(--rl);padding:2rem;transition:box-shadow var(--t),transform var(--t)}
     .feat:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
@@ -119,8 +104,6 @@
     .feat-icon.blue{background:rgba(37,99,235,.1)}.feat-icon.cyan{background:rgba(6,182,212,.1)}.feat-icon.gold{background:rgba(245,158,11,.1)}.feat-icon.green{background:rgba(34,197,94,.1)}.feat-icon.purple{background:rgba(139,92,246,.1)}.feat-icon.red{background:rgba(239,68,68,.1)}
     .feat h3{font-size:1.05rem;margin-bottom:.5rem;color:var(--q-navy)}
     .feat p{font-size:.875rem;color:var(--slate-500);line-height:1.6}
-
-    /* ── SMS SECTION ─────────────────────────────────────── */
     .sms-section{background:linear-gradient(135deg,var(--q-navy),var(--q-blue));padding:6rem 2rem;color:#fff;overflow:hidden;position:relative}
     .sms-section::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/svg%3E")}
     .sms-inner{max-width:1280px;margin:0 auto;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
@@ -136,46 +119,32 @@
     .msg-in{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border-bottom-left-radius:.2rem}
     .msg-out{background:var(--q-accent);color:#fff;margin-left:auto;border-bottom-right-radius:.2rem;text-align:right}
     .msg-time{font-size:.7rem;opacity:.6;margin-top:.25rem}
-
-    /* ── ORG CTA ─────────────────────────────────────────── */
     .org-cta{background:var(--q-accent);padding:5rem 2rem;text-align:center;color:#fff}
     .org-cta h2{color:#fff;font-size:clamp(1.75rem,3vw,2.5rem);margin-bottom:.875rem}
     .org-cta p{opacity:.8;max-width:520px;margin:0 auto 2rem;line-height:1.7}
-    .org-cta .btn-primary{background:#fff;color:var(--q-accent)}.org-cta .btn-primary:hover{background:var(--slate-100)}
-
-    /* ── FOOTER ─────────────────────────────────────────── */
+    .org-cta .btn-white{background:#fff;color:var(--q-accent)}.org-cta .btn-white:hover{background:var(--slate-100)}
     footer{background:var(--q-navy);color:rgba(255,255,255,.5);padding:3rem 2rem;text-align:center}
-    footer .logo{justify-content:center;margin-bottom:1rem;font-size:1.25rem}
-    footer p{font-size:.825rem;line-height:1.7}
-    footer a{color:rgba(255,255,255,.4);transition:color var(--t)}.footer a:hover{color:#fff}
-
-    /* ── TOAST ───────────────────────────────────────────── */
+    footer p{font-size:.825rem;line-height:1.7;margin-top:.75rem}
     #toasts{position:fixed;top:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:.75rem;z-index:9999;pointer-events:none}
     .toast{padding:.875rem 1.25rem;border-radius:.5rem;box-shadow:var(--shadow-lg);font-size:.875rem;font-weight:500;display:flex;align-items:center;gap:.625rem;pointer-events:all;min-width:250px;max-width:380px;animation:tIn .3s ease}
     .t-success{background:#f0fdf4;border-left:4px solid var(--green);color:#15803d}
     .t-error{background:#fef2f2;border-left:4px solid var(--red);color:#b91c1c}
     .t-info{background:#eff6ff;border-left:4px solid var(--q-accent);color:#1d4ed8}
     @keyframes tIn{from{opacity:0;transform:translateX(2rem)}to{opacity:1;transform:translateX(0)}}
-
-    /* ── RESPONSIVE ──────────────────────────────────────── */
     @media(max-width:1024px){.hero-inner{grid-template-columns:1fr;gap:2.5rem}.sms-inner{grid-template-columns:1fr}}
     @media(max-width:768px){.nav-links{display:none}.hamburger{display:flex}.hero-inner{padding:6rem 1rem 3rem}.stats-inner{grid-template-columns:repeat(2,1fr)}.nav-wrap{padding:0 1rem}}
     @media(max-width:480px){.stats-inner{grid-template-columns:repeat(2,1fr)}.hero-btns{flex-direction:column}}
-
-    /* ── RTL SUPPORT ─────────────────────────────────────── */
     [dir=rtl] .logo{flex-direction:row-reverse}
     [dir=rtl] .found-meta{flex-direction:row-reverse}
-    [dir=rtl] .step-num{text-align:right}
     [dir=rtl] .msg-in{border-bottom-left-radius:.875rem;border-bottom-right-radius:.2rem}
     [dir=rtl] .msg-out{border-bottom-right-radius:.875rem;border-bottom-left-radius:.2rem;margin-left:0;margin-right:auto;text-align:left}
   </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav id="nav">
   <div class="nav-wrap">
-    <a href="index.html" class="logo">
+    <a href="/" class="logo">
       <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
         <rect width="30" height="30" rx="8" fill="#2563eb"/>
         <rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/>
@@ -186,9 +155,9 @@
       <span class="logo-badge">Beta</span>
     </a>
     <div class="nav-links" id="nav-links">
-      <a href="#how" class="nav-a">How it works</a>
+      <a href="#how"      class="nav-a">How it works</a>
       <a href="#features" class="nav-a">Features</a>
-      <a href="#sms" class="nav-a">SMS Queue</a>
+      <a href="#sms"      class="nav-a">SMS Queue</a>
       <select class="lang-sel" onchange="changeLang(this.value)" id="lang-sel">
         <option value="en">🌐 EN</option>
         <option value="fr">FR</option>
@@ -196,14 +165,13 @@
         <option value="es">ES</option>
         <option value="pt">PT</option>
       </select>
-      <a href="/login-user" class="nav-a" data-t="login">Login</a>
+      <a href="/login-user" class="nav-a" id="nav-login" data-t="login">Login</a>
       <a href="/register-org" class="nav-cta">For Organizations</a>
     </div>
     <div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-bg">
     <div class="hero-orb orb1"></div>
@@ -212,44 +180,43 @@
     <div class="hero-grid"></div>
   </div>
   <div class="hero-inner">
-    <!-- Left: headline -->
     <div>
       <div class="hero-tag">🚀 Queue + Code = QCode</div>
       <h1>Queue Smarter,<br/><span>Not Harder</span></h1>
-      <p class="hero-sub" data-t="enter_code">Join any queue instantly with a code. Track your position, see your exact wait time, and never waste time standing in line again.</p>
+      <p class="hero-sub">Join any queue instantly with a code. Track your position, see your exact wait time, and never waste time standing in line again.</p>
       <div class="hero-btns">
         <a href="/register-user" class="btn btn-primary btn-lg" data-t="register">Create Free Account</a>
-        <a href="/register-org" class="btn btn-outline btn-lg">For Organizations →</a>
+        <a href="/register-org"  class="btn btn-outline btn-lg">For Organizations →</a>
       </div>
     </div>
 
-    <!-- Right: Join card -->
     <div>
       <div class="join-card">
         <div class="join-card-title" data-t="join_queue">Join a Queue</div>
-        <div class="join-card-sub" data-t="enter_code">Enter the service code given to you</div>
+        <div class="join-card-sub"   data-t="enter_code">Enter the service code given to you</div>
 
         <div id="step-code">
           <div class="input-row">
-            <input id="code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8" data-t-placeholder="enter_code"/>
-            <button class="btn btn-primary" onclick="findService()" data-t="find">Find</button>
+            <input id="code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="10" autocomplete="off"/>
+            <button class="btn btn-primary" id="find-btn" onclick="findService()" data-t="find">Find</button>
           </div>
-          <span id="code-err" class="ferr"></span>
+          <div id="code-err" class="ferr"></div>
         </div>
 
         <div id="step-join" style="display:none;margin-top:1.25rem">
           <div class="found-box">
             <div class="found-name" id="found-name"></div>
             <div class="found-meta">
+              <span id="found-org"></span>
               <span id="found-staff"></span>
-              <span id="found-eta-preview"></span>
+              <span id="found-eta"></span>
               <span id="found-waiting"></span>
             </div>
           </div>
 
           <div id="user-join-section" style="display:none;margin-bottom:.875rem">
-            <button class="btn btn-success btn-full btn-lg" onclick="joinAsUser()">
-              ✓ <span data-t="confirm_join">Join Queue as</span> <span id="user-label"></span>
+            <button class="btn btn-success btn-full btn-lg" id="user-join-btn" onclick="joinAsUser()">
+              ✓ Join Queue as <span id="user-label"></span>
             </button>
           </div>
 
@@ -259,18 +226,22 @@
             <button class="btn btn-outline btn-full" onclick="joinAsGuest()">Join as Guest</button>
           </div>
 
+          <button onclick="resetSearch()" style="background:none;border:none;color:rgba(255,255,255,.35);font-size:.8rem;cursor:pointer;margin-top:.875rem;width:100%;text-align:center;padding:.5rem">
+            ← Search a different code
+          </button>
+
           <div class="create-acc">
             <p>Want <strong>ETA alerts</strong> &amp; <strong>queue history</strong>?</p>
-            <a href="auth/register-user.html" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)">Create Account →</a>
+            <a href="/register-user" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)">Create Account →</a>
           </div>
         </div>
 
-        <!-- SMS Join info -->
-        <div class="sms-info" id="sms-info">
+        <div class="sms-info">
           <div class="sms-icon">📱</div>
           <div class="sms-text">
             <strong data-t="join_sms">No internet? Join by SMS</strong>
-            <span data-t="sms_hint">Text your service code to</span> <strong id="sms-number" style="color:var(--q-cyan)"></strong>
+            <span data-t="sms_hint">Text your service code to</span>
+            <strong style="color:var(--q-cyan)">+2349155189936</strong>
           </div>
         </div>
       </div>
@@ -278,17 +249,15 @@
   </div>
 </section>
 
-<!-- STATS -->
 <div class="stats-bar">
   <div class="stats-inner">
     <div class="stat-item"><div class="num" id="stat-orgs">—</div><div class="lbl">Organizations</div></div>
     <div class="stat-item"><div class="num" id="stat-served">—</div><div class="lbl">People Served</div></div>
-    <div class="stat-item"><div class="num" id="stat-countries">5</div><div class="lbl">Languages</div></div>
-    <div class="stat-item"><div class="num">∞</div><div class="lbl">Queues Supported</div></div>
+    <div class="stat-item"><div class="num" id="stat-queues">—</div><div class="lbl">Active Queues</div></div>
+    <div class="stat-item"><div class="num">5</div><div class="lbl">Languages</div></div>
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
 <section class="section" id="how" style="background:#fff">
   <div class="section-inner">
     <div class="section-tag">✦ Simple Process</div>
@@ -296,14 +265,13 @@
     <p class="section-sub">Three steps to skip the physical line — for everyone, everywhere.</p>
     <div class="steps-grid">
       <div class="step"><div class="step-num">01</div><div class="step-icon">🎫</div><h3>Get Your Code</h3><p>The organization gives you a 6-character service code when you arrive or in advance.</p></div>
-      <div class="step"><div class="step-num">02</div><div class="step-icon">⚡</div><h3>Enter & Join</h3><p>Type the code on QCode or text it to our SMS number. You get a ticket instantly.</p></div>
+      <div class="step"><div class="step-num">02</div><div class="step-icon">⚡</div><h3>Enter &amp; Join</h3><p>Type the code on QCode or text it to our SMS number. You get a ticket instantly.</p></div>
       <div class="step"><div class="step-num">03</div><div class="step-icon">⏰</div><h3>Know Your Time</h3><p>See your exact position and estimated time. Only return when it's nearly your turn.</p></div>
       <div class="step"><div class="step-num">04</div><div class="step-icon">📢</div><h3>Get Called</h3><p>When you're next, you'll be alerted in real time. Step up and get served — zero waiting.</p></div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
 <section class="section" id="features">
   <div class="section-inner">
     <div class="section-tag">✦ Full Feature Set</div>
@@ -314,7 +282,7 @@
       <div class="feat"><div class="feat-icon cyan">📱</div><h3>SMS Queue</h3><p>No smartphone or internet? Text your service code and join from any phone.</p></div>
       <div class="feat"><div class="feat-icon gold">⏱️</div><h3>Exact ETA</h3><p>See the exact time you'll be served based on the organization's defined time interval.</p></div>
       <div class="feat"><div class="feat-icon green">🌍</div><h3>5 Languages</h3><p>English, French, Arabic (RTL), Spanish, and Portuguese — fully translated.</p></div>
-      <div class="feat"><div class="feat-icon purple">📊</div><h3>Reports & Analytics</h3><p>Organizations download full queue history reports. Admins see everything.</p></div>
+      <div class="feat"><div class="feat-icon purple">📊</div><h3>Reports &amp; Analytics</h3><p>Organizations download full queue history reports. Admins see everything.</p></div>
       <div class="feat"><div class="feat-icon red">🔐</div><h3>Verified Organizations</h3><p>Orgs submit documents and are approved by super admin before going live.</p></div>
       <div class="feat"><div class="feat-icon blue">🗂️</div><h3>Queue History</h3><p>Registered users see every queue they've ever joined, with timestamps and status.</p></div>
       <div class="feat"><div class="feat-icon cyan">🔄</div><h3>Restore Deleted Services</h3><p>Accidentally deleted a service? Restore it instantly from the trash bin.</p></div>
@@ -323,16 +291,15 @@
   </div>
 </section>
 
-<!-- SMS SECTION -->
 <section class="sms-section" id="sms">
   <div class="sms-inner">
     <div>
       <div class="section-tag" style="background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.3);color:var(--q-cyan)">📱 SMS Queue</div>
-      <h2>Join a Queue With Just a Sending A service Code to +2349155189936</h2>
+      <h2>Join a Queue With Just a Text Message</h2>
       <p>No smartphone, no internet, no problem. Anyone with a basic phone can join a QCode queue by sending a simple SMS message. Perfect for communities with limited connectivity.</p>
       <div class="sms-steps">
         <div class="sms-step"><div class="sms-step-num">1</div><div class="sms-step-text"><strong>Get the Service Code</strong>Organisation gives you code e.g. "HOSP01"</div></div>
-        <div class="sms-step"><div class="sms-step-num">2</div><div class="sms-step-text"><strong>Text it to QCode</strong>Send "HOSP01" to <span id="sms-num-2" style="color:var(--q-cyan)"></span></div></div>
+        <div class="sms-step"><div class="sms-step-num">2</div><div class="sms-step-text"><strong>Text it to QCode</strong>Send "HOSP01" to <strong style="color:var(--q-cyan)">+2349155189936</strong></div></div>
         <div class="sms-step"><div class="sms-step-num">3</div><div class="sms-step-text"><strong>Get your ticket back</strong>Instant reply with position &amp; estimated time</div></div>
       </div>
     </div>
@@ -340,182 +307,242 @@
       <div class="phone-mock">
         <div style="font-size:.75rem;color:rgba(255,255,255,.4);text-align:center;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.08em">SMS Conversation</div>
         <div class="msg-bubble msg-in">HOSP01<div class="msg-time">You → QCode • 10:42 AM</div></div>
-        <div class="msg-bubble msg-out">✅ Joined! Ticket: <strong>H007</strong><br/>Position: 7 | ETA: ~35 min (11:17 AM)<br/>Reply CANCEL to leave queue.<div class="msg-time">QCode • 10:42 AM</div></div>
+        <div class="msg-bubble msg-out">✅ Joined! Ticket: <strong>H007</strong><br/>Position: 7 | ETA: ~35 min (11:17 AM)<br/>Stay nearby.<div class="msg-time">QCode • 10:42 AM</div></div>
         <div class="msg-bubble msg-in">STATUS<div class="msg-time">You → QCode • 11:05 AM</div></div>
-        <div class="msg-bubble msg-out">📋 H007 | Position: 3<br/>ETA: ~12 min (11:17 AM)<br/>Get ready — you're nearly next!<div class="msg-time">QCode • 11:05 AM</div></div>
+        <div class="msg-bubble msg-out">📋 H007 | Position: 3<br/>ETA: ~12 min<br/>Get ready — nearly next!<div class="msg-time">QCode • 11:05 AM</div></div>
         <div class="msg-bubble msg-out" style="background:var(--q-cyan);margin-top:.75rem">📢 H007 — You're being called!<br/>Please proceed to the counter now.<div class="msg-time">QCode • 11:18 AM</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ORG CTA -->
 <section class="org-cta">
   <h2>Running a Service?</h2>
   <p>Create your organization account, submit verification docs, and go live with QCode in minutes. Manage queues, track reports, and serve more people efficiently.</p>
-  <a href="/register-org" class="btn btn-primary btn-lg">Register Your Organization →</a>
+  <a href="/register-org" class="btn btn-white btn-lg">Register Your Organization →</a>
 </section>
 
 <footer>
-  <div class="logo" style="font-size:1.25rem"><svg width="24" height="24" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg><span><span style="color:var(--q-cyan)">Q</span>Code</span></div>
+  <div class="logo" style="justify-content:center">
+    <svg width="24" height="24" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
+    <span><span class="logo-q">Q</span>Code</span>
+  </div>
   <p>Queue Smarter, Not Harder · © 2025 QCode · Available in English, Français, العربية, Español, Português</p>
 </footer>
 
 <div id="toasts"></div>
-  
-  {% raw %}
-  <script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// ALL DATA FROM FLASK API — ZERO SUPABASE JS
+// ═══════════════════════════════════════════════════════════════
 
 // i18n
 const LANGS = {
-  en:{join_queue:'Join a Queue',enter_code:'Enter the service code given to you',find:'Find',confirm_join:'Confirm & Join',join_sms:'No internet? Join by SMS',sms_hint:'Text your service code to',register:'Create Free Account',login:'Login'},
-  fr:{join_queue:'Rejoindre la file',enter_code:'Entrez votre code de service',find:'Trouver',confirm_join:'Confirmer',join_sms:'Pas internet ? Rejoindre par SMS',sms_hint:'Envoyez votre code au',register:"S'inscrire",login:'Connexion'},
-  ar:{join_queue:'انضم إلى الطابور',enter_code:'أدخل رمز الخدمة',find:'بحث',confirm_join:'تأكيد الانضمام',join_sms:'بدون إنترنت؟ انضم عبر SMS',sms_hint:'أرسل الرمز إلى',register:'تسجيل',login:'دخول'},
-  es:{join_queue:'Unirse a la cola',enter_code:'Ingresa tu código',find:'Buscar',confirm_join:'Confirmar',join_sms:'Sin internet? Únete por SMS',sms_hint:'Envía tu código al',register:'Registrarse',login:'Ingresar'},
-  pt:{join_queue:'Entrar na fila',enter_code:'Digite seu código',find:'Encontrar',confirm_join:'Confirmar',join_sms:'Sem internet? Entre por SMS',sms_hint:'Envie seu código para',register:'Cadastrar',login:'Entrar'},
+  en:{join_queue:'Join a Queue',enter_code:'Enter the service code given to you',find:'Find',join_sms:'No internet? Join by SMS',sms_hint:'Text your service code to',register:'Create Free Account',login:'Login'},
+  fr:{join_queue:'Rejoindre la file',enter_code:'Entrez votre code de service',find:'Trouver',join_sms:'Pas internet ? Rejoindre par SMS',sms_hint:'Envoyez votre code au',register:"S'inscrire",login:'Connexion'},
+  ar:{join_queue:'انضم إلى الطابور',enter_code:'أدخل رمز الخدمة',find:'بحث',join_sms:'بدون إنترنت؟ انضم عبر SMS',sms_hint:'أرسل الرمز إلى',register:'تسجيل',login:'دخول'},
+  es:{join_queue:'Unirse a la cola',enter_code:'Ingresa tu código',find:'Buscar',join_sms:'Sin internet? Únete por SMS',sms_hint:'Envía tu código al',register:'Registrarse',login:'Ingresar'},
+  pt:{join_queue:'Entrar na fila',enter_code:'Digite seu código',find:'Encontrar',join_sms:'Sem internet? Entre por SMS',sms_hint:'Envie seu código para',register:'Cadastrar',login:'Entrar'},
 };
 let curLang = localStorage.getItem('qcode_lang') || navigator.language?.slice(0,2) || 'en';
 if (!LANGS[curLang]) curLang = 'en';
 
-function t(k){ return (LANGS[curLang]||LANGS.en)[k]||k; }
 function changeLang(l){
   curLang = l; localStorage.setItem('qcode_lang', l);
   document.documentElement.lang = l;
   document.documentElement.dir  = l === 'ar' ? 'rtl' : 'ltr';
-  document.querySelectorAll('[data-t]').forEach(el => { const k=el.getAttribute('data-t'); if(LANGS[l]?.[k]) el.textContent=LANGS[l][k]; });
-  document.querySelectorAll('[data-t-placeholder]').forEach(el => { const k=el.getAttribute('data-t-placeholder'); if(LANGS[l]?.[k]) el.placeholder=LANGS[l][k]; });
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.getAttribute('data-t');
+    if (LANGS[l]?.[k]) el.textContent = LANGS[l][k];
+  });
 }
-
-function toast(msg, type='info', ms=4500){
-  const t = document.createElement('div'); t.className=`toast t-${type}`;
-  const icons={success:'✓',error:'✕',info:'ℹ'};t.innerHTML=`<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
-  document.getElementById('toasts').appendChild(t);
-  setTimeout(()=>t.remove(), ms);
-}
-
-// Navbar scroll effect
-window.addEventListener('scroll', () => {
-  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20);
-});
-document.getElementById('nav').classList.add('scrolled');
-
-function toggleMenu(){
-  const nl = document.getElementById('nav-links');
-  nl.style.display = nl.style.display === 'flex' ? 'none' : 'flex';
-  nl.style.flexDirection = 'column';
-  nl.style.position = 'absolute';
-  nl.style.top = '68px';
-  nl.style.left = '0'; nl.style.right = '0';
-  nl.style.background = 'rgba(10,22,40,.98)';
-  nl.style.padding = '1rem 2rem';
-  nl.style.gap = '0.5rem';
-}
-
-// Set SMS number
-document.getElementById('sms-number').textContent = SMS_NUMBER;
-document.getElementById('sms-num-2').textContent  = SMS_NUMBER;
-
-// Init lang selector
 document.getElementById('lang-sel').value = curLang;
 changeLang(curLang);
 
-// Load stats
+function toast(msg, type='info', ms=4500){
+  const el = document.createElement('div');
+  el.className = `toast t-${type}`;
+  el.innerHTML = `<span>${{success:'✓',error:'✕',info:'ℹ'}[type]}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), ms);
+}
+
+window.addEventListener('scroll', () =>
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 20));
+document.getElementById('nav').classList.add('scrolled');
+
+function toggleMenu(){
+  const nl   = document.getElementById('nav-links');
+  const open = nl.style.display === 'flex';
+  Object.assign(nl.style, {
+    display: open ? 'none' : 'flex', flexDirection:'column',
+    position:'absolute', top:'68px', left:'0', right:'0',
+    background:'rgba(10,22,40,.98)', padding:'1rem 2rem', gap:'.5rem',
+  });
+}
+
+// ── LIVE STATS — uses public endpoint, no login needed ────────
 async function loadStats(){
   try {
-    const { count: orgs } = await db.from('profiles').select('*', {count:'exact',head:true}).eq('role','organization').eq('approval_status','approved');
-    const { count: served } = await db.from('queue_entries').select('*', {count:'exact',head:true}).eq('status','completed');
-    document.getElementById('stat-orgs').textContent  = (orgs||0).toLocaleString();
-    document.getElementById('stat-served').textContent = (served||0).toLocaleString();
-  } catch{}
+    const res  = await fetch('/api/public/stats');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.approved_orgs   != null) document.getElementById('stat-orgs').textContent    = data.approved_orgs.toLocaleString();
+    if (data.total_served    != null) document.getElementById('stat-served').textContent  = data.total_served.toLocaleString();
+    if (data.active_services != null) document.getElementById('stat-queues').textContent  = data.active_services.toLocaleString();
+  } catch(e){}
 }
 
-// State
-let myProfile = null, foundSvc = null;
+// ── SESSION CHECK ─────────────────────────────────────────────
+// Orgs/admins are redirected to their dashboard.
+// Regular users STAY on the homepage (they use the join card).
+let myProfile = null;
 
-async function initAuth(){
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) return;
-  const { data: p } = await db.from('profiles').select('*').eq('id', session.user.id).single();
-  myProfile = p;
-  if (p?.role === 'organization') window.location.href = 'dashboard/org.html';
-}
-
-// ── FIND SERVICE ─────────────────────────────────────────────
-async function findService(){
-  const code = document.getElementById('code-in').value.trim().toUpperCase();
-  const err  = document.getElementById('code-err'); err.style.display='none';
-  if (!code){ err.textContent='Please enter a service code.'; err.style.display='block'; return; }
+async function checkSession(){
   try {
-    const { data: svc } = await db.from('services').select('*, profiles(org_name,approval_status)').eq('service_code', code).single();
-    if (!svc){ err.textContent='No service found with that code.'; err.style.display='block'; return; }
-    if (svc.profiles?.approval_status !== 'approved'){ err.textContent='This organization is not yet approved.'; err.style.display='block'; return; }
-    if (svc.status === 'closed'){ err.textContent='This queue is currently closed.'; err.style.display='block'; return; }
-    if (svc.status === 'paused'){ err.textContent='This queue is paused. Please try again soon.'; err.style.display='block'; return; }
-    if (svc.max_users){
-      const { count } = await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',svc.id).in('status',['waiting','called','serving']);
-      if (count >= svc.max_users){ err.textContent='This queue is full.'; err.style.display='block'; return; }
+    const res  = await fetch('/api/auth/me');
+    const data = await res.json();
+    if (!data.logged_in) return;
+
+    // Update nav link to show name
+    const navLogin  = document.getElementById('nav-login');
+    navLogin.textContent = data.full_name || data.org_name || 'My Account';
+    navLogin.href        = data.role === 'organization' ? '/org'
+                         : data.role === 'super_admin'  ? '/super-admin'
+                         : '/user';
+
+    // Org and admin → redirect away from homepage
+    if (data.role === 'organization') { window.location.href = '/org';         return; }
+    if (data.role === 'super_admin')  { window.location.href = '/super-admin'; return; }
+
+    // Logged-in users → fetch profile so join card shows their name
+    if (data.role === 'user'){
+      try {
+        const pr = await fetch('/api/user/profile');
+        const p  = await pr.json();
+        if (!p.error) myProfile = p;
+      } catch(e){}
     }
-    foundSvc = svc;
+  } catch(e){}
+}
 
-    // Count waiting
-    const { count: waiting } = await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',svc.id).eq('status','waiting');
-    const eta = waiting * (svc.time_interval || 5);
-    const etaTime = new Date(Date.now() + eta * 60000);
+// ── STATE ─────────────────────────────────────────────────────
+let foundSvc = null;
 
-    document.getElementById('found-name').textContent      = svc.name;
-    document.getElementById('found-staff').textContent     = svc.staff_name ? `👤 ${svc.staff_name}` : '';
-    document.getElementById('found-eta-preview').textContent = `⏱ ~${eta} min wait`;
-    document.getElementById('found-waiting').textContent   = `👥 ${waiting} waiting`;
+// ── FIND SERVICE — GET /api/user/find-service?code=XXXX ───────
+async function findService(){
+  const raw  = document.getElementById('code-in').value.trim();
+  const code = raw.toUpperCase().replace(/\s+/g,'');
+  const err  = document.getElementById('code-err');
+  const btn  = document.getElementById('find-btn');
+  err.style.display = 'none';
+
+  if (!code){
+    err.textContent   = 'Please enter a service code.';
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = '…';
+
+  try {
+    const res  = await fetch(`/api/user/find-service?code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+
+    if (!res.ok){
+      err.textContent   = data.error || 'Service not found. Please check the code and try again.';
+      err.style.display = 'block';
+      return;
+    }
+
+    foundSvc = data;
+
+    document.getElementById('found-name').textContent    = data.name;
+    document.getElementById('found-org').textContent     = data.org_name   ? `🏢 ${data.org_name}`   : '';
+    document.getElementById('found-staff').textContent   = data.staff_name ? `👤 ${data.staff_name}` : '';
+    document.getElementById('found-eta').textContent     = `⏱ ~${data.eta_minutes  || 0} min wait`;
+    document.getElementById('found-waiting').textContent = `👥 ${data.waiting_count || 0} waiting`;
 
     document.getElementById('step-code').style.display = 'none';
     document.getElementById('step-join').style.display = 'block';
 
     if (myProfile?.role === 'user'){
       document.getElementById('user-join-section').style.display = 'block';
-      document.getElementById('user-label').textContent = myProfile.full_name || myProfile.email;
+      document.getElementById('user-label').textContent = myProfile.full_name || myProfile.email || 'me';
     }
-  } catch(e){ err.textContent='Error finding service.'; err.style.display='block'; }
+
+  } catch(e){
+    err.textContent   = 'Network error. Please check your connection.';
+    err.style.display = 'block';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = LANGS[curLang]?.find || 'Find';
+  }
 }
 
-// ── JOIN AS USER ─────────────────────────────────────────────
+function resetSearch(){
+  foundSvc = null;
+  document.getElementById('code-in').value          = '';
+  document.getElementById('step-code').style.display = 'block';
+  document.getElementById('step-join').style.display = 'none';
+  document.getElementById('code-err').style.display  = 'none';
+  document.getElementById('user-join-section').style.display = 'none';
+}
+
+// ── JOIN AS USER — POST /api/user/join-queue ──────────────────
 async function joinAsUser(){
   if (!foundSvc || !myProfile) return;
+  const btn = document.getElementById('user-join-btn');
+  btn.disabled = true; btn.textContent = 'Joining…';
   try {
-    const { data: ex } = await db.from('queue_entries').select('id').eq('service_id',foundSvc.id).eq('user_id',myProfile.id).in('status',['waiting','called','serving']).maybeSingle();
-    if (ex){ toast('You are already in this queue.','error'); return; }
-    const { data: s } = await db.from('services').select('ticket_counter,ticket_prefix,time_interval').eq('id',foundSvc.id).single();
-    const n = s.ticket_counter + 1;
-    await db.from('services').update({ticket_counter:n}).eq('id',foundSvc.id);
-    const label = `${s.ticket_prefix}${String(n).padStart(3,'0')}`;
-    const { count: ahead } = await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',foundSvc.id).eq('status','waiting');
-    const eta = new Date(Date.now() + (ahead + 1) * (s.time_interval||5) * 60000);
-    const { data: entry } = await db.from('queue_entries').insert({service_id:foundSvc.id,user_id:myProfile.id,ticket_label:label,ticket_number:n,status:'waiting',estimated_time:eta.toISOString(),join_method:'web'}).select().single();
-    sessionStorage.setItem('activeEntry', JSON.stringify({entry, service:foundSvc}));
-    window.location.href = `dashboard/user.html?service=${foundSvc.id}`;
-  } catch(e){ toast(e.message||'Failed to join.','error'); }
+    const res  = await fetch('/api/user/join-queue', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ service_id: foundSvc.id }),
+    });
+    const data = await res.json();
+    if (!res.ok){ toast(data.error || 'Failed to join queue.', 'error'); return; }
+    sessionStorage.setItem('activeEntry', JSON.stringify(data.entry));
+    window.location.href = '/user';
+  } catch(e){
+    toast('Network error. Please try again.', 'error');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = `✓ Join Queue as ${myProfile?.full_name || 'me'}`;
+  }
 }
 
-// ── JOIN AS GUEST ────────────────────────────────────────────
+// ── JOIN AS GUEST — POST /api/guest/join ──────────────────────
 async function joinAsGuest(){
   if (!foundSvc) return;
   const name = document.getElementById('guest-name').value.trim();
-  if (!name){ toast('Please enter your name.','error'); return; }
+  if (!name){ toast('Please enter your full name.', 'error'); return; }
   try {
-    const { data: s } = await db.from('services').select('ticket_counter,ticket_prefix,time_interval').eq('id',foundSvc.id).single();
-    const n = s.ticket_counter + 1;
-    await db.from('services').update({ticket_counter:n}).eq('id',foundSvc.id);
-    const label = `${s.ticket_prefix}${String(n).padStart(3,'0')}`;
-    const { count: ahead } = await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',foundSvc.id).eq('status','waiting');
-    const eta = new Date(Date.now() + (ahead + 1) * (s.time_interval||5) * 60000);
-    const { data: entry } = await db.from('queue_entries').insert({service_id:foundSvc.id,user_id:null,guest_name:name,ticket_label:label,ticket_number:n,status:'waiting',estimated_time:eta.toISOString(),join_method:'web'}).select().single();
-    sessionStorage.setItem('guestEntry', JSON.stringify({entry, service:foundSvc}));
-    window.location.href = 'dashboard/guest.html';
-  } catch(e){ toast(e.message||'Failed to join.','error'); }
+    const res  = await fetch('/api/guest/join', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ service_id: foundSvc.id, guest_name: name }),
+    });
+    const data = await res.json();
+    if (!res.ok){ toast(data.error || 'Failed to join queue.', 'error'); return; }
+    sessionStorage.setItem('guestEntry', JSON.stringify(data.entry));
+    window.location.href = '/guest';
+  } catch(e){
+    toast('Network error. Please try again.', 'error');
+  }
 }
 
-document.getElementById('code-in').addEventListener('keydown', e => { if(e.key==='Enter') findService(); });
-loadStats();
-initAuth();
-</script>{% endraw %}
+// ── INPUT HELPERS ─────────────────────────────────────────────
+document.getElementById('code-in').addEventListener('input', function(){
+  this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+});
+document.getElementById('code-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter') findService();
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+checkSession();   // check who is logged in, update nav
+loadStats();      // fetch live org/served/queue counts
+</script>
 </body>
 </html>
