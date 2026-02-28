@@ -44,6 +44,11 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
         "Missing required env vars: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_KEY"
     )
 
+def get_groq():
+    from groq import Groq
+    return Groq(api_key=os.getenv("GROQ_API_KEY", ""))
+
+SMS_GATEWAY_NUMBER = os.getenv("SMS_GATEWAY_NUMBER", "+2349155189936")
 # ─────────────────────────────────────────────
 # HEADERS
 # ─────────────────────────────────────────────
@@ -295,6 +300,29 @@ def register_user():
 # REGISTER ORG
 # HTML: POST /api/auth/register-org  (multipart/form-data)
 # ─────────────────────────────────────────────
+ ════════════════════════════════════════════════
+@app.route("/api/ai/faq", methods=["POST"])
+def ai_faq():
+    data = request.get_json()
+    messages = data.get("messages", [])
+    system_prompt = data.get("system", "You are QCode Assistant, a helpful queue management support AI.")
+
+    if not messages:
+        return jsonify({"error": "No messages"}), 400
+
+    try:
+        client = get_groq()
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[{"role": "system", "content": system_prompt}, *messages],
+            max_tokens=600,
+            temperature=0.7,
+        )
+        return jsonify({"response": response.choices[0].message.content})
+    except Exception as e:
+        print(f"Groq error: {e}")
+        return jsonify({"error": "AI service unavailable. Please try again."}), 500
+
 
 @app.route("/api/auth/register-org", methods=["POST"])
 @app.route("/api/register-org",      methods=["POST"])
