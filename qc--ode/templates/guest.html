@@ -1,132 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Your Ticket — QCode</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s200:#e2e8f0;--s500:#64748b;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--shl:0 16px 48px rgba(10,22,40,.2)}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.2rem;font-weight:800;color:#fff;text-decoration:none;margin-bottom:2.5rem}
-    .logo span{color:var(--cyan)}
-    .card{background:#fff;border-radius:1.5rem;padding:2.5rem;width:100%;max-width:420px;box-shadow:var(--shl);text-align:center}
-    .live-dot{display:inline-flex;align-items:center;gap:.375rem;font-size:.72rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.5rem;padding:.3rem .75rem;background:rgba(34,197,94,.08);border-radius:999px}
-    .live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.2s ease infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-    .called-box{display:none;background:linear-gradient(135deg,#15803d,var(--green));border-radius:1rem;padding:1.25rem 1.5rem;margin-bottom:1.5rem;animation:pulse 1.5s ease infinite}
-    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)}50%{box-shadow:0 0 0 14px rgba(34,197,94,0)}}
-    .called-box h2{font-family:var(--fh);color:#fff;font-size:1.25rem;margin-bottom:.25rem}
-    .called-box p{color:rgba(255,255,255,.85);font-size:.875rem}
-    .svc-lbl{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem}
-    .svc-name{font-size:1rem;font-weight:600;color:var(--navy);margin-bottom:.25rem}
-    .org-name{font-size:.8rem;color:var(--s500);margin-bottom:2rem}
-    .ticket-lbl{font-size:.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em}
-    .ticket-num{font-family:var(--fh);font-size:5.5rem;font-weight:800;color:var(--navy);line-height:1;margin:.2rem 0 1.75rem}
-    .pill-row{display:flex;flex-direction:column;align-items:center;gap:.625rem;margin-bottom:1.75rem}
-    .pill{display:inline-flex;align-items:center;gap:.5rem;border-radius:999px;padding:.5rem 1.25rem;font-size:.875rem;font-weight:600}
-    .pill-pos{background:rgba(37,99,235,.08);border:1.5px solid rgba(37,99,235,.2);color:var(--accent)}
-    .pill-eta{background:rgba(6,182,212,.08);border:1.5px solid rgba(6,182,212,.25);color:#0e7490}
-    .divider{height:1px;background:var(--s200);margin:1.5rem 0}
-    .stats-pair{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:1.25rem}
-    .sp{background:#f8fafc;border:1px solid #e2e8f0;border-radius:.625rem;padding:1rem}
-    .sp-n{font-family:var(--fh);font-size:1.75rem;font-weight:800;color:var(--accent);line-height:1}
-    .sp-l{font-size:.7rem;color:var(--s500);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
-    .last-upd{font-size:.7rem;color:#94a3b8;margin-bottom:1.5rem}
-    .btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.75rem 1.5rem;border-radius:var(--r);font-family:var(--fb);font-size:.875rem;font-weight:600;cursor:pointer;width:100%;text-decoration:none;border:none;transition:all .18s}
-    .bp{background:var(--accent);color:#fff;margin-bottom:.625rem}.bp:hover{background:#1d4ed8}
-    .bg{background:transparent;color:var(--s500);border:1.5px solid #e2e8f0}.bg:hover{border-color:var(--red);color:var(--red)}
-    .cta{background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(6,182,212,.04));border:1px solid rgba(37,99,235,.15);border-radius:1rem;padding:1.25rem;margin-top:1.5rem}
-    .cta h3{font-family:var(--fh);font-size:.9rem;color:var(--navy);margin-bottom:.375rem}
-    .cta p{font-size:.78rem;color:var(--s500);margin-bottom:.875rem;line-height:1.5}
-    #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
-    .toast{padding:.75rem 1.125rem;border-radius:.5rem;box-shadow:var(--shl);font-size:.825rem;font-weight:500;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
-    .t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
-    @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:translateX(0)}}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Your Ticket — QCode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#0d0f14;--ink2:#1e2230;--ink3:#323848;
+  --muted:#8892a4;--border:#e4e8f0;--bg:#f4f6fb;--white:#fff;
+  --brand:#4361ee;--brand2:#3a0ca3;--cyan:#4cc9f0;--green:#06d6a0;
+  --amber:#ffd166;--red:#ef4565;
+  --fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
+  --r:.75rem;--rl:1.25rem;--rxl:1.75rem;
+  --sh:0 2px 8px rgba(13,15,20,.07);--shm:0 6px 24px rgba(13,15,20,.12);--shl:0 16px 48px rgba(13,15,20,.16);
+  --t:.2s cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--ink2) 0%,var(--brand2) 55%,#0f172a 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem}
+h1,h2,h3{font-family:var(--fh)}
+.logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.2rem;font-weight:700;color:#fff;text-decoration:none;margin-bottom:2rem}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);margin-left:.2rem;animation:p 2s ease infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.card{background:var(--white);border-radius:var(--rxl);padding:2.5rem;width:100%;max-width:440px;box-shadow:var(--shl)}
+
+/* LIVE TAG */
+.live-tag{display:inline-flex;align-items:center;gap:.375rem;font-size:.7rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.5rem;padding:.3rem .875rem;background:rgba(6,214,160,.1);border:1px solid rgba(6,214,160,.25);border-radius:99px}
+.live-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:p 1.2s ease infinite}
+
+/* CALLED ALERT */
+.called-alert{display:none;background:linear-gradient(135deg,#047857,var(--green));border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1.5rem;animation:glow 1.5s ease infinite;text-align:center}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(6,214,160,.4)}50%{box-shadow:0 0 0 14px rgba(6,214,160,0)}}
+.called-alert h2{font-family:var(--fh);color:#fff;font-size:1.15rem;margin-bottom:.25rem}
+.called-alert p{color:rgba(255,255,255,.8);font-size:.85rem}
+
+/* TICKET DISPLAY */
+.svc-lbl{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.2rem;text-align:center}
+.svc-name{font-family:var(--fh);font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:.125rem;text-align:center}
+.org-name{font-size:.8rem;color:var(--muted);margin-bottom:2rem;text-align:center}
+.ticket-lbl{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;text-align:center}
+.ticket-num{font-family:var(--fh);font-size:5.5rem;font-weight:700;color:var(--brand);line-height:1;margin:.2rem 0 1.5rem;text-align:center;letter-spacing:-.04em}
+
+/* CHIPS */
+.chip-row{display:flex;flex-direction:column;align-items:center;gap:.625rem;margin-bottom:1.75rem}
+.chip{display:inline-flex;align-items:center;gap:.5rem;border-radius:99px;padding:.5rem 1.25rem;font-size:.875rem;font-weight:600}
+.chip-pos{background:rgba(67,97,238,.08);border:1.5px solid rgba(67,97,238,.18);color:var(--brand)}
+.chip-eta{background:rgba(76,201,240,.08);border:1.5px solid rgba(76,201,240,.2);color:#0e7490}
+.chip-time{background:rgba(6,214,160,.08);border:1.5px solid rgba(6,214,160,.2);color:#047857;font-size:.8rem}
+
+/* DIVIDER */
+.hr{height:1px;background:var(--border);margin:1.5rem 0}
+
+/* STATS */
+.stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:1.25rem}
+.sp{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center}
+.sp-n{font-family:var(--fh);font-size:1.75rem;font-weight:700;color:var(--brand);line-height:1}
+.sp-l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:.2rem}
+.last-upd{font-size:.7rem;color:var(--muted);margin-bottom:1.5rem;text-align:center}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.75rem 1.5rem;border-radius:var(--r);font-family:var(--fb);font-size:.875rem;font-weight:600;cursor:pointer;width:100%;border:none;transition:all var(--t)}
+.btn-danger{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-danger:hover{border-color:var(--red);color:var(--red)}
+.btn-primary{background:var(--brand);color:#fff;margin-bottom:.625rem}.btn-primary:hover{background:var(--brand2);transform:translateY(-1px)}
+
+/* END CODE */
+.ec-box{background:rgba(255,209,102,.08);border:1.5px solid rgba(255,209,102,.3);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1rem}
+.ec-title{font-family:var(--fh);font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:.375rem}
+.ec-desc{font-size:.78rem;color:var(--muted);margin-bottom:.75rem;line-height:1.5}
+.inp-row{display:flex;gap:.5rem}
+.inp{flex:1;padding:.7rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fh);font-size:.95rem;color:var(--ink);letter-spacing:.12em;text-transform:uppercase;transition:border-color var(--t)}
+.inp:focus{outline:none;border-color:var(--brand);background:var(--white)}
+.inp::placeholder{color:var(--muted);letter-spacing:.05em;font-size:.85rem;text-transform:none;font-family:var(--fb)}
+.ec-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--r);padding:.7rem 1.25rem;font-family:var(--fh);font-weight:700;font-size:.875rem;cursor:pointer;transition:all var(--t);flex-shrink:0}
+.ec-btn:hover{background:var(--brand2)}
+
+/* CTA */
+.cta-box{background:linear-gradient(135deg,rgba(67,97,238,.05),rgba(76,201,240,.04));border:1px solid rgba(67,97,238,.12);border-radius:var(--rl);padding:1.25rem;margin-top:1.5rem;text-align:center}
+.cta-box h3{font-family:var(--fh);font-size:.9rem;color:var(--ink);margin-bottom:.375rem}
+.cta-box p{font-size:.78rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5}
+.cta-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.5rem;background:var(--brand);color:#fff;border-radius:var(--r);font-family:var(--fh);font-weight:700;font-size:.85rem;text-decoration:none;transition:all var(--t)}
+.cta-btn:hover{background:var(--brand2)}
+
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;z-index:400;background:rgba(13,15,20,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.25rem}
+.modal{background:var(--white);border-radius:var(--rxl);padding:2rem;width:100%;max-width:420px;box-shadow:var(--shl);animation:mu .2s cubic-bezier(.16,1,.3,1)}
+@keyframes mu{from{opacity:0;transform:translateY(1.5rem)}to{opacity:1;transform:none}}
+.modal-title{font-family:var(--fh);font-size:1.15rem;font-weight:700;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)}
+.modal-btn{padding:.65rem 1.375rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;cursor:pointer;transition:all var(--t)}
+.mb-p{background:var(--brand);color:#fff}.mb-p:hover{background:var(--brand2)}
+.mb-g{background:var(--bg);color:var(--ink3);border:1.5px solid var(--border)}.mb-g:hover{border-color:var(--brand);color:var(--brand)}
+.stars{display:flex;gap:.5rem;margin-bottom:1rem;justify-content:center}
+.star{font-size:2.25rem;cursor:pointer;filter:grayscale(1) opacity(.3);transition:all .15s}
+.star.on{filter:none;transform:scale(1.1)}
+.fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1rem}
+.lbl{font-size:.8rem;font-weight:700;color:var(--ink3)}
+.ta{padding:.75rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;color:var(--ink);width:100%;resize:vertical;min-height:80px;outline:none;transition:border-color var(--t)}
+.ta:focus{border-color:var(--brand);background:var(--white)}
+
+/* TOAST */
+#toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+.toast{padding:.75rem 1.125rem;border-radius:.625rem;box-shadow:var(--shl);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+.t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
+.t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#047857}
+.t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
+@keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
+</style>
 </head>
 <body>
-<a href="../index.html" class="logo">
-  <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
-  <span>Q</span>Code
+
+<a href="/" class="logo">
+  <svg width="26" height="26" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#4361ee"/><rect x="7" y="9" width="16" height="3" rx="1.5" fill="white"/><rect x="7" y="14" width="11" height="3" rx="1.5" fill="#a8c8ff"/><rect x="7" y="19" width="7" height="3" rx="1.5" fill="#7ea8ff"/></svg>
+  QCode<span class="logo-dot"></span>
 </a>
-<div class="card">
-  <div class="live-dot">Live Tracking</div>
-  <div id="called-box" class="called-box"><h2>📢 You're Being Called!</h2><p>Please proceed to the service counter now.</p></div>
+
+<div class="card" id="main-card">
+  <div class="live-tag">Live Tracking</div>
+
+  <div id="called-alert" class="called-alert">
+    <h2>📢 You're Being Called!</h2>
+    <p>Please proceed to the service counter now.</p>
+  </div>
+
   <div class="svc-lbl">Service</div>
   <div class="svc-name" id="svc-name">—</div>
   <div class="org-name" id="org-name">—</div>
+
   <div class="ticket-lbl">Your Ticket</div>
   <div class="ticket-num" id="ticket-num">—</div>
-  <div class="pill-row">
-    <span class="pill pill-pos">Position <strong id="pos-num" style="margin-left:.375rem">—</strong></span>
-    <span class="pill pill-eta">⏱ ETA: <strong id="eta-str" style="margin-left:.375rem">Calculating…</strong></span>
+
+  <div class="chip-row">
+    <span class="chip chip-pos">Position <strong id="pos-num" style="margin-left:.375rem">—</strong></span>
+    <span class="chip chip-eta">⏱ ~<span id="eta-min">—</span> min wait</span>
+    <span class="chip chip-time">🕐 Your turn at <strong id="eta-exact">—</strong></span>
   </div>
-  <div class="divider"></div>
-  <div class="stats-pair">
+
+  <div class="hr"></div>
+  <div class="stat-pair">
     <div class="sp"><div class="sp-n" id="stat-ahead">—</div><div class="sp-l">Ahead of You</div></div>
     <div class="sp"><div class="sp-n" id="stat-total">—</div><div class="sp-l">Total Waiting</div></div>
   </div>
   <div class="last-upd">Updated: <span id="last-upd">—</span></div>
-  <button class="btn bg" onclick="leaveQueue()">✕ Leave Queue</button>
-  <div class="cta">
-    <h3>Want alerts &amp; history?</h3>
-    <p>Create a free account to track all queues, get called notifications, and never miss your turn.</p>
-    <a href="../auth/register-user.html" class="btn bp">Create Free Account →</a>
+
+  <div id="ec-box" class="ec-box" style="display:none">
+    <div class="ec-title">🔑 Enter End Code</div>
+    <div class="ec-desc">The staff will give you a 6-character end code to verify your visit is complete.</div>
+    <div class="inp-row">
+      <input id="ec-inp" class="inp" type="text" placeholder="Enter code" maxlength="6"/>
+      <button class="ec-btn" onclick="submitEndCode()">Verify</button>
+    </div>
+  </div>
+
+  <button class="btn btn-danger" onclick="leaveQueue()">✕ Leave Queue</button>
+
+  <div class="cta-box">
+    <h3>Want alerts & history?</h3>
+    <p>Create a free account to track all queues and get notified before your turn.</p>
+    <a href="/register-user" class="cta-btn">Create Free Account →</a>
   </div>
 </div>
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-modal" class="overlay" style="display:none">
+  <div class="modal">
+    <div class="modal-title">⭐ How was your experience?</div>
+    <p style="color:var(--muted);font-size:.875rem;margin-bottom:1.25rem;line-height:1.6">Rate your visit to <strong id="fb-svc">this service</strong>.</p>
+    <div class="stars" id="stars">
+      <span class="star" onclick="setStar(1)">⭐</span>
+      <span class="star" onclick="setStar(2)">⭐</span>
+      <span class="star" onclick="setStar(3)">⭐</span>
+      <span class="star" onclick="setStar(4)">⭐</span>
+      <span class="star" onclick="setStar(5)">⭐</span>
+    </div>
+    <div class="fg">
+      <label class="lbl">Comments (optional)</label>
+      <textarea id="fb-comment" class="ta" placeholder="Tell us what you think…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn mb-g" onclick="closeFeedback()">Skip</button>
+      <button class="modal-btn mb-p" onclick="submitFeedback()">Submit</button>
+    </div>
+  </div>
+</div>
+
 <div id="toasts"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-{% raw %}<script>
-const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY='YOUR_ANON_PUBLIC_KEY';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-function toast(msg,type='w',ms=8000){const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>⚠</span><span>${msg}</span>`;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);}
-function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-let entry=null,service=null,channel=null;
-async function init(){
-  const stored=sessionStorage.getItem('guestEntry');
-  if(!stored){window.location.href='../index.html';return;}
-  try{const p=JSON.parse(stored);entry=p.entry;service=p.service;}catch{window.location.href='../index.html';return;}
-  document.getElementById('ticket-num').textContent=entry.ticket_label;
-  document.getElementById('svc-name').textContent=service.name||'—';
-  document.getElementById('org-name').textContent=service.profiles?.org_name||'';
-  await refreshPosition();subscribeQueue();setInterval(refreshPosition,30000);
+
+{% raw %}
+<script>
+function toast(msg, type='w', ms=7000) {
+  const el = document.createElement('div');
+  el.className = `toast t-${type}`;
+  const icons = {w:'⚠',s:'✓',e:'✕'};
+  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), ms);
 }
-async function refreshPosition(){
-  try{
-    const {data:me}=await db.from('queue_entries').select('status,estimated_time').eq('id',entry.id).single();
-    if(!me)return;entry={...entry,...me};
-    document.getElementById('called-box').style.display=me.status==='called'?'block':'none';
-    if(['completed','no_show','cancelled'].includes(me.status)){
-      sessionStorage.removeItem('guestEntry');
-      document.querySelector('.card').innerHTML=`<div style="padding:1rem"><div style="font-size:3rem;margin-bottom:1rem">${me.status==='completed'?'✅':'❌'}</div><h2 style="font-family:Syne,sans-serif;color:#0a1628;margin-bottom:.75rem">${me.status==='completed'?'You were served!':me.status==='no_show'?'Marked as no-show':'Queue left'}</h2><p style="color:#64748b;margin-bottom:2rem;line-height:1.6">Ticket ${entry.ticket_label} is closed. Create an account to track future queues.</p><a href="../auth/register-user.html" style="display:block;padding:.875rem;background:#2563eb;color:#fff;border-radius:.625rem;font-weight:600;text-decoration:none;text-align:center;margin-bottom:.75rem">Create Free Account</a><a href="../index.html" style="display:block;padding:.875rem;color:#64748b;border:1.5px solid #e2e8f0;border-radius:.625rem;font-weight:600;text-decoration:none;text-align:center">← Back to Home</a></div>`;
+
+function fmtExact(ts) {
+  if (!ts) return '—';
+  try { return new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}); }
+  catch(e) { return '—'; }
+}
+
+// ── Load entry from sessionStorage ──
+let entry = null;
+let svcId = null;
+let starRating = 0;
+let ecShown = false;
+
+function init() {
+  // Support two storage keys — from homepage guest join or direct
+  let stored = sessionStorage.getItem('guestEntry');
+  if (!stored) stored = sessionStorage.getItem('qc_guest');
+  
+  if (!stored) {
+    showError('No active queue found. Please join a queue first.', true);
+    return;
+  }
+  try {
+    const parsed = JSON.parse(stored);
+    // Support both {entry, service} and flat entry format
+    if (parsed.entry) {
+      entry = parsed.entry;
+      const svc = parsed.service || {};
+      document.getElementById('svc-name').textContent = svc.name || entry.svc_name || '—';
+      document.getElementById('org-name').textContent = svc.org_name || entry.org_name || '';
+    } else {
+      entry = parsed;
+      document.getElementById('svc-name').textContent = entry.svc_name || '—';
+      document.getElementById('org-name').textContent = entry.org_name || '';
+    }
+    svcId = entry.service_id;
+  } catch(e) {
+    showError('Could not load queue data. Please join again.', true);
+    return;
+  }
+
+  document.getElementById('ticket-num').textContent = entry.ticket_label || '—';
+  refreshPosition();
+  setInterval(refreshPosition, 20000);
+}
+
+async function refreshPosition() {
+  if (!entry) return;
+  try {
+    const res  = await fetch(`/api/guest/status/${entry.id}`);
+    if (!res.ok) {
+      if (res.status === 404) { showError('Your queue entry has expired.', true); return; }
       return;
     }
-    const {count:ahead}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',service.id).eq('status','waiting').lt('ticket_number',entry.ticket_number);
-    const {count:total}=await db.from('queue_entries').select('*',{count:'exact',head:true}).eq('service_id',service.id).eq('status','waiting');
-    const pos=(ahead||0)+1;
-    document.getElementById('pos-num').textContent=pos;
-    document.getElementById('stat-ahead').textContent=Math.max(0,pos-1);
-    document.getElementById('stat-total').textContent=total||0;
-    if(me.estimated_time){const etaDate=new Date(me.estimated_time);const mins=Math.max(0,Math.round((etaDate-Date.now())/60000));document.getElementById('eta-str').textContent=`~${mins} min (${fmtTime(me.estimated_time)})`;}
-    document.getElementById('last-upd').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  }catch(e){console.error(e);}
+    const data = await res.json();
+    entry = {...entry, ...data};
+
+    // Terminal states
+    if (['completed','no_show','cancelled'].includes(data.status)) {
+      sessionStorage.removeItem('guestEntry');
+      sessionStorage.removeItem('qc_guest');
+      if (data.status === 'completed') {
+        document.getElementById('fb-svc').textContent = entry.svc_name || 'this service';
+        document.getElementById('feedback-modal').style.display = 'flex';
+      } else {
+        showTerminal(data.status);
+      }
+      return;
+    }
+
+    // Called state
+    const called = data.status === 'called';
+    document.getElementById('called-alert').style.display = called ? 'block' : 'none';
+    document.getElementById('ec-box').style.display = called ? 'block' : 'none';
+    if (called && !ecShown) { ecShown = true; toast('📢 You are being called! Please go to the counter.', 'w', 10000); }
+
+    const pos  = data.position || 1;
+    const mins = data.eta_minutes || 0;
+    document.getElementById('pos-num').textContent    = pos;
+    document.getElementById('eta-min').textContent    = mins;
+    document.getElementById('stat-ahead').textContent = Math.max(0, pos - 1);
+    document.getElementById('stat-total').textContent = data.total || 0;
+    document.getElementById('eta-exact').textContent  = fmtExact(data.eta_time || data.estimated_time);
+    document.getElementById('last-upd').textContent   = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  } catch(e) {
+    console.error('Status fetch error:', e);
+  }
 }
-function subscribeQueue(){
-  if(channel)channel.unsubscribe();
-  channel=db.channel(`guest:${service.id}`)
-    .on('postgres_changes',{event:'*',schema:'public',table:'queue_entries',filter:`service_id=eq.${service.id}`},async(payload)=>{
-      await refreshPosition();
-      if(payload.new?.id===entry.id&&payload.new?.status==='called')toast('📢 You are being called! Please go to the counter now.','w',10000);
-    }).subscribe();
+
+async function submitEndCode() {
+  const code = (document.getElementById('ec-inp').value || '').trim().toUpperCase();
+  if (code.length < 6) { toast('Enter the 6-character end code.', 'e'); return; }
+  const res  = await fetch('/api/user/verify-end-code', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({entry_id: entry.id, end_code: code})
+  });
+  const data = await res.json();
+  if (!res.ok) { toast(data.error || 'Invalid code. Try again.', 'e'); return; }
+  sessionStorage.removeItem('guestEntry');
+  sessionStorage.removeItem('qc_guest');
+  document.getElementById('fb-svc').textContent = entry.svc_name || 'this service';
+  document.getElementById('feedback-modal').style.display = 'flex';
 }
-async function leaveQueue(){
-  if(!confirm('Leave this queue?'))return;
-  try{await db.from('queue_entries').update({status:'cancelled',completed_at:new Date().toISOString()}).eq('id',entry.id);}catch{}
-  sessionStorage.removeItem('guestEntry');window.location.href='../index.html';
+
+async function leaveQueue() {
+  if (!confirm('Leave this queue?')) return;
+  try {
+    await fetch(`/api/user/leave-queue/${entry.id}`, {method:'POST', headers:{'Content-Type':'application/json'}});
+  } catch(e) {}
+  sessionStorage.removeItem('guestEntry');
+  sessionStorage.removeItem('qc_guest');
+  window.location.href = '/';
 }
+
+function showError(msg, redirect=false) {
+  document.getElementById('main-card').innerHTML = `
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:3rem;margin-bottom:1rem">❓</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;color:#0d0f14;margin-bottom:.75rem">Queue Not Found</h2>
+      <p style="color:#8892a4;margin-bottom:2rem;line-height:1.6">${msg}</p>
+      <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;padding:.875rem 2rem;background:#4361ee;color:#fff;border-radius:.75rem;font-weight:700;font-family:'Space Grotesk',sans-serif;text-decoration:none">← Join a Queue</a>
+    </div>`;
+}
+
+function showTerminal(status) {
+  const msgs = {no_show:'Marked as no-show', cancelled:'Queue left'};
+  document.getElementById('main-card').innerHTML = `
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:3rem;margin-bottom:1rem">❌</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;color:#0d0f14;margin-bottom:.75rem">${msgs[status]||'Session Ended'}</h2>
+      <p style="color:#8892a4;margin-bottom:2rem;line-height:1.6">Your queue session has ended. Create an account to track future queues easily.</p>
+      <a href="/register-user" style="display:block;padding:.875rem;background:#4361ee;color:#fff;border-radius:.75rem;font-weight:700;text-decoration:none;text-align:center;margin-bottom:.75rem;font-family:'Space Grotesk',sans-serif">Create Free Account</a>
+      <a href="/" style="display:block;padding:.875rem;color:#8892a4;border:1.5px solid #e4e8f0;border-radius:.75rem;font-weight:600;text-decoration:none;text-align:center;font-family:'Space Grotesk',sans-serif">← Back to Home</a>
+    </div>`;
+}
+
+// ── FEEDBACK ──
+function setStar(n) {
+  starRating = n;
+  document.querySelectorAll('.star').forEach((s, i) => s.classList.toggle('on', i < n));
+}
+
+async function submitFeedback() {
+  if (!starRating) { toast('Please select a rating.', 'e'); return; }
+  const comment = document.getElementById('fb-comment').value.trim();
+  try {
+    await fetch('/api/user/feedback', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({entry_id: entry?.id, rating: starRating, comment})
+    });
+  } catch(e) {}
+  closeFeedback();
+  showTerminal('completed');
+  // Override with success message
+  document.querySelector('#main-card div div:first-child').textContent = '✅';
+  document.querySelector('#main-card h2').textContent = 'Thanks for your feedback!';
+}
+
+function closeFeedback() {
+  document.getElementById('feedback-modal').style.display = 'none';
+  if (!entry) showTerminal('completed');
+}
+
 init();
-</script>{% endraw %}
+</script>
+{% endraw %}
 </body>
 </html>
