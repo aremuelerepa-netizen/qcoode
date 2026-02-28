@@ -1,15 +1,3 @@
-""
-QCode Backend — Final Production Version
-=========================================
-KEY FIXES vs previous versions:
-1. Uses Supabase Admin API (POST /auth/v1/admin/users) to create accounts
-   - Bypasses email confirmation requirement entirely
-   - Bypasses Supabase free-tier email rate limit (3/hour)
-   - Users can log in immediately after registering
-2. Super admin login uses env vars only — no Supabase call at all
-3. All routes match HTML fetch() calls exactly (/api/auth/X)
-4. Port binding uses $PORT env var for Render compatibility
-"""
 
 import os
 import json
