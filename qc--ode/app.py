@@ -1,4 +1,4 @@
-"""
+""
 QCode Backend — Final Production Version
 =========================================
 KEY FIXES vs previous versions:
