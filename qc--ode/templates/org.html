@@ -10,7 +10,7 @@
   --ink:#0d0f14;--ink2:#1e2230;--ink3:#323848;
   --muted:#8892a4;--border:#e4e8f0;--bg:#f4f6fb;--white:#fff;
   --brand:#4361ee;--brand2:#3a0ca3;--cyan:#4cc9f0;--green:#06d6a0;
-  --amber:#ffd166;--red:#ef4565;--purple:#7209b7;
+  --amber:#ffd166;--red:#ef4565;
   --green-l:#d1fae5;--amber-l:#fef3c7;--red-l:#fee2e2;
   --fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;
   --r:.75rem;--rl:1.25rem;--rxl:1.75rem;
@@ -20,21 +20,24 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--fb);background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
 h1,h2,h3,h4{font-family:var(--fh);line-height:1.15;letter-spacing:-.02em}
+a{text-decoration:none;color:var(--brand)}
 
 /* ─── TOPBAR ─── */
-.topbar{background:var(--ink2);height:62px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.05)}
+.topbar{background:var(--ink2);height:62px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100;flex-shrink:0}
 .tb-logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.1rem;font-weight:700;color:#fff;text-decoration:none}
 .tb-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pd 2s ease infinite}
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
-.tb-org{font-size:.82rem;color:rgba(255,255,255,.55);padding-left:.875rem;border-left:1px solid rgba(255,255,255,.1);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-org{font-size:.82rem;color:rgba(255,255,255,.5);padding-left:.875rem;border-left:1px solid rgba(255,255,255,.1);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:.5rem}
 .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fb);font-size:.8rem;font-weight:600;color:rgba(255,255,255,.6);transition:all var(--t)}
 .tb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .tb-logout{color:#f87171!important}.tb-logout:hover{background:rgba(239,68,68,.15)!important}
+
+/* PENDING BAR */
 .pending-bar{background:rgba(255,209,102,.12);border-bottom:1px solid rgba(255,209,102,.25);padding:.6rem 1.5rem;text-align:center;font-size:.8rem;color:#92400e;display:none}
 
 /* ─── SHELL ─── */
-.shell{display:flex;flex:1}
+.shell{display:flex;flex:1;overflow:hidden}
 .sidebar{width:240px;background:var(--white);border-right:1px solid var(--border);padding:1.25rem 1rem;flex-shrink:0;display:flex;flex-direction:column;gap:.15rem;overflow-y:auto}
 .main{flex:1;padding:1.75rem;overflow-y:auto;max-height:calc(100vh - 62px)}
 
@@ -52,50 +55,57 @@ h1,h2,h3,h4{font-family:var(--fh);line-height:1.15;letter-spacing:-.02em}
 .panel{display:none;animation:fi .2s ease}
 .panel.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ─── PAGE HEADER ─── */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem}
-.ph h1{font-size:1.6rem}.ph p{color:var(--muted);margin-top:.25rem;font-size:.88rem}
+.ph h1{font-size:1.6rem}.ph p{color:var(--muted);margin-top:.25rem;font-size:.875rem}
 
 /* ─── STATS ─── */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:1.75rem}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:1.75rem}
 .stat{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem 1.5rem;border-top:3px solid var(--brand)}
 .stat-n{font-family:var(--fh);font-size:2rem;font-weight:700;color:var(--brand);line-height:1}
 .stat-l{font-size:.72rem;color:var(--muted);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+.stat.g{border-top-color:var(--green)}.stat.g .stat-n{color:#047857}
+.stat.r{border-top-color:var(--red)}.stat.r .stat-n{color:var(--red)}
+.stat.a{border-top-color:var(--amber)}.stat.a .stat-n{color:#92400e}
 
 /* ─── CARD ─── */
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;box-shadow:var(--sh)}
-.card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:1.25rem}
+.card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
 
 /* ─── BUTTONS ─── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem 1.25rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.82rem;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-.bp{background:var(--brand);color:#fff}.bp:hover:not(:disabled){background:var(--brand2)}
+.bp{background:var(--brand);color:#fff}.bp:hover:not(:disabled){background:var(--brand2);transform:translateY(-1px)}
 .bs{background:var(--green);color:#fff}.bs:hover:not(:disabled){filter:brightness(1.07)}
 .bd{background:var(--red);color:#fff}.bd:hover:not(:disabled){filter:brightness(1.07)}
 .bg{background:transparent;color:var(--ink3);border:1.5px solid var(--border)}.bg:hover:not(:disabled){border-color:var(--brand);color:var(--brand)}
-.bam{background:var(--amber);color:var(--ink)}.bam:hover:not(:disabled){filter:brightness(1.06)}
+.bam{background:var(--amber);color:var(--ink2)}.bam:hover:not(:disabled){filter:brightness(1.06)}
 .bsm{padding:.325rem .75rem;font-size:.75rem}
+.btn-full{width:100%;display:flex}
 
 /* ─── INPUTS ─── */
 .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
-.lbl{font-size:.8rem;font-weight:700;color:var(--ink3)}.hint{font-size:.74rem;color:var(--muted)}
+.lbl{font-size:.8rem;font-weight:700;color:var(--ink3)}
+.hint{font-size:.74rem;color:var(--muted)}
 .inp{padding:.75rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;color:var(--ink);width:100%;transition:border-color var(--t),box-shadow var(--t)}
 .inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(67,97,238,.15);background:var(--white)}
 .inp::placeholder{color:var(--muted)}
 select.inp{cursor:pointer}
 textarea.inp{resize:vertical;min-height:70px}
 .inp-row{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
-.ferr{font-size:.78rem;color:var(--red);margin-top:.25rem;display:none}
+.ferr{font-size:.78rem;color:var(--red);margin-top:.3rem;display:none;padding:.4rem .75rem;background:var(--red-l);border-radius:.4rem}
 
 /* ─── SERVICE CARDS ─── */
 .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
 .svc-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);padding:1.5rem;transition:all var(--t);position:relative;overflow:hidden}
 .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--cyan))}
 .svc-card:hover{border-color:rgba(67,97,238,.3);box-shadow:var(--shm)}
-.svc-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.875rem}
+.svc-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.875rem;gap:.5rem}
 .svc-name{font-family:var(--fh);font-size:1.05rem;font-weight:700;color:var(--ink)}
 .svc-staff{font-size:.78rem;color:var(--muted);margin-top:.2rem}
 .svc-code{font-family:var(--fh);font-size:1.3rem;font-weight:700;letter-spacing:.2em;color:var(--brand);background:rgba(67,97,238,.07);border:1.5px dashed rgba(67,97,238,.25);border-radius:var(--r);padding:.4rem .875rem;cursor:pointer;display:inline-block;transition:all var(--t)}
-.svc-code:hover{background:rgba(67,97,238,.12)}
+.svc-code:hover{background:rgba(67,97,238,.14)}
 .svc-meta{display:flex;gap:.875rem;margin-top:.875rem;flex-wrap:wrap}
 .svc-meta span{font-size:.76rem;color:var(--muted)}
 .svc-sched{font-size:.73rem;color:var(--muted);margin-top:.5rem;padding:.3rem .625rem;background:var(--bg);border-radius:.4rem;display:inline-block}
@@ -103,22 +113,34 @@ textarea.inp{resize:vertical;min-height:70px}
 
 /* ─── BADGE ─── */
 .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:99px;font-size:.72rem;font-weight:700}
-.b-waiting{background:rgba(67,97,238,.1);color:var(--brand)}.b-called{background:var(--amber-l);color:#92400e}
-.b-serving{background:var(--green-l);color:#047857}.b-completed{background:rgba(136,146,164,.1);color:var(--muted)}
-.b-no_show{background:var(--red-l);color:var(--red)}.b-cancelled{background:rgba(136,146,164,.1);color:var(--muted)}
-.b-open{background:var(--green-l);color:#047857}.b-paused{background:var(--amber-l);color:#92400e}.b-closed{background:var(--red-l);color:var(--red)}
-.b-pending{background:var(--amber-l);color:#92400e}.b-approved{background:var(--green-l);color:#047857}
+.b-waiting{background:rgba(67,97,238,.1);color:var(--brand)}
+.b-called{background:var(--amber-l);color:#92400e}
+.b-serving{background:var(--green-l);color:#047857}
+.b-completed{background:rgba(136,146,164,.1);color:var(--muted)}
+.b-no_show,.b-cancelled{background:var(--red-l);color:var(--red)}
+.b-open{background:var(--green-l);color:#047857}
+.b-paused{background:var(--amber-l);color:#92400e}
+.b-closed{background:var(--red-l);color:var(--red)}
+.b-pending{background:var(--amber-l);color:#92400e}
+.b-approved{background:var(--green-l);color:#047857}
+.b-suspended{background:var(--red-l);color:var(--red)}
 
 /* ─── QUEUE VIEW ─── */
 .q-header{background:var(--ink2);border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.875rem}
-.q-header-left h2{font-family:var(--fh);color:#fff;font-size:1.2rem}
-.q-header-left .qh-meta{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap}
+.qh-left h2{font-family:var(--fh);color:#fff;font-size:1.2rem}
+.qh-meta{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap}
 .qh-code{font-family:var(--fh);font-weight:700;letter-spacing:.15em;color:var(--cyan);cursor:pointer;font-size:1rem}
+.qh-code:hover{text-decoration:underline}
 .called-banner{background:linear-gradient(135deg,#047857,var(--green));color:#fff;border-radius:var(--rl);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;animation:sl .3s ease}
 @keyframes sl{from{opacity:0;transform:translateY(-.5rem)}to{opacity:1;transform:none}}
 .cb-ticket{font-family:var(--fh);font-size:2rem;font-weight:700}
 .cb-name{font-size:.875rem;opacity:.85;margin-top:.1rem}
-.cb-endcode{font-size:.8rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:.4rem;padding:.3rem .625rem;margin-top:.4rem;letter-spacing:.1em;font-family:var(--fh)}
+.cb-endcode{font-size:.8rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:.4rem;padding:.3rem .625rem;margin-top:.4rem;letter-spacing:.1em;font-family:var(--fh);display:inline-block}
+
+/* ─── TABS ─── */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
+.tab{padding:.625rem 1.25rem;background:none;border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all var(--t)}
+.tab:hover{color:var(--brand)}.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
 
 /* ─── TABLE ─── */
 .tbl-wrap{overflow-x:auto}
@@ -126,37 +148,35 @@ table{width:100%;border-collapse:collapse}
 thead{border-bottom:2px solid var(--border)}
 th{text-align:left;padding:.75rem 1rem;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
 td{padding:.875rem 1rem;font-size:.85rem;border-bottom:1px solid var(--bg);color:var(--ink3);vertical-align:middle}
-tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
 .ticket-tag{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--brand)}
-.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
-.tab{padding:.625rem 1.25rem;background:none;border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all var(--t)}
-.tab:hover{color:var(--brand)}.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
-.dot-on{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 2px rgba(6,214,160,.3)}
+.dot-on{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 2px rgba(6,214,160,.25)}
 .dot-off{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block}
 
 /* ─── FORM BUILDER ─── */
-.form-builder{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.form-builder{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:1.25rem}
 .fb-header{background:var(--bg);padding:.75rem 1rem;font-size:.78rem;font-weight:700;color:var(--ink3);border-bottom:1px solid var(--border)}
-.fb-fields{padding:.875rem}
-.fb-field{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.75rem 1rem;margin-bottom:.625rem;display:flex;align-items:center;gap:.75rem}
+.fb-body{padding:.875rem}
+.fb-field-row{display:flex;align-items:center;gap:.625rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem 1rem;margin-bottom:.5rem}
 .fb-field-info{flex:1}
 .fb-field-label{font-size:.82rem;font-weight:700;color:var(--ink)}
-.fb-field-type{font-size:.72rem;color:var(--muted);margin-top:.1rem}
-.fb-add{padding:.625rem;display:flex;gap:.5rem;border-top:1px solid var(--border);background:var(--bg)}
-.fb-add select{flex:1;padding:.5rem;border:1px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.8rem;background:var(--white);color:var(--ink)}
+.fb-field-type{font-size:.72rem;color:var(--muted);margin-top:.1rem;text-transform:capitalize}
+.fb-add-row{display:flex;gap:.5rem;padding:.625rem;border-top:1px solid var(--border);background:var(--bg);flex-wrap:wrap}
+.fb-add-row select,.fb-add-row input{flex:1;min-width:100px;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.8rem;background:var(--white);color:var(--ink)}
+
+/* ─── BREAK TIMES ─── */
+.break-item{display:flex;align-items:center;gap:.625rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem 1rem;margin-bottom:.5rem}
+.break-item span{flex:1;font-size:.82rem;color:var(--ink3)}
+
+/* ─── SECTION HDR ─── */
+.section-hdr{font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.12em;margin:1.5rem 0 .875rem;padding-bottom:.5rem;border-bottom:1.5px solid rgba(67,97,238,.1)}
+.section-hdr:first-child{margin-top:0}
 
 /* ─── RESTORE ─── */
 .restore-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);margin-bottom:.625rem}
 .ri-name{font-weight:700;color:var(--ink);font-size:.88rem}
 .ri-meta{font-size:.74rem;color:var(--muted);margin-top:.2rem}
-
-/* ─── REPORT ─── */
-.report-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem}
-
-/* ─── BREAK TIMES ─── */
-.break-list{margin-bottom:.75rem}
-.break-item{display:flex;align-items:center;gap:.625rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem 1rem;margin-bottom:.5rem}
-.break-item span{flex:1;font-size:.82rem;color:var(--ink3)}
 
 /* ─── OVERLAY / MODAL ─── */
 .overlay{position:fixed;inset:0;z-index:300;background:rgba(13,15,20,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.25rem;animation:fo .15s ease}
@@ -165,11 +185,11 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
 @keyframes mu{from{opacity:0;transform:translateY(1rem)}to{opacity:1;transform:none}}
 .modal-title{font-size:1.2rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
 .modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
-.section-hdr{font-family:var(--fh);font-size:.72rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.875rem;padding-bottom:.5rem;border-bottom:1px solid var(--border)}
 
 /* ─── MISC ─── */
 .empty{text-align:center;padding:3.5rem 2rem;color:var(--muted)}
-.empty h3{color:var(--ink3);font-size:1.05rem;margin:.75rem 0 .375rem}.empty p{font-size:.875rem}
+.empty h3{color:var(--ink3);font-size:1.05rem;margin:.75rem 0 .375rem}
+.empty p{font-size:.875rem}
 .spin{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--muted)}
@@ -178,10 +198,18 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
 .t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#047857}
 .t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
 .t-i{background:#eff6ff;border-left:3px solid var(--brand);color:#1d4ed8}
+.t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
 @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
 
 @media(max-width:900px){.sidebar{width:210px}}
-@media(max-width:700px){.shell{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}.main{padding:1rem}.svc-grid{grid-template-columns:1fr}.inp-row{grid-template-columns:1fr}}
+@media(max-width:700px){
+  .shell{flex-direction:column}
+  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}
+  .sb-section{display:none}
+  .main{padding:1rem}
+  .svc-grid{grid-template-columns:1fr}
+  .inp-row{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -193,16 +221,16 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
   </a>
   <span class="tb-org" id="org-name-display">Dashboard</span>
   <div class="tb-right">
-    <span id="status-badge" class="badge" style="font-size:.7rem"></span>
+    <span id="status-badge" class="badge"></span>
     <button class="tb-btn tb-logout" onclick="doLogout()">Logout</button>
   </div>
 </div>
-<div class="pending-bar" id="pending-bar">Your organization is <strong>pending approval</strong>. Services won't be visible until approved.</div>
+<div class="pending-bar" id="pending-bar">Your organization is <strong>pending approval</strong>. Services won't be visible to users until approved by QCode admin.</div>
 
 <div class="shell">
   <div class="sidebar">
     <button class="create-btn" onclick="openCreateModal()">+ Create Service</button>
-    <div class="sb-section">Menu</div>
+    <div class="sb-section">Manage</div>
     <button class="sb-item active" onclick="showPanel('services')" id="nav-services"><span>🗂</span> My Services <span class="sb-badge" id="svc-count">0</span></button>
     <button class="sb-item" onclick="showPanel('queue')" id="nav-queue"><span>📋</span> Live Queue</button>
     <div class="sb-divider"></div>
@@ -215,24 +243,30 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
 
   <div class="main">
 
-    <!-- SERVICES -->
+    <!-- ═══ SERVICES ═══ -->
     <div class="panel active" id="panel-services">
       <div class="ph"><div><h1>My Services</h1><p>Create and manage your queue services</p></div></div>
-      <div class="stats">
-        <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">Total Services</div></div>
-        <div class="stat" style="border-top-color:var(--brand)"><div class="stat-n" id="s-waiting">—</div><div class="stat-l">Waiting Now</div></div>
-        <div class="stat" style="border-top-color:var(--green)"><div class="stat-n" id="s-served">—</div><div class="stat-l">Served Total</div></div>
-        <div class="stat" style="border-top-color:var(--red)"><div class="stat-n" id="s-noshow">—</div><div class="stat-l">No-Shows</div></div>
+      <div class="stats-row">
+        <div class="stat">  <div class="stat-n" id="s-total">0</div>   <div class="stat-l">Total Services</div></div>
+        <div class="stat">  <div class="stat-n" id="s-waiting">0</div> <div class="stat-l">Waiting Now</div></div>
+        <div class="stat g"><div class="stat-n" id="s-served">0</div>  <div class="stat-l">Served Today</div></div>
+        <div class="stat r"><div class="stat-n" id="s-noshow">0</div>  <div class="stat-l">No-Shows</div></div>
       </div>
-      <div class="svc-grid" id="svc-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
+      <div class="svc-grid" id="svc-grid">
+        <div class="loading"><div class="spin"></div> Loading services…</div>
+      </div>
     </div>
 
-    <!-- QUEUE -->
+    <!-- ═══ QUEUE ═══ -->
     <div class="panel" id="panel-queue">
-      <div id="no-svc-sel" class="empty"><div style="font-size:3rem;margin-bottom:.75rem">📋</div><h3>Select a service first</h3><p>Click "Manage Queue" on any service card.</p></div>
+      <div id="no-svc-sel" class="empty">
+        <div style="font-size:3rem;margin-bottom:.75rem">📋</div>
+        <h3>Select a service first</h3>
+        <p>Click "Manage Queue" on any service card to open the live queue.</p>
+      </div>
       <div id="queue-view" style="display:none">
         <div class="q-header">
-          <div class="q-header-left">
+          <div class="qh-left">
             <h2 id="q-svc-name">—</h2>
             <div class="qh-meta">
               <span>Code:</span>
@@ -248,128 +282,149 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
               <option value="paused">Paused</option>
               <option value="closed">Closed</option>
             </select>
+            <button class="btn bg bsm" onclick="loadQueue()">↺ Refresh</button>
           </div>
         </div>
+
+        <!-- CALLED BANNER -->
         <div id="called-banner" style="display:none" class="called-banner">
           <div>
             <div class="cb-ticket" id="cb-ticket">—</div>
-            <div class="cb-name" id="cb-name">—</div>
-            <div class="cb-endcode">End Code: <span id="cb-endcode">—</span></div>
+            <div class="cb-name"   id="cb-name">—</div>
+            <div class="cb-endcode">End Code: <span id="cb-endcode" style="font-size:.95rem">—</span></div>
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-            <button class="btn bsm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="markEntry('serving')">Serving</button>
-            <button class="btn bsm" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.15)" onclick="markEntry('no_show')">No-Show</button>
+            <button class="btn bsm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="markEntry('serving')">Serving ▶</button>
+            <button class="btn bsm" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15)" onclick="markEntry('no_show')">No-Show</button>
             <button class="btn bs bsm" onclick="markEntry('completed')">✓ Done</button>
           </div>
         </div>
-        <div class="card">
+
+        <div class="card" style="margin-bottom:0">
           <div class="tabs">
             <button class="tab active" id="t-live"    onclick="switchTab('live')">Live Queue</button>
             <button class="tab"        id="t-history" onclick="switchTab('history')">History</button>
           </div>
-          <div id="pane-live"><div class="tbl-wrap"><table>
-            <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Online</th><th>End Code</th><th>Actions</th></tr></thead>
-            <tbody id="live-tbody"></tbody>
-          </table></div></div>
-          <div id="pane-history" style="display:none"><div class="tbl-wrap"><table>
-            <thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th></tr></thead>
-            <tbody id="hist-tbody"></tbody>
-          </table></div></div>
+          <div id="pane-live">
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Online</th><th>End Code</th><th>Actions</th></tr></thead>
+              <tbody id="live-tbody"><tr><td colspan="8"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+            </table></div>
+          </div>
+          <div id="pane-history" style="display:none">
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead>
+              <tbody id="hist-tbody"><tr><td colspan="7"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+            </table></div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- REPORTS -->
+    <!-- ═══ REPORTS ═══ -->
     <div class="panel" id="panel-reports">
       <div class="ph"><div><h1>Reports</h1><p>Download queue history for any service</p></div></div>
       <div class="card">
-        <div class="report-bar">
-          <div class="fg" style="margin:0;flex:1;max-width:280px"><select class="inp" id="report-svc"><option value="">Select service…</option></select></div>
-          <div style="display:flex;gap:.625rem;flex-wrap:wrap">
-            <button class="btn bp" onclick="loadReport()">Load Report</button>
-            <button class="btn bg" onclick="downloadCSV()">Download CSV</button>
-            <button class="btn bg" onclick="downloadPDF()">Print PDF</button>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.25rem">
+          <div class="fg" style="margin:0;flex:1;min-width:200px">
+            <label class="lbl">Select Service</label>
+            <select id="report-svc" class="inp"><option value="">Select a service…</option></select>
           </div>
+          <button class="btn bp" onclick="loadReport()">Load Report</button>
+          <button class="btn bg" onclick="downloadCSV()">⬇ CSV</button>
+          <button class="btn bg" onclick="printReport()">🖨 Print</button>
         </div>
         <div class="tbl-wrap"><table>
           <thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead>
-          <tbody id="report-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Select a service and load report</td></tr></tbody>
+          <tbody id="report-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Select a service and load report to see data.</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- RESTORE -->
+    <!-- ═══ RESTORE ═══ -->
     <div class="panel" id="panel-restore">
-      <div class="ph"><div><h1>Restore Deleted Services</h1><p>Services deleted within 30 days can be restored</p></div></div>
+      <div class="ph"><div><h1>Restore Deleted Services</h1><p>Recover services deleted within the last 30 days</p></div></div>
       <div id="restore-list"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
 
-    <!-- ACCOUNT -->
+    <!-- ═══ ACCOUNT ═══ -->
     <div class="panel" id="panel-account">
       <div class="ph"><div><h1>Account Settings</h1></div></div>
       <div class="card" style="max-width:560px">
-        <div class="card-title">Organization Info</div>
-        <div id="acc-info" style="font-size:.875rem;color:var(--ink3);line-height:1.9"></div>
-        <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
-          <div class="fg"><label class="lbl">Update Phone</label><input id="acc-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/></div>
-          <div class="fg"><label class="lbl">Logo URL</label><input id="acc-logo" class="inp" type="url" placeholder="https://yoursite.com/logo.png"/><span class="hint">Link to your organization logo image</span></div>
-          <button class="btn bp" onclick="updateAccount()">Save Changes</button>
+        <div class="card-title">Organization Profile</div>
+        <div id="acc-info" style="font-size:.875rem;color:var(--ink3);line-height:2;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)"></div>
+        <div class="fg"><label class="lbl">Phone Number</label><input id="acc-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/></div>
+        <div class="fg">
+          <label class="lbl">Logo URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+          <input id="acc-logo" class="inp" type="url" placeholder="https://yoursite.com/logo.png" oninput="previewLogo(this.value)"/>
+          <span class="hint">Link to your organization logo image</span>
+          <div id="logo-preview" style="margin-top:.5rem;width:56px;height:56px;border-radius:var(--r);border:1.5px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏢</div>
         </div>
+        <button class="btn bp" onclick="updateAccount()">Save Changes</button>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- CREATE SERVICE MODAL -->
-<div id="modal-create" class="overlay" style="display:none" onclick="bgClose(event,'modal-create')">
+<!-- ═══ CREATE SERVICE MODAL ═══ -->
+<div id="modal-create" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-create')">
   <div class="modal">
-    <h2 class="modal-title">➕ Create New Service</h2>
-    
+    <h2 class="modal-title">➕ Create New Queue Service</h2>
+
     <div class="section-hdr">Basic Info</div>
     <div class="inp-row">
-      <div class="fg"><label class="lbl">Service Name *</label><input id="m-name" class="inp" placeholder="e.g. Window 1 – General"/></div>
+      <div class="fg"><label class="lbl">Service Name *</label><input id="m-name" class="inp" placeholder="e.g. Window 1 – Visa"/></div>
       <div class="fg"><label class="lbl">Staff Member</label><input id="m-staff" class="inp" placeholder="e.g. John Doe"/></div>
     </div>
     <div class="fg"><label class="lbl">Description</label><textarea id="m-desc" class="inp" placeholder="Brief description (optional)"></textarea></div>
-    
+
     <div class="section-hdr">Queue Settings</div>
     <div class="inp-row">
-      <div class="fg"><label class="lbl">Ticket Prefix *</label><input id="m-prefix" class="inp" placeholder="A" maxlength="5" value="A"/><span class="hint">e.g. A → A001</span></div>
-      <div class="fg"><label class="lbl">Minutes per Person *</label><input id="m-interval" class="inp" type="number" min="1" max="120" value="5"/></div>
+      <div class="fg"><label class="lbl">Ticket Prefix *</label><input id="m-prefix" class="inp" placeholder="A" maxlength="5" value="A"/><span class="hint">e.g. A → A001, A002…</span></div>
+      <div class="fg"><label class="lbl">Minutes per Person *</label><input id="m-interval" class="inp" type="number" min="1" max="120" value="5"/><span class="hint">Time slot for each person</span></div>
     </div>
-    <div class="fg"><label class="lbl">Max Queue Size (optional)</label><input id="m-max" class="inp" type="number" min="1" placeholder="Leave blank for unlimited"/></div>
-    
+    <div class="fg"><label class="lbl">Max Queue Size <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="m-max" class="inp" type="number" min="1" placeholder="Leave blank for unlimited"/></div>
+
     <div class="section-hdr">Schedule</div>
     <div class="inp-row">
-      <div class="fg"><label class="lbl">Queue Start Time</label><input id="m-start" class="inp" type="datetime-local"/><span class="hint">When queue opens for joining</span></div>
-      <div class="fg"><label class="lbl">Queue End Time</label><input id="m-end" class="inp" type="datetime-local"/><span class="hint">When queue closes</span></div>
-    </div>
-    
-    <div class="section-hdr">Break Times</div>
-    <div id="break-list" class="break-list"></div>
-    <div style="display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap">
-      <input id="brk-start" class="inp" type="time" style="width:auto;flex:1" placeholder="Break start"/>
-      <input id="brk-end"   class="inp" type="time" style="width:auto;flex:1" placeholder="Break end"/>
-      <button class="btn bp bsm" onclick="addBreak()">+ Add Break</button>
-    </div>
-    
-    <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Add fields users must fill before joining the queue.</p>
-    <div class="form-builder">
-      <div class="fb-header">Form Fields</div>
-      <div class="fb-fields" id="fb-fields"><p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet</p></div>
-      <div class="fb-add">
-        <select id="fb-type"><option value="text">Text input</option><option value="textarea">Long text</option><option value="select">Dropdown</option><option value="file">File upload</option></select>
-        <input id="fb-label" class="inp" style="flex:2;padding:.5rem" placeholder="Field label…"/>
-        <button class="btn bp bsm" onclick="addFormField()">Add</button>
+      <div class="fg">
+        <label class="lbl">Queue Start Time</label>
+        <input id="m-start" class="inp" type="datetime-local"/>
+        <span class="hint">When users can start joining</span>
+      </div>
+      <div class="fg">
+        <label class="lbl">Queue End Time</label>
+        <input id="m-end" class="inp" type="datetime-local"/>
+        <span class="hint">Queue closes at this time</span>
       </div>
     </div>
-    
+
+    <div class="section-hdr">Break Times <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Add break periods when the queue is paused (e.g. lunch 12:00 – 13:00).</p>
+    <div id="break-list"></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:flex-end">
+      <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break Start</label><input id="brk-start" class="inp" type="time"/></div>
+      <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break End</label><input id="brk-end" class="inp" type="time"/></div>
+      <button class="btn bp bsm" style="align-self:flex-end;margin-bottom:1.125rem" onclick="addBreak()">+ Add Break</button>
+    </div>
+
+    <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Fields users must fill before joining. Leave empty for no custom form.</p>
+    <div class="form-builder">
+      <div class="fb-header">Form Fields</div>
+      <div class="fb-body" id="fb-fields"><p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p></div>
+      <div class="fb-add-row">
+        <select id="fb-type"><option value="text">Text</option><option value="textarea">Long text</option><option value="select">Dropdown</option><option value="file">File upload</option></select>
+        <input id="fb-label" placeholder="Field label (e.g. Date of Birth)"/>
+        <button class="btn bp bsm" onclick="addFormField()">+ Add</button>
+      </div>
+    </div>
+
     <div id="m-err" class="ferr" style="margin-top:.75rem"></div>
     <div class="modal-footer">
       <button class="btn bg" onclick="closeModal('modal-create')">Cancel</button>
-      <button class="btn bp" onclick="createService()">Create Service</button>
+      <button class="btn bp" onclick="createService()" id="create-btn">Create Service</button>
     </div>
   </div>
 </div>
@@ -377,17 +432,18 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--bg)}
 <div id="toasts"></div>
 
 <script>
+// ─── API HELPER ───
 async function api(url, opts) {
   try {
-    const body = (opts && opts.body && typeof opts.body === 'object') ? JSON.stringify(opts.body) : (opts && opts.body);
-    const r = await fetch(url, { headers:{'Content-Type':'application/json'}, credentials:'include', ...opts, body });
+    const body = opts && opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : (opts && opts.body);
+    const r = await fetch(url, { credentials:'include', headers:{'Content-Type':'application/json'}, ...opts, body });
     const data = await r.json().catch(() => ({}));
-    return {ok: r.ok, status: r.status, data};
-  } catch(e) { return {ok:false, status:0, data:{error:'Network error.'}}; }
+    return { ok: r.ok, status: r.status, data };
+  } catch(e) { return { ok: false, status: 0, data: { error: 'Network error.' } }; }
 }
 
-function toast(msg, type='i', ms=4000) {
-  const icons = {s:'✓',e:'✕',i:'ℹ'};
+function toast(msg, type='i', ms=4500) {
+  const icons = {s:'✓', e:'✕', i:'ℹ', w:'⚠'};
   const el = document.createElement('div');
   el.className = `toast t-${type}`;
   el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
@@ -395,45 +451,56 @@ function toast(msg, type='i', ms=4000) {
   setTimeout(() => el.remove(), ms);
 }
 
-function bgClose(e, id) { if (e.target.id===id) closeModal(id); }
-function closeModal(id) { document.getElementById(id).style.display='none'; }
-function openModal(id)  { document.getElementById(id).style.display='flex'; }
-function fmt(ts)     { if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function fmt(ts) { if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function fmtTime(ts) { if(!ts) return '—'; return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function diffMin(a,b){ if(!a||!b) return '—'; return Math.round((new Date(b)-new Date(a))/60000); }
+function diffMin(a,b) { if(!a||!b) return '—'; return Math.max(0,Math.round((new Date(b)-new Date(a))/60000)); }
+function esc(s) { return (s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
+
 function badge(s) {
-  const m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved'};
+  const m = {waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved',suspended:'b-suspended'};
   return `<span class="badge ${m[s]||''}">${(s||'').replace('_',' ')}</span>`;
 }
 
-let profile=null, services=[], activeSvc=null, calledEntry=null, formFields=[], breaks=[], reportData=[], pollTimer=null;
+function closeModal(id) { document.getElementById(id).style.display='none'; }
+function openModal(id)  { document.getElementById(id).style.display='flex'; }
 
+// ─── STATE ───
+let profile=null, services=[], activeSvc=null, calledEntry=null;
+let formFields=[], breaks=[], reportData=[];
+let pollTimer=null;
+
+// ─── INIT ───
 async function init() {
   const me = await api('/api/auth/me');
   if (!me.ok || !me.data.logged_in) { window.location.href='/login-org'; return; }
-  if (me.data.role !== 'organization') { window.location.href = me.data.role==='user'?'/user':'/super-admin'; return; }
+  if (me.data.role !== 'organization') { window.location.href = me.data.role==='user' ? '/user' : '/super-admin'; return; }
+
   const pr = await api('/api/org/profile');
   if (!pr.ok) { window.location.href='/login-org'; return; }
   profile = pr.data;
 
   document.getElementById('org-name-display').textContent = profile.org_name || 'Dashboard';
   const sb = document.getElementById('status-badge');
-  sb.textContent = profile.approval_status;
-  sb.className   = `badge b-${profile.approval_status}`;
+  sb.textContent = profile.approval_status || 'pending';
+  sb.className   = `badge b-${profile.approval_status||'pending'}`;
+
   if (profile.approval_status === 'pending') document.getElementById('pending-bar').style.display='block';
 
-  document.getElementById('acc-info').innerHTML =
-    `<div><strong>Organization:</strong> ${profile.org_name||'—'}</div>
-     <div><strong>Email:</strong> ${profile.email||'—'}</div>
-     <div><strong>Address:</strong> ${profile.company_address||'—'}</div>
-     <div><strong>Phone:</strong> ${profile.phone||'—'}</div>
-     <div><strong>Status:</strong> ${badge(profile.approval_status)}</div>`;
-  document.getElementById('acc-phone').value = profile.phone || '';
-  document.getElementById('acc-logo').value  = profile.logo_url || '';
+  document.getElementById('acc-phone').value = profile.phone   || '';
+  document.getElementById('acc-logo').value  = profile.logo_url|| '';
+  if (profile.logo_url) previewLogo(profile.logo_url);
+
+  document.getElementById('acc-info').innerHTML = `
+    <div><strong>Organization:</strong> ${profile.org_name||'—'}</div>
+    <div><strong>Email:</strong> ${profile.email||'—'}</div>
+    <div><strong>Address:</strong> ${profile.company_address||'—'}</div>
+    <div><strong>Phone:</strong> ${profile.phone||'—'}</div>
+    <div><strong>Status:</strong> ${badge(profile.approval_status||'pending')}</div>`;
 
   await loadServices();
 }
 
+// ─── PANEL NAV ───
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
@@ -443,13 +510,14 @@ function showPanel(name) {
   if (name==='reports') populateReportSelect();
 }
 
+// ─── SERVICES ───
 async function loadServices() {
   const r = await api('/api/org/services');
-  services = r.ok ? r.data : [];
+  services = r.ok ? (r.data||[]) : [];
   document.getElementById('svc-count').textContent = services.length;
   document.getElementById('s-total').textContent   = services.length;
   let waiting=0, served=0, noshow=0;
-  services.forEach(s => { waiting += s.count_waiting||0; served += s.count_completed||0; noshow += s.count_no_show||0; });
+  services.forEach(s => { waiting += (s.count_waiting||0); served += (s.count_completed||0); noshow += (s.count_no_show||0); });
   document.getElementById('s-waiting').textContent = waiting;
   document.getElementById('s-served').textContent  = served;
   document.getElementById('s-noshow').textContent  = noshow;
@@ -458,45 +526,49 @@ async function loadServices() {
 
 function fmtSched(svc) {
   if (!svc.schedule_start && !svc.schedule_end) return '';
-  const s = svc.schedule_start ? new Date(svc.schedule_start).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-  const e = svc.schedule_end   ? new Date(svc.schedule_end).toLocaleString([],{hour:'2-digit',minute:'2-digit'}) : '—';
-  return `🕐 ${s} → ${e}`;
+  const s = svc.schedule_start ? new Date(svc.schedule_start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+  const e = svc.schedule_end   ? new Date(svc.schedule_end).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
+  return `🕐 ${s} – ${e}`;
 }
 
 function renderServices() {
   const grid = document.getElementById('svc-grid');
   if (!services.length) {
-    grid.innerHTML='<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" to add your first queue.</p></div>';
+    grid.innerHTML = `<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" above to add your first queue.</p></div>`;
     return;
   }
-  grid.innerHTML = services.map(s => `
-    <div class="svc-card">
+  grid.innerHTML = services.map(s => {
+    const sched = fmtSched(s);
+    return `<div class="svc-card">
       <div class="svc-card-top">
-        <div>
+        <div style="min-width:0">
           <div class="svc-name">${s.name}</div>
           ${s.staff_name ? `<div class="svc-staff">👤 ${s.staff_name}</div>` : ''}
         </div>
         ${badge(s.status)}
       </div>
-      <span class="svc-code" onclick="navigator.clipboard.writeText('${s.service_code}');toast('Code copied!','s')" title="Click to copy">${s.service_code}</span>
+      <span class="svc-code" onclick="navigator.clipboard.writeText('${s.service_code}').then(()=>toast('Code copied!','s'))" title="Click to copy">${s.service_code}</span>
       <div class="svc-meta">
         <span>⏱ ${s.time_interval} min/person</span>
         <span>🎫 ${s.ticket_prefix}###</span>
-        ${s.max_users ? `<span>👥 Max ${s.max_users}</span>` : '<span>👥 Unlimited</span>'}
+        <span>👥 ${s.max_users ? 'Max '+s.max_users : 'Unlimited'}</span>
       </div>
       <div class="svc-meta" style="margin-top:.375rem">
-        <span>Waiting: <strong>${s.count_waiting||0}</strong></span>
-        <span>Served: <strong>${s.count_completed||0}</strong></span>
+        <span>Waiting: <strong style="color:var(--brand)">${s.count_waiting||0}</strong></span>
+        <span>Served: <strong style="color:#047857">${s.count_completed||0}</strong></span>
+        <span>No-show: <strong style="color:var(--red)">${s.count_no_show||0}</strong></span>
       </div>
-      ${fmtSched(s) ? `<div class="svc-sched">${fmtSched(s)}</div>` : ''}
+      ${sched ? `<div class="svc-sched">${sched}</div>` : ''}
       <div class="svc-actions">
-        <button class="btn bp bsm" onclick='selectQueue(${JSON.stringify(s).replace(/'/g,"\\'")})'  >Manage Queue</button>
-        <button class="btn bd bsm" onclick="deleteSvc('${s.id}','${s.name.replace(/'/g,"\\'")}')">Delete</button>
+        <button class="btn bp bsm" onclick='openQueueView(${JSON.stringify(s)})'>📋 Manage Queue</button>
+        <button class="btn bd bsm" onclick="deleteSvc('${s.id}','${esc(s.name)}')">🗑 Delete</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-function selectQueue(svc) {
+// ─── QUEUE VIEW ───
+function openQueueView(svc) {
   activeSvc = svc; calledEntry = null;
   showPanel('queue');
   document.getElementById('no-svc-sel').style.display  = 'none';
@@ -507,7 +579,7 @@ function selectQueue(svc) {
   document.getElementById('status-sel').value          = svc.status;
   document.getElementById('q-svc-badge').textContent   = svc.status;
   document.getElementById('q-svc-badge').className     = `badge b-${svc.status}`;
-  loadQueue();
+  switchTab('live');
   clearInterval(pollTimer);
   pollTimer = setInterval(loadQueue, 10000);
 }
@@ -516,61 +588,72 @@ async function loadQueue() {
   if (!activeSvc) return;
   const r = await api('/api/org/queue/'+activeSvc.id);
   if (!r.ok) return;
-  calledEntry = null;
-  for (const e of r.data) { if (e.status==='called') { calledEntry=e; break; } }
-  renderQueueTable(r.data);
+  const entries = r.data || [];
+  calledEntry = entries.find(e => e.status==='called') || null;
+  renderLiveTable(entries);
   renderCalledBanner();
 }
 
-function renderQueueTable(entries) {
+function renderLiveTable(entries) {
   const tb = document.getElementById('live-tbody');
-  if (!entries.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Queue is empty</td></tr>'; return; }
-  tb.innerHTML = entries.map((e,i) => {
-    const name   = e.user_name || 'Guest';
-    const online = e.user_id ? (e.user_online ? '<span class="dot-on"></span>' : '<span class="dot-off"></span>') : '—';
+  if (!entries.length) {
+    tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Queue is empty right now.</td></tr>';
+    return;
+  }
+  tb.innerHTML = entries.map((e, i) => {
     const method = e.join_method==='sms' ? '📱 SMS' : '🌐 Web';
-    const ec     = e.end_code || '—';
-    const acts   = e.status==='called'
-      ? `<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('${e.id}','completed')">Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button></div>`
-      : `<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`;
+    const online = e.user_id ? (e.user_online ? '<span class="dot-on"></span>' : '<span class="dot-off"></span>') : '—';
+    const ec = `<span style="font-family:var(--fh);font-size:.82rem;font-weight:700;color:var(--brand);letter-spacing:.05em">${e.end_code||'—'}</span>`;
+    let acts = '';
+    if (e.status==='called') acts = `<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('${e.id}','completed')">✓ Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button></div>`;
+    else if (e.status==='waiting') acts = `<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`;
+    else acts = badge(e.status);
     return `<tr>
       <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
-      <td><span class="ticket-tag">${e.ticket_label}</span></td>
-      <td>${name}${!e.user_id?'<span style="font-size:.7rem;color:var(--muted)"> (guest)</span>':''}</td>
-      <td>${method}</td><td>${badge(e.status)}</td><td>${online}</td>
-      <td><span style="font-family:var(--fh);font-size:.8rem;font-weight:700;color:var(--brand);letter-spacing:.05em">${ec}</span></td>
-      <td>${acts}</td></tr>`;
+      <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
+      <td>${e.user_name||'Guest'}${!e.user_id?'<span style="font-size:.7rem;color:var(--muted)"> (guest)</span>':''}</td>
+      <td>${method}</td>
+      <td>${badge(e.status)}</td>
+      <td style="text-align:center">${online}</td>
+      <td>${ec}</td>
+      <td>${acts}</td>
+    </tr>`;
   }).join('');
 }
 
 function renderCalledBanner() {
   const b = document.getElementById('called-banner');
   if (!calledEntry) { b.style.display='none'; return; }
-  document.getElementById('cb-ticket').textContent  = calledEntry.ticket_label;
-  document.getElementById('cb-name').textContent    = calledEntry.user_name || 'Guest';
-  document.getElementById('cb-endcode').textContent = calledEntry.end_code || '—';
+  document.getElementById('cb-ticket').textContent  = calledEntry.ticket_label||'—';
+  document.getElementById('cb-name').textContent    = calledEntry.user_name||'Guest';
+  document.getElementById('cb-endcode').textContent = calledEntry.end_code||'—';
   b.style.display = 'flex';
 }
 
 async function callNext() {
-  const btn = document.getElementById('call-btn'); btn.disabled=true;
+  const btn = document.getElementById('call-btn'); btn.disabled=true; btn.textContent='Calling…';
   const r = await api('/api/org/queue/call-next/'+activeSvc.id, {method:'POST'});
-  btn.disabled=false;
+  btn.disabled=false; btn.textContent='📢 Call Next';
   if (!r.ok) { toast(r.data.error||'No one waiting.','i'); return; }
-  toast(`Calling ${r.data.entry.ticket_label} — End code: ${r.data.entry.end_code||'N/A'}`, 's', 8000);
+  toast(`📢 Calling ${r.data.entry.ticket_label} — End code: ${r.data.entry.end_code||'—'}`, 's', 8000);
   await loadQueue();
 }
 
 async function markEntry(status) { if (calledEntry) await markById(calledEntry.id, status); }
+
 async function markById(id, status) {
   const r = await api('/api/org/queue/entry/'+id, {method:'POST', body:{status}});
   if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  if (['completed','no_show'].includes(status)) calledEntry=null;
-  toast('Marked as '+status.replace('_',' '), 's');
+  if (['completed','no_show','cancelled'].includes(status)) calledEntry=null;
+  toast('Marked as ' + status.replace('_',' '), 's');
   await loadQueue();
+  if (status==='completed') await loadServices(); // update counts
 }
 
-function copyCode() { if (!activeSvc) return; navigator.clipboard.writeText(activeSvc.service_code); toast('Code copied!','s'); }
+function copyCode() {
+  if (!activeSvc) return;
+  navigator.clipboard.writeText(activeSvc.service_code).then(() => toast('Service code copied!','s'));
+}
 
 async function changeStatus() {
   const status = document.getElementById('status-sel').value;
@@ -579,109 +662,134 @@ async function changeStatus() {
   activeSvc.status = status;
   document.getElementById('q-svc-badge').textContent = status;
   document.getElementById('q-svc-badge').className   = `badge b-${status}`;
-  toast('Queue '+status, 'i');
+  toast('Queue status set to '+status, 'i');
   await loadServices();
 }
 
 function switchTab(t) {
-  document.getElementById('t-live').classList.toggle('active',t==='live');
-  document.getElementById('t-history').classList.toggle('active',t==='history');
-  document.getElementById('pane-live').style.display    = t==='live'    ? 'block':'none';
-  document.getElementById('pane-history').style.display = t==='history' ? 'block':'none';
+  document.getElementById('t-live').classList.toggle('active',    t==='live');
+  document.getElementById('t-history').classList.toggle('active', t==='history');
+  document.getElementById('pane-live').style.display    = t==='live'    ? 'block' : 'none';
+  document.getElementById('pane-history').style.display = t==='history' ? 'block' : 'none';
+  if (t==='live')    loadQueue();
   if (t==='history') loadQueueHistory();
 }
 
 async function loadQueueHistory() {
   const r  = await api('/api/org/report/'+activeSvc.id);
   const tb = document.getElementById('hist-tbody');
-  if (!r.ok||!r.data.length) { tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">No history yet</td></tr>'; return; }
+  if (!r.ok || !r.data.length) {
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No history yet.</td></tr>';
+    return;
+  }
   tb.innerHTML = r.data.map(e => `<tr>
-    <td><span class="ticket-tag">${e.ticket_label}</span></td>
+    <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
     <td>${e.guest_name||'User'}</td>
     <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
     <td>${badge(e.status)}</td>
-    <td>${fmtTime(e.joined_at)}</td>
-    <td>${fmtTime(e.completed_at)}</td></tr>`).join('');
+    <td style="font-size:.78rem">${fmtTime(e.joined_at)}</td>
+    <td style="font-size:.78rem">${fmtTime(e.completed_at)}</td>
+    <td>${diffMin(e.joined_at,e.completed_at)}</td>
+  </tr>`).join('');
 }
 
 async function deleteSvc(id, name) {
-  if (!confirm(`Delete "${name}"? It can be restored within 30 days.`)) return;
+  if (!confirm(`Delete "${name}"?\nIt can be restored from the Restore panel within 30 days.`)) return;
   const r = await api('/api/org/services/'+id+'/delete', {method:'POST'});
   if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  toast(`"${name}" deleted.`, 'i');
+  toast(`"${name}" deleted.`,'w');
+  if (activeSvc && activeSvc.id===id) {
+    clearInterval(pollTimer);
+    activeSvc=null;
+    document.getElementById('no-svc-sel').style.display  = 'block';
+    document.getElementById('queue-view').style.display  = 'none';
+  }
   await loadServices();
 }
 
+// ─── RESTORE ───
 async function loadRestore() {
   const r  = await api('/api/org/services/deleted');
   const el = document.getElementById('restore-list');
-  if (!r.ok || !r.data.length) { el.innerHTML='<div class="empty"><div style="font-size:3rem">🗑</div><h3>Nothing to restore</h3><p>Deleted services appear here for 30 days.</p></div>'; return; }
+  if (!r.ok || !r.data.length) {
+    el.innerHTML='<div class="empty"><div style="font-size:3rem">🗑</div><h3>Nothing to restore</h3><p>Deleted services appear here for 30 days.</p></div>';
+    return;
+  }
   const now   = Date.now();
-  const valid = r.data.filter(s => now - new Date(s.deleted_at) < 30*24*60*60*1000);
+  const valid = r.data.filter(s => now - new Date(s.deleted_at).getTime() < 30*24*60*60*1000);
   if (!valid.length) { el.innerHTML='<div class="empty"><h3>Nothing restorable</h3></div>'; return; }
   el.innerHTML = valid.map(s => `
     <div class="restore-item">
-      <div><div class="ri-name">${s.name}</div><div class="ri-meta">Code: ${s.service_code} · Deleted ${new Date(s.deleted_at).toLocaleDateString()}</div></div>
-      <button class="btn bp bsm" onclick="restoreSvc('${s.id}','${s.name.replace(/'/g,"\\'")}')">Restore</button>
+      <div>
+        <div class="ri-name">${s.name}</div>
+        <div class="ri-meta">Code: ${s.service_code} · Deleted ${new Date(s.deleted_at).toLocaleDateString()}</div>
+      </div>
+      <button class="btn bp bsm" onclick="restoreSvc('${s.id}','${esc(s.name)}')">↩ Restore</button>
     </div>`).join('');
 }
 
 async function restoreSvc(id, name) {
   const r = await api('/api/org/services/'+id+'/restore', {method:'POST'});
   if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  toast(`"${name}" restored!`, 's');
+  toast(`"${name}" restored! ✓`,'s');
   await loadRestore(); await loadServices();
 }
 
+// ─── REPORTS ───
 function populateReportSelect() {
   const sel = document.getElementById('report-svc');
-  sel.innerHTML = '<option value="">Select service…</option>' + services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  sel.innerHTML = '<option value="">Select a service…</option>' + services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 async function loadReport() {
   const svcId = document.getElementById('report-svc').value;
   if (!svcId) { toast('Select a service first.','e'); return; }
   const r = await api('/api/org/report/'+svcId);
-  reportData = r.ok ? r.data : [];
+  reportData = r.ok ? (r.data||[]) : [];
   const tb = document.getElementById('report-tbody');
-  if (!reportData.length) { tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No data for this service</td></tr>'; return; }
+  if (!reportData.length) {
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No completed queue entries yet.</td></tr>';
+    return;
+  }
   tb.innerHTML = reportData.map(e => `<tr>
-    <td><span class="ticket-tag">${e.ticket_label}</span></td>
+    <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
     <td>${e.guest_name||'User'}</td>
     <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
     <td>${badge(e.status)}</td>
-    <td>${fmt(e.joined_at)}</td>
-    <td>${fmt(e.completed_at)}</td>
-    <td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
+    <td style="font-size:.78rem">${fmt(e.joined_at)}</td>
+    <td style="font-size:.78rem">${fmt(e.completed_at)}</td>
+    <td>${diffMin(e.joined_at,e.completed_at)}</td>
+  </tr>`).join('');
 }
 
 function downloadCSV() {
   if (!reportData.length) { toast('Load a report first.','e'); return; }
   const rows = reportData.map(e => [e.ticket_label,e.guest_name||'User',e.join_method,e.status,fmt(e.joined_at),fmt(e.completed_at),diffMin(e.joined_at,e.completed_at)].join(','));
-  const blob = new Blob(['Ticket,Name,Method,Status,Joined,Completed,WaitMin\n'+rows.join('\n')], {type:'text/csv'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='qcode-report-'+Date.now()+'.csv'; a.click();
+  const csv  = 'Ticket,Name,Method,Status,Joined,Completed,WaitMin\n'+rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'qcode-report-'+Date.now()+'.csv';
+  a.click();
   toast('CSV downloaded!','s');
 }
 
-function downloadPDF() {
+function printReport() {
   if (!reportData.length) { toast('Load a report first.','e'); return; }
-  const win = window.open('','_blank');
+  const win  = window.open('','_blank');
   const rows = reportData.map(e => `<tr><td>${e.ticket_label}</td><td>${e.guest_name||'User'}</td><td>${e.join_method}</td><td>${e.status}</td><td>${fmt(e.joined_at)}</td><td>${fmt(e.completed_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
-  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{color:#0d0f14;font-family:'Space Grotesk',sans-serif}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .75rem;text-align:left}th{background:#f4f6fb;font-size:.8rem}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4">Generated: ${new Date().toLocaleString()}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
   win.document.close(); win.print();
 }
 
 // ─── CREATE SERVICE ───
-let formFields = [];
-let breaks = [];
-
 function openCreateModal() {
-  formFields = []; breaks = [];
+  formFields=[]; breaks=[];
   renderFormFields(); renderBreaks();
-  document.getElementById('m-name').value=''; document.getElementById('m-staff').value='';
-  document.getElementById('m-desc').value=''; document.getElementById('m-prefix').value='A';
-  document.getElementById('m-interval').value='5'; document.getElementById('m-max').value='';
-  document.getElementById('m-start').value=''; document.getElementById('m-end').value='';
+  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('m-prefix').value   = 'A';
+  document.getElementById('m-interval').value = '5';
+  document.getElementById('m-max').value      = '';
   document.getElementById('m-err').style.display='none';
   openModal('modal-create');
 }
@@ -689,10 +797,10 @@ function openCreateModal() {
 function addBreak() {
   const s = document.getElementById('brk-start').value;
   const e = document.getElementById('brk-end').value;
-  if (!s || !e) { toast('Enter both break start and end times.','e'); return; }
+  if (!s || !e) { toast('Enter both start and end for the break.','e'); return; }
   if (s >= e)   { toast('Break end must be after start.','e'); return; }
   const today = new Date().toISOString().split('T')[0];
-  breaks.push({ start: `${today}T${s}:00`, end: `${today}T${e}:00` });
+  breaks.push({ start:`${today}T${s}:00`, end:`${today}T${e}:00` });
   document.getElementById('brk-start').value='';
   document.getElementById('brk-end').value='';
   renderBreaks();
@@ -700,75 +808,95 @@ function addBreak() {
 
 function renderBreaks() {
   const el = document.getElementById('break-list');
-  if (!breaks.length) { el.innerHTML='<p style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem">No breaks added</p>'; return; }
+  if (!breaks.length) { el.innerHTML='<p style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">No breaks added.</p>'; return; }
   el.innerHTML = breaks.map((b,i) => `
     <div class="break-item">
       <span>☕ ${b.start.slice(11,16)} – ${b.end.slice(11,16)}</span>
       <button class="btn bg bsm" onclick="removeBreak(${i})">Remove</button>
     </div>`).join('');
 }
-
 function removeBreak(i) { breaks.splice(i,1); renderBreaks(); }
 
 function addFormField() {
   const type  = document.getElementById('fb-type').value;
-  const label = document.getElementById('fb-label').value.trim();
-  if (!label) { toast('Enter a field label first.','e'); return; }
-  formFields.push({id:'f'+Date.now(), label, type, required:false});
+  const label = (document.getElementById('fb-label').value||'').trim();
+  if (!label) { toast('Enter a field label.','e'); return; }
+  formFields.push({ id:'f'+Date.now(), label, type, required:false });
   document.getElementById('fb-label').value='';
   renderFormFields();
 }
 
-function removeField(id) { formFields = formFields.filter(f => f.id!==id); renderFormFields(); }
+function removeField(id) { formFields=formFields.filter(f=>f.id!==id); renderFormFields(); }
 
 function renderFormFields() {
   const el = document.getElementById('fb-fields');
-  if (!formFields.length) { el.innerHTML='<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet</p>'; return; }
   const icons = {text:'📝',textarea:'📄',select:'📋',file:'📁'};
+  if (!formFields.length) { el.innerHTML='<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>'; return; }
   el.innerHTML = formFields.map(f => `
-    <div class="fb-field">
-      <span style="font-size:1.25rem">${icons[f.type]||'📝'}</span>
+    <div class="fb-field-row">
+      <span style="font-size:1.15rem">${icons[f.type]||'📝'}</span>
       <div class="fb-field-info"><div class="fb-field-label">${f.label}</div><div class="fb-field-type">${f.type}</div></div>
       <button class="btn bd bsm" onclick="removeField('${f.id}')">Remove</button>
     </div>`).join('');
 }
 
 async function createService() {
-  const name     = document.getElementById('m-name').value.trim();
-  const staff    = document.getElementById('m-staff').value.trim();
-  const desc     = document.getElementById('m-desc').value.trim();
-  const prefix   = document.getElementById('m-prefix').value.trim().toUpperCase();
-  const interval = parseInt(document.getElementById('m-interval').value)||5;
-  const maxVal   = document.getElementById('m-max').value;
-  const max      = maxVal ? parseInt(maxVal) : null;
-  const start    = document.getElementById('m-start').value;
-  const end      = document.getElementById('m-end').value;
   const errEl    = document.getElementById('m-err');
+  const createBtn= document.getElementById('create-btn');
   errEl.style.display='none';
 
-  if (!name || !prefix) { errEl.textContent='Service name and ticket prefix are required.'; errEl.style.display='block'; return; }
-  if (start && end && start >= end) { errEl.textContent='End time must be after start time.'; errEl.style.display='block'; return; }
+  const name     = (document.getElementById('m-name').value||'').trim();
+  const staff    = (document.getElementById('m-staff').value||'').trim();
+  const desc     = (document.getElementById('m-desc').value||'').trim();
+  const prefix   = (document.getElementById('m-prefix').value||'').trim().toUpperCase();
+  const interval = parseInt(document.getElementById('m-interval').value)||5;
+  const maxVal   = document.getElementById('m-max').value;
+  const startVal = document.getElementById('m-start').value;
+  const endVal   = document.getElementById('m-end').value;
 
-  const r = await api('/api/org/services', {method:'POST', body:{
-    name, staff_name:staff||null, description:desc||null,
-    ticket_prefix:prefix, time_interval:interval, max_users:max,
+  if (!name)   { errEl.textContent='Service name is required.';    errEl.style.display='block'; return; }
+  if (!prefix) { errEl.textContent='Ticket prefix is required.';   errEl.style.display='block'; return; }
+  if (startVal && endVal && startVal>=endVal) { errEl.textContent='End time must be after start time.'; errEl.style.display='block'; return; }
+
+  createBtn.disabled=true; createBtn.textContent='Creating…';
+
+  const r = await api('/api/org/services', { method:'POST', body:{
+    name, staff_name: staff||null, description: desc||null,
+    ticket_prefix: prefix, time_interval: interval,
+    max_users: maxVal ? parseInt(maxVal) : null,
     user_info_form: formFields,
-    schedule_start: start ? new Date(start).toISOString() : null,
-    schedule_end:   end   ? new Date(end).toISOString()   : null,
+    schedule_start: startVal ? new Date(startVal).toISOString() : null,
+    schedule_end:   endVal   ? new Date(endVal).toISOString()   : null,
     break_times: breaks,
   }});
-  if (!r.ok) { errEl.textContent = r.data.error||'Failed to create.'; errEl.style.display='block'; return; }
-  toast(`Service created! Code: ${r.data.service.service_code}`, 's', 7000);
+
+  createBtn.disabled=false; createBtn.textContent='Create Service';
+
+  if (!r.ok) { errEl.textContent = r.data.error||'Failed to create service.'; errEl.style.display='block'; return; }
+
+  const code = r.data.service?.service_code || '—';
+  toast(`✓ Service created! Share this code: ${code}`, 's', 8000);
   closeModal('modal-create');
   await loadServices();
 }
 
+// ─── ACCOUNT ───
+function previewLogo(url) {
+  const el = document.getElementById('logo-preview');
+  if (!el) return;
+  if (url && url.startsWith('http')) {
+    el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🏢'" alt="logo"/>`;
+  } else {
+    el.textContent = '🏢';
+  }
+}
+
 async function updateAccount() {
-  const phone = document.getElementById('acc-phone').value.trim();
-  const logo  = document.getElementById('acc-logo').value.trim();
-  const r = await api('/api/org/profile', {method:'POST', body:{phone, logo_url:logo}});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  toast('Account updated!', 's');
+  const phone    = document.getElementById('acc-phone').value.trim();
+  const logo_url = document.getElementById('acc-logo').value.trim();
+  const r = await api('/api/org/profile', {method:'POST', body:{phone, logo_url}});
+  if (!r.ok) { toast(r.data.error||'Error saving.','e'); return; }
+  toast('Account updated!','s');
 }
 
 async function doLogout() {
@@ -777,6 +905,7 @@ async function doLogout() {
   window.location.href = '/';
 }
 
+// ─── BOOT ───
 init();
 </script>
 </body>
