@@ -529,7 +529,7 @@ function toast(msg,type,ms){
 function fmt(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
-function badge(s){var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return '<span class="badge '+(m[s]||'")>'+((s||'').replace('_',' '))+'</span>';}
+function badge(s){var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return '<span class="badge '+(m[s]||'')+'">'+(( s||'').replace('_',' '))+'</span>';}
 
 // ═══ STATE ═══
 var profile=null,activeEntry=null,foundSvc=null,pollTimer=null;
@@ -595,6 +595,16 @@ function show(name){
   document.getElementById('panel-'+name).classList.add('active');
   if(document.getElementById('nav-'+name))document.getElementById('nav-'+name).classList.add('active');
   if(document.getElementById('bn-'+name))document.getElementById('bn-'+name).classList.add('active');
+  // Re-render active queue when navigating to it, so ticket is always visible
+  if(name==='active'&&activeEntry&&activeEntry.id){
+    document.getElementById('no-active').style.display='none';
+    document.getElementById('active-view').style.display='block';
+    document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
+    document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
+    document.getElementById('a-svc-name').textContent=activeEntry.svc_name||'—';
+    document.getElementById('a-org-name').textContent=activeEntry.org_name||'';
+    _applyLockedEta();
+  }
   if(name==='history')loadHistory();
   if(name==='nearby')loadNearby();
 }
@@ -705,13 +715,19 @@ function _applyLockedEta(){
   document.getElementById('exact-time-box').style.display='';
 }
 
+var _404count=0;
 async function refreshActive(){
   if(!activeEntry)return;
   var r=await api('/api/user/queue-status/'+activeEntry.id);
   if(!r.ok){
-    if(r.status===404){clearActiveEntry();return;}
-    return; // Network error — keep showing stored data
+    if(r.status===404){
+      _404count++;
+      // Only clear after 3 consecutive 404s - prevents clearing on network blip or slow DB
+      if(_404count>=3){clearActiveEntry();return;}
+    }
+    return; // Network error or session issue — keep showing stored data
   }
+  _404count=0; // reset on success
   var d=r.data;
 
   if(['completed','cancelled','no_show'].includes(d.status)){
