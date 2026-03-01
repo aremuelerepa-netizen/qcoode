@@ -1,8 +1,4 @@
-import os
-import re
-import json
-import random
-import requests
+import os, re, json, random, requests
 from functools import wraps
 from datetime import datetime, timezone, timedelta
 from flask import Flask, render_template, request, jsonify, session
@@ -17,13 +13,9 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"]   = os.getenv("FLASK_ENV") == "production"
 CORS(app, supports_credentials=True)
 
-# ─────────────────────────────────────────────
-# CONFIG
-# ─────────────────────────────────────────────
 SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
-
 SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
 SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
 
@@ -35,81 +27,49 @@ def get_groq():
     return Groq(api_key=os.getenv("GROQ_API_KEY", ""))
 
 SMS_GATEWAY_NUMBER = os.getenv("SMS_GATEWAY_NUMBER", "+2349155189936")
-ANDROID_GW_URL     = os.getenv("ANDROID_GW_URL", "")
-ANDROID_GW_LOGIN   = os.getenv("ANDROID_GW_LOGIN", "")
-ANDROID_GW_PASSWORD= os.getenv("ANDROID_GW_PASSWORD", "")
-ANDROID_GW_DEVICE  = os.getenv("ANDROID_GW_DEVICE", "")
-FALLBACK_SMS_URL   = os.getenv("FALLBACK_SMS_URL", "")
-FALLBACK_SMS_KEY   = os.getenv("FALLBACK_SMS_KEY", "")
-FALLBACK_KEY_FLD   = os.getenv("FALLBACK_KEY_FLD", "apikey")
-FALLBACK_PHONE_FLD = os.getenv("FALLBACK_PHONE_FLD", "to")
-FALLBACK_MSG_FLD   = os.getenv("FALLBACK_MSG_FLD", "message")
-SMS_SENDER_ID      = os.getenv("SMS_SENDER_ID", "QCode")
+ANDROID_GW_URL      = os.getenv("ANDROID_GW_URL", "")
+ANDROID_GW_LOGIN    = os.getenv("ANDROID_GW_LOGIN", "")
+ANDROID_GW_PASSWORD = os.getenv("ANDROID_GW_PASSWORD", "")
+ANDROID_GW_DEVICE   = os.getenv("ANDROID_GW_DEVICE", "")
+FALLBACK_SMS_URL    = os.getenv("FALLBACK_SMS_URL", "")
+FALLBACK_SMS_KEY    = os.getenv("FALLBACK_SMS_KEY", "")
+FALLBACK_KEY_FLD    = os.getenv("FALLBACK_KEY_FLD", "apikey")
+FALLBACK_PHONE_FLD  = os.getenv("FALLBACK_PHONE_FLD", "to")
+FALLBACK_MSG_FLD    = os.getenv("FALLBACK_MSG_FLD", "message")
+SMS_SENDER_ID       = os.getenv("SMS_SENDER_ID", "QCode")
 
-# ─────────────────────────────────────────────
-# HEADERS
-# ─────────────────────────────────────────────
 def _h_service():
-    return {
-        "apikey":        SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
-        "Content-Type":  "application/json",
-        "Prefer":        "return=representation",
-    }
+    return {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json", "Prefer": "return=representation"}
 
 def _h_anon():
-    return {
-        "apikey":        SUPABASE_ANON_KEY,
-        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
-        "Content-Type":  "application/json",
-    }
+    return {"apikey": SUPABASE_ANON_KEY, "Authorization": f"Bearer {SUPABASE_ANON_KEY}", "Content-Type": "application/json"}
 
-# ─────────────────────────────────────────────
-# SUPABASE AUTH HELPERS
-# ─────────────────────────────────────────────
 def admin_create_user(email, password):
-    r = requests.post(
-        f"{SUPABASE_URL}/auth/v1/admin/users",
+    r = requests.post(f"{SUPABASE_URL}/auth/v1/admin/users",
         headers={"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}", "Content-Type": "application/json"},
-        json={"email": email, "password": password, "email_confirm": True},
-        timeout=15
-    )
+        json={"email": email, "password": password, "email_confirm": True}, timeout=15)
     return r.json()
 
 def sb_signin(email, password):
-    r = requests.post(
-        f"{SUPABASE_URL}/auth/v1/token?grant_type=password",
-        headers=_h_anon(),
-        json={"email": email, "password": password},
-        timeout=15
-    )
+    r = requests.post(f"{SUPABASE_URL}/auth/v1/token?grant_type=password", headers=_h_anon(), json={"email": email, "password": password}, timeout=15)
     return r.json()
 
 def sb_signout(token):
     try:
-        requests.post(f"{SUPABASE_URL}/auth/v1/logout",
-            headers={"apikey": SUPABASE_ANON_KEY, "Authorization": f"Bearer {token}"},
-            timeout=5)
-    except Exception:
-        pass
+        requests.post(f"{SUPABASE_URL}/auth/v1/logout", headers={"apikey": SUPABASE_ANON_KEY, "Authorization": f"Bearer {token}"}, timeout=5)
+    except: pass
 
-# ─────────────────────────────────────────────
-# DATABASE HELPERS
-# ─────────────────────────────────────────────
 def db_insert(table, data):
     r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}", headers=_h_service(), json=data, timeout=15)
     return {"ok": r.ok, "data": r.json(), "status": r.status_code}
 
 def db_select(table, filters=None, single=False):
     params = {"select": "*"}
-    if filters:
-        params.update(filters)
+    if filters: params.update(filters)
     h = dict(_h_service())
-    if single:
-        h["Accept"] = "application/vnd.pgrst.object+json"
+    if single: h["Accept"] = "application/vnd.pgrst.object+json"
     r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, params=params, timeout=15)
-    if not r.ok:
-        return None if single else []
+    if not r.ok: return None if single else []
     return r.json()
 
 def db_update(table, match, data):
@@ -120,341 +80,221 @@ def db_update(table, match, data):
 def db_count(table, filters=None):
     h = {**_h_service(), "Prefer": "count=exact"}
     params = {"select": "id"}
-    if filters:
-        params.update(filters)
+    if filters: params.update(filters)
     r = requests.head(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, params=params, timeout=15)
-    try:
-        return int(r.headers.get("content-range", "0/0").split("/")[1])
-    except Exception:
-        return 0
+    try: return int(r.headers.get("content-range","0/0").split("/")[1])
+    except: return 0
 
 def get_profile(user_id):
     return db_select("profiles", {"id": f"eq.{user_id}"}, single=True) or {}
 
-# ─────────────────────────────────────────────
-# PAGE ROUTES
-# ─────────────────────────────────────────────
+def _rcode(n=6):
+    return "".join(random.choices("ABCDEFGHJKLMNPQRSTUVWXYZ23456789", k=n))
+
+def send_sms(to_phone, message):
+    if ANDROID_GW_URL:
+        try:
+            body = {"phoneNumbers": [to_phone], "message": message}
+            if ANDROID_GW_DEVICE: body["simNumber"] = ANDROID_GW_DEVICE
+            auth = (ANDROID_GW_LOGIN, ANDROID_GW_PASSWORD) if ANDROID_GW_LOGIN else None
+            requests.post(ANDROID_GW_URL.rstrip("/")+"/message", json=body, auth=auth, timeout=10)
+            return
+        except Exception as e: print(f"[Android GW Error] {e}")
+    if FALLBACK_SMS_URL:
+        try:
+            requests.post(FALLBACK_SMS_URL, data={FALLBACK_KEY_FLD: FALLBACK_SMS_KEY, FALLBACK_PHONE_FLD: to_phone, FALLBACK_MSG_FLD: message, "sender": SMS_SENDER_ID}, timeout=10)
+            return
+        except Exception as e: print(f"[Fallback SMS Error] {e}")
+    print(f"[SMS]\nTo: {to_phone}\n{message}")
+
+def _log_sms(from_phone, message_body, service_code, entry_id, status):
+    try:
+        db_insert("sms_joins", {"from_phone": from_phone, "message_body": message_body, "service_code": service_code, "queue_entry_id": entry_id, "status": status, "created_at": datetime.now(timezone.utc).isoformat()})
+    except Exception as e: print(f"[Log Error] {e}")
+
+# ─── PAGE ROUTES ───────────────────────────────────────────────
 @app.route("/")
-def home():
-    return render_template("index.html")
+def home(): return render_template("index.html")
 
 @app.route("/register-user")
 @app.route("/auth/register-user")
-def register_user_page():
-    return render_template("register-user.html")
+def register_user_page(): return render_template("register-user.html")
 
 @app.route("/register-org")
 @app.route("/auth/register-org")
-def register_org_page():
-    return render_template("register-org.html")
+def register_org_page(): return render_template("register-org.html")
 
 @app.route("/login-user")
 @app.route("/auth/login-user")
-def login_user_page():
-    return render_template("login-user.html")
+def login_user_page(): return render_template("login-user.html")
 
 @app.route("/login-org")
 @app.route("/auth/login-org")
-def login_org_page():
-    return render_template("login-org.html")
+def login_org_page(): return render_template("login-org.html")
 
 @app.route("/user")
 @app.route("/dashboard/user")
-def user_dashboard():
-    return render_template("user.html")
+def user_dashboard(): return render_template("user.html")
 
 @app.route("/org")
 @app.route("/dashboard/org")
-def org_dashboard():
-    return render_template("org.html")
+def org_dashboard(): return render_template("org.html")
 
 @app.route("/guest")
 @app.route("/dashboard/guest")
-def guest_dashboard():
-    return render_template("guest.html")
+def guest_dashboard(): return render_template("guest.html")
 
 @app.route("/super-admin")
 @app.route("/admin")
-def super_admin_page():
-    return render_template("super_admin.html")
+def super_admin_page(): return render_template("super_admin.html")
 
-# ─────────────────────────────────────────────
-# SESSION CHECK
-# ─────────────────────────────────────────────
-@app.route("/api/auth/me", methods=["GET"])
+# ─── SESSION ───────────────────────────────────────────────────
+@app.route("/api/auth/me")
 def api_me():
-    if not session.get("user_id"):
-        return jsonify({"logged_in": False}), 200
-    return jsonify({
-        "logged_in":  True,
-        "user_id":    session["user_id"],
-        "role":       session.get("role"),
-        "email":      session.get("email"),
-        "full_name":  session.get("full_name"),
-        "org_name":   session.get("org_name"),
-    }), 200
+    if not session.get("user_id"): return jsonify({"logged_in": False}), 200
+    return jsonify({"logged_in": True, "user_id": session["user_id"], "role": session.get("role"), "email": session.get("email"), "full_name": session.get("full_name"), "org_name": session.get("org_name")}), 200
 
-# ─────────────────────────────────────────────
-# REGISTER USER
-# ─────────────────────────────────────────────
+# ─── REGISTER USER ─────────────────────────────────────────────
 @app.route("/api/auth/register-user", methods=["POST"])
-@app.route("/api/register-user", methods=["POST"])
+@app.route("/api/register-user",      methods=["POST"])
 def register_user():
-    data      = request.get_json() or {}
-    full_name = (data.get("full_name") or "").strip()
-    email     = (data.get("email") or "").strip().lower()
-    password  = (data.get("password") or "")
-    phone     = (data.get("phone") or "").strip()
-
-    if not full_name or not email or not password:
-        return jsonify({"error": "Name, email and password are required."}), 400
-    if len(password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters."}), 400
-
+    d = request.get_json() or {}
+    full_name = (d.get("full_name") or "").strip()
+    email     = (d.get("email")     or "").strip().lower()
+    password  = (d.get("password")  or "")
+    phone     = (d.get("phone")     or "").strip()
+    if not full_name or not email or not password: return jsonify({"error": "Name, email and password are required."}), 400
+    if len(password) < 8: return jsonify({"error": "Password must be at least 8 characters."}), 400
     result = admin_create_user(email, password)
     uid    = result.get("id")
-
     if not uid:
-        msg = (result.get("message") or result.get("msg") or result.get("error_description") or str(result))
-        if "already been registered" in msg.lower() or "already exists" in msg.lower():
-            return jsonify({"error": "An account with this email already exists."}), 400
+        msg = result.get("message") or result.get("msg") or result.get("error_description") or str(result)
+        if "already" in msg.lower(): return jsonify({"error": "An account with this email already exists."}), 400
         return jsonify({"error": f"Registration failed: {msg}"}), 400
-
-    ins = db_insert("profiles", {
-        "id":              uid,
-        "role":            "user",
-        "full_name":       full_name,
-        "email":           email,
-        "phone":           phone or None,
-        "approval_status": "approved",
-        "is_online":       False,
-    })
-    if not ins["ok"]:
-        return jsonify({"error": "Account created but profile save failed."}), 500
-
+    ins = db_insert("profiles", {"id": uid, "role": "user", "full_name": full_name, "email": email, "phone": phone or None, "approval_status": "approved", "is_online": False})
+    if not ins["ok"]: return jsonify({"error": "Account created but profile save failed."}), 500
     return jsonify({"success": True, "message": "Account created! You can now log in."}), 201
 
-# ─────────────────────────────────────────────
-# AI FAQ
-# ─────────────────────────────────────────────
+# ─── AI FAQ ────────────────────────────────────────────────────
 @app.route("/api/ai/faq", methods=["POST"])
 def ai_faq():
-    data          = request.get_json()
-    messages      = data.get("messages", [])
-    system_prompt = data.get("system", "You are QCode Assistant, a helpful queue management support AI.")
-    if not messages:
-        return jsonify({"error": "No messages"}), 400
+    d = request.get_json() or {}
+    messages = d.get("messages", [])
+    system_prompt = d.get("system", "You are QCode Assistant, a helpful queue management AI.")
+    if not messages: return jsonify({"error": "No messages"}), 400
     try:
         client   = get_groq()
-        response = client.chat.completions.create(
-            model="llama3-70b-8192",
-            messages=[{"role": "system", "content": system_prompt}, *messages],
-            max_tokens=600,
-            temperature=0.7,
-        )
+        response = client.chat.completions.create(model="llama3-70b-8192", messages=[{"role": "system", "content": system_prompt}, *messages], max_tokens=600, temperature=0.7)
         return jsonify({"response": response.choices[0].message.content})
     except Exception as e:
         print(f"Groq error: {e}")
         return jsonify({"error": "AI service unavailable."}), 500
 
-# ─────────────────────────────────────────────
-# REGISTER ORG  (supports multipart for logo)
-# ─────────────────────────────────────────────
+# ─── REGISTER ORG ──────────────────────────────────────────────
 @app.route("/api/auth/register-org", methods=["POST"])
-@app.route("/api/register-org", methods=["POST"])
+@app.route("/api/register-org",      methods=["POST"])
 def register_org():
     ct = (request.content_type or "").lower()
     if "multipart" in ct or "form" in ct:
         org_name = (request.form.get("org_name") or "").strip()
-        email    = (request.form.get("email") or "").strip().lower()
+        email    = (request.form.get("email")    or "").strip().lower()
         password = (request.form.get("password") or "")
-        phone    = (request.form.get("org_phone") or "").strip()
-        address  = (request.form.get("org_address") or "").strip()
-        org_type = (request.form.get("org_type") or "").strip()
-        logo_url = (request.form.get("logo_url") or "").strip()
+        phone    = (request.form.get("org_phone")    or "").strip()
+        address  = (request.form.get("org_address")  or "").strip()
+        org_type = (request.form.get("org_type")     or "").strip()
     else:
-        d        = request.get_json() or {}
+        d = request.get_json() or {}
         org_name = (d.get("org_name") or "").strip()
-        email    = (d.get("email") or "").strip().lower()
+        email    = (d.get("email")    or "").strip().lower()
         password = (d.get("password") or "")
-        phone    = (d.get("org_phone") or "").strip()
-        address  = (d.get("org_address") or "").strip()
-        org_type = (d.get("org_type") or "").strip()
-        logo_url = (d.get("logo_url") or "").strip()
-
-    if not org_name or not email or not password:
-        return jsonify({"error": "Organization name, email and password are required."}), 400
-    if len(password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters."}), 400
-
+        phone    = (d.get("org_phone")    or "").strip()
+        address  = (d.get("org_address")  or "").strip()
+        org_type = (d.get("org_type")     or "").strip()
+    if not org_name or not email or not password: return jsonify({"error": "Organization name, email and password are required."}), 400
+    if len(password) < 8: return jsonify({"error": "Password must be at least 8 characters."}), 400
     result = admin_create_user(email, password)
     uid    = result.get("id")
-
     if not uid:
-        msg = (result.get("message") or result.get("msg") or result.get("error_description") or str(result))
-        if "already been registered" in msg.lower() or "already exists" in msg.lower():
-            return jsonify({"error": "An account with this email already exists."}), 400
+        msg = result.get("message") or result.get("msg") or result.get("error_description") or str(result)
+        if "already" in msg.lower(): return jsonify({"error": "An account with this email already exists."}), 400
         return jsonify({"error": f"Registration failed: {msg}"}), 400
-
     address_full = " | ".join(filter(None, [org_type, address])) or None
+    ins = db_insert("profiles", {"id": uid, "role": "organization", "org_name": org_name, "full_name": org_name, "email": email, "phone": phone or None, "company_address": address_full, "approval_status": "pending", "is_online": False})
+    if not ins["ok"]: return jsonify({"error": "Account created but profile save failed."}), 500
+    return jsonify({"success": True, "org_name": org_name, "message": f"Registration submitted! '{org_name}' is pending admin approval."}), 201
 
-    ins = db_insert("profiles", {
-        "id":              uid,
-        "role":            "organization",
-        "org_name":        org_name,
-        "full_name":       org_name,
-        "email":           email,
-        "phone":           phone or None,
-        "company_address": address_full,
-        "logo_url":        logo_url or None,
-        "approval_status": "pending",
-        "is_online":       False,
-    })
-    if not ins["ok"]:
-        return jsonify({"error": "Account created but profile save failed."}), 500
-
-    return jsonify({
-        "success":  True,
-        "org_name": org_name,
-        "message":  f"Registration submitted! '{org_name}' is pending admin approval.",
-    }), 201
-
-# ─────────────────────────────────────────────
-# LOGIN USER
-# ─────────────────────────────────────────────
+# ─── LOGIN USER ────────────────────────────────────────────────
 @app.route("/api/auth/login", methods=["POST"])
 @app.route("/api/login-user", methods=["POST"])
 def login_user():
-    data     = request.get_json() or {}
-    email    = (data.get("email") or "").strip().lower()
-    password = (data.get("password") or "")
-
-    if not email or not password:
-        return jsonify({"error": "Email and password are required."}), 400
-
+    d = request.get_json() or {}
+    email    = (d.get("email")    or "").strip().lower()
+    password = (d.get("password") or "")
+    if not email or not password: return jsonify({"error": "Email and password are required."}), 400
     signin = sb_signin(email, password)
     token  = signin.get("access_token")
-
     if not token:
-        raw = (signin.get("error_description") or signin.get("msg") or signin.get("message") or signin.get("error") or "Login failed.")
-        if "invalid" in raw.lower() or "credentials" in raw.lower():
-            raw = "Incorrect email or password."
-        elif "not confirmed" in raw.lower():
-            raw = "Account not confirmed. Please contact support."
+        raw = signin.get("error_description") or signin.get("msg") or signin.get("message") or signin.get("error") or "Login failed."
+        if "invalid" in raw.lower() or "credentials" in raw.lower(): raw = "Incorrect email or password."
         return jsonify({"error": raw}), 401
-
     uid = (signin.get("user") or {}).get("id")
-    if not uid:
-        return jsonify({"error": "Could not retrieve user info."}), 401
-
+    if not uid: return jsonify({"error": "Could not retrieve user info."}), 401
     profile = get_profile(uid)
-    if not profile:
-        return jsonify({"error": "Profile not found."}), 404
-
+    if not profile: return jsonify({"error": "Profile not found."}), 404
     role   = profile.get("role", "user")
     status = profile.get("approval_status", "approved")
-
-    if status == "suspended":
-        sb_signout(token)
-        return jsonify({"error": "This account has been suspended."}), 403
-
+    if status == "suspended": sb_signout(token); return jsonify({"error": "This account has been suspended."}), 403
     session.permanent = True
-    session["user_id"]   = uid
-    session["role"]      = role
-    session["email"]     = profile.get("email", "")
-    session["full_name"] = profile.get("full_name", "")
-    session["org_name"]  = profile.get("org_name", "")
-
+    session.update({"user_id": uid, "role": role, "email": profile.get("email",""), "full_name": profile.get("full_name",""), "org_name": profile.get("org_name","")})
     db_update("profiles", {"id": uid}, {"is_online": True})
+    return jsonify({"success": True, "role": role, "redirect": {"user": "/user", "organization": "/org", "super_admin": "/super-admin"}.get(role, "/user")}), 200
 
-    redirect_map = {"user": "/user", "organization": "/org", "super_admin": "/super-admin"}
-    return jsonify({"success": True, "role": role, "redirect": redirect_map.get(role, "/user")}), 200
-
-# ─────────────────────────────────────────────
-# LOGIN ORG
-# ─────────────────────────────────────────────
+# ─── LOGIN ORG ─────────────────────────────────────────────────
 @app.route("/api/auth/login-org", methods=["POST"])
-@app.route("/api/login-org", methods=["POST"])
+@app.route("/api/login-org",      methods=["POST"])
 def login_org():
-    data     = request.get_json() or {}
-    email    = (data.get("email") or "").strip().lower()
-    password = (data.get("password") or "")
-
-    if not email or not password:
-        return jsonify({"error": "Email and password are required."}), 400
-
+    d = request.get_json() or {}
+    email    = (d.get("email")    or "").strip().lower()
+    password = (d.get("password") or "")
+    if not email or not password: return jsonify({"error": "Email and password are required."}), 400
     if email == SUPER_ADMIN_EMAIL and password == SUPER_ADMIN_PASSWORD:
         session.permanent = True
-        session["user_id"]   = "super-admin"
-        session["role"]      = "super_admin"
-        session["email"]     = SUPER_ADMIN_EMAIL
-        session["full_name"] = "Super Admin"
-        session["org_name"]  = "QCode Admin"
+        session.update({"user_id": "super-admin", "role": "super_admin", "email": SUPER_ADMIN_EMAIL, "full_name": "Super Admin", "org_name": "QCode Admin"})
         return jsonify({"success": True, "role": "super_admin", "redirect": "/super-admin"}), 200
-
     signin = sb_signin(email, password)
     token  = signin.get("access_token")
-
     if not token:
-        raw = (signin.get("error_description") or signin.get("msg") or signin.get("message") or signin.get("error") or "Login failed.")
-        if "invalid" in raw.lower() or "credentials" in raw.lower():
-            raw = "Incorrect email or password."
+        raw = signin.get("error_description") or signin.get("msg") or signin.get("message") or signin.get("error") or "Login failed."
+        if "invalid" in raw.lower(): raw = "Incorrect email or password."
         return jsonify({"error": raw}), 401
-
     uid = (signin.get("user") or {}).get("id")
-    if not uid:
-        return jsonify({"error": "Could not retrieve user info."}), 401
-
+    if not uid: return jsonify({"error": "Could not retrieve user info."}), 401
     profile = get_profile(uid)
-    if not profile:
-        return jsonify({"error": "Profile not found."}), 404
-
+    if not profile: return jsonify({"error": "Profile not found."}), 404
     role   = profile.get("role")
     status = profile.get("approval_status", "pending")
-
-    if role != "organization":
-        sb_signout(token)
-        return jsonify({"error": "This page is for organizations only."}), 403
-
-    if status == "pending":
-        sb_signout(token)
-        return jsonify({"error": "Your organization is pending admin approval."}), 403
-
-    if status == "suspended":
-        sb_signout(token)
-        return jsonify({"error": "This account has been suspended."}), 403
-
+    if role != "organization": sb_signout(token); return jsonify({"error": "This page is for organizations only."}), 403
+    if status == "pending": sb_signout(token); return jsonify({"error": "Your organization is pending admin approval."}), 403
+    if status == "suspended": sb_signout(token); return jsonify({"error": "This account has been suspended."}), 403
     session.permanent = True
-    session["user_id"]   = uid
-    session["role"]      = "organization"
-    session["email"]     = profile.get("email", "")
-    session["org_name"]  = profile.get("org_name", "")
-    session["full_name"] = profile.get("org_name", "")
-
+    session.update({"user_id": uid, "role": "organization", "email": profile.get("email",""), "org_name": profile.get("org_name",""), "full_name": profile.get("org_name","")})
     db_update("profiles", {"id": uid}, {"is_online": True})
-
     return jsonify({"success": True, "role": "organization", "redirect": "/org"}), 200
 
-# ─────────────────────────────────────────────
-# LOGOUT
-# ─────────────────────────────────────────────
+# ─── LOGOUT ────────────────────────────────────────────────────
 @app.route("/api/auth/logout", methods=["POST"])
-@app.route("/api/logout", methods=["POST"])
+@app.route("/api/logout",      methods=["POST"])
 def logout():
     uid = session.get("user_id")
-    if uid and uid != "super-admin":
-        db_update("profiles", {"id": uid}, {"is_online": False})
+    if uid and uid != "super-admin": db_update("profiles", {"id": uid}, {"is_online": False})
     session.clear()
     return jsonify({"success": True, "redirect": "/"}), 200
 
-# ─────────────────────────────────────────────
-# USER DASHBOARD API
-# ─────────────────────────────────────────────
+# ─── USER APIs ─────────────────────────────────────────────────
 @app.route("/api/user/profile", methods=["GET"])
 def api_user_profile():
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
+    if not uid: return jsonify({"error": "Not logged in"}), 401
     profile = get_profile(uid)
     profile["total_queues"] = db_count("queue_entries", {"user_id": f"eq.{uid}"})
     return jsonify(profile), 200
@@ -462,63 +302,26 @@ def api_user_profile():
 @app.route("/api/user/profile", methods=["POST"])
 def api_user_profile_update():
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
+    if not uid: return jsonify({"error": "Not logged in"}), 401
     d   = request.get_json() or {}
     upd = {}
-    if "full_name"      in d: upd["full_name"]     = d["full_name"] or None
-    if "phone"          in d: upd["phone"]          = d["phone"] or None
-    if "preferred_lang" in d: upd["preferred_lang"] = d["preferred_lang"]
-    if upd:
-        db_update("profiles", {"id": uid}, upd)
+    for k in ("full_name","phone","preferred_lang"): 
+        if k in d: upd[k] = d[k] or None
+    if upd: db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
 
-@app.route("/api/user/find-service", methods=["GET"])
+@app.route("/api/user/find-service")
 def api_find_service():
     code = (request.args.get("code") or "").strip().upper()
-    if not code:
-        return jsonify({"error": "Service code required"}), 400
+    if not code: return jsonify({"error": "Service code required"}), 400
     svcs = db_select("services", {"service_code": f"eq.{code}"})
-    if not svcs:
-        return jsonify({"error": f"No service found with code '{code}'."}), 404
+    if not svcs: return jsonify({"error": f"No service found with code '{code}'."}), 404
     svc = svcs[0]
     org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
-    if org.get("approval_status") != "approved":
-        return jsonify({"error": "This organization is not currently active."}), 403
-    if svc["status"] == "closed":
-        return jsonify({"error": f"'{svc['name']}' queue is closed."}), 400
-    if svc["status"] == "paused":
-        return jsonify({"error": f"'{svc['name']}' queue is paused. Try again soon."}), 400
-
-    # Check schedule
-    now_utc = datetime.now(timezone.utc)
-    if svc.get("schedule_start") and svc.get("schedule_end"):
-        try:
-            start_t = datetime.fromisoformat(svc["schedule_start"].replace("Z", "+00:00"))
-            end_t   = datetime.fromisoformat(svc["schedule_end"].replace("Z", "+00:00"))
-            if now_utc < start_t:
-                return jsonify({"error": f"Queue hasn't started yet. Starts at {start_t.strftime('%H:%M')}."}), 400
-            if now_utc > end_t:
-                return jsonify({"error": f"Queue has ended for today."}), 400
-        except Exception:
-            pass
-
-    # Check break times
-    breaks = []
-    try:
-        breaks = json.loads(svc.get("break_times") or "[]")
-    except Exception:
-        pass
-    for brk in breaks:
-        try:
-            b_start = datetime.fromisoformat(brk["start"].replace("Z", "+00:00"))
-            b_end   = datetime.fromisoformat(brk["end"].replace("Z", "+00:00"))
-            if b_start <= now_utc <= b_end:
-                return jsonify({"error": f"Queue is on break until {b_end.strftime('%H:%M')}."}), 400
-        except Exception:
-            pass
-
-    waiting              = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
+    if org.get("approval_status") != "approved": return jsonify({"error": "This organization is not currently active."}), 403
+    if svc["status"] == "closed": return jsonify({"error": f"'{svc['name']}' queue is closed."}), 400
+    if svc["status"] == "paused": return jsonify({"error": f"'{svc['name']}' queue is paused. Try again soon."}), 400
+    waiting = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
     svc["waiting_count"] = waiting
     svc["org_name"]      = org.get("org_name", "")
     svc["org_logo"]      = org.get("logo_url", "")
@@ -528,134 +331,64 @@ def api_find_service():
 @app.route("/api/user/join-queue", methods=["POST"])
 def api_join_queue():
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
+    if not uid: return jsonify({"error": "Not logged in"}), 401
     d      = request.get_json() or {}
     svc_id = d.get("service_id")
-    if not svc_id:
-        return jsonify({"error": "service_id required"}), 400
+    if not svc_id: return jsonify({"error": "service_id required"}), 400
     svcs = db_select("services", {"id": f"eq.{svc_id}"})
-    if not svcs:
-        return jsonify({"error": "Service not found"}), 404
+    if not svcs: return jsonify({"error": "Service not found"}), 404
     svc = svcs[0]
-    if svc["status"] != "open":
-        return jsonify({"error": f"Queue is {svc['status']}."}), 400
-    already = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "user_id":    f"eq.{uid}",
-        "status":     "in.(waiting,called,serving)",
-    })
-    if already:
-        return jsonify({"error": "You are already in this queue.", "entry": already[0]}), 409
-
-    # max capacity check
-    if svc.get("max_users"):
-        current = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(waiting,called,serving)"})
-        if current >= svc["max_users"]:
-            return jsonify({"error": "Queue is full."}), 400
-
+    if svc["status"] != "open": return jsonify({"error": f"Queue is {svc['status']}."}), 400
+    max_u   = svc.get("max_users") or 9999
+    current = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(waiting,called,serving)"})
+    if current >= max_u: return jsonify({"error": "Queue is full. Please try again later."}), 400
+    already = db_select("queue_entries", {"service_id": f"eq.{svc_id}", "user_id": f"eq.{uid}", "status": "in.(waiting,called,serving)"})
+    if already: return jsonify({"error": "You are already in this queue.", "entry": already[0]}), 409
     n     = (svc.get("ticket_counter") or 0) + 1
-    label = f"{svc.get('ticket_prefix', 'Q')}{str(n).zfill(3)}"
+    label = f"{svc.get('ticket_prefix','Q')}{str(n).zfill(3)}"
     db_update("services", {"id": svc_id}, {"ticket_counter": n})
-
     pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
-    eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos * (svc.get("time_interval") or 5))).isoformat()
-
-    # Generate end code (6 chars)
-    chars    = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    end_code = "".join(random.choices(chars, k=6))
-
-    res = db_insert("queue_entries", {
-        "service_id":       svc_id,
-        "user_id":          uid,
-        "ticket_label":     label,
-        "ticket_number":    n,
-        "status":           "waiting",
-        "estimated_time":   eta_t,
-        "join_method":      "web",
-        "custom_form_data": json.dumps(d.get("custom_form_data") or {}),
-        "end_code":         end_code,
-        "notify_before":    d.get("notify_before", False),
-        "notify_minutes":   d.get("notify_minutes", 5),
-        "notify_method":    d.get("notify_method", "push"),
-    })
-    if not res["ok"]:
-        return jsonify({"error": "Failed to join queue."}), 500
+    eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
+    end_code = _rcode(4)
+    res = db_insert("queue_entries", {"service_id": svc_id, "user_id": uid, "ticket_label": label, "ticket_number": n, "status": "waiting", "estimated_time": eta_t, "join_method": "web", "custom_form_data": json.dumps(d.get("custom_form_data") or {}), "end_code": end_code})
+    if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
     entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
-    entry["position"] = pos
-    entry["svc_name"] = svc["name"]
-    entry["org_name"] = (db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}).get("org_name", "")
+    entry["position"]      = pos
+    entry["svc_name"]      = svc["name"]
     entry["time_interval"] = svc.get("time_interval", 5)
-    return jsonify({"success": True, "entry": entry}), 201
+    org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
+    entry["org_name"]      = org.get("org_name", "")
+    return jsonify({"success": True, "entry": entry, "end_code": end_code}), 201
 
-@app.route("/api/user/queue-status/<entry_id>", methods=["GET"])
+@app.route("/api/user/queue-status/<entry_id>")
 def api_queue_status(entry_id):
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
+    if not uid: return jsonify({"error": "Not logged in"}), 401
     rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-    if not rows or rows[0].get("user_id") != uid:
-        return jsonify({"error": "Not found"}), 404
+    if not rows or rows[0].get("user_id") != uid: return jsonify({"error": "Not found"}), 404
     entry = rows[0]
-    ahead = db_count("queue_entries", {
-        "service_id":    f"eq.{entry['service_id']}",
-        "status":        "eq.waiting",
-        "ticket_number": f"lt.{entry['ticket_number']}",
-    })
+    ahead = db_count("queue_entries", {"service_id": f"eq.{entry['service_id']}", "status": "eq.waiting", "ticket_number": f"lt.{entry['ticket_number']}"})
     total = db_count("queue_entries", {"service_id": f"eq.{entry['service_id']}", "status": "eq.waiting"})
     svcs  = db_select("services", {"id": f"eq.{entry['service_id']}"})
     svc   = svcs[0] if svcs else {}
-
-    pos = ahead + 1
-    interval = svc.get("time_interval") or 5
-    eta_mins = max(0, ahead * interval)
-    eta_time = datetime.now(timezone.utc) + timedelta(minutes=eta_mins)
-
-    entry["position"]    = pos
-    entry["ahead"]       = ahead
-    entry["total"]       = total
-    entry["eta_minutes"] = eta_mins
-    entry["eta_time"]    = eta_time.isoformat()
-    entry["svc_name"]    = svc.get("name", "")
-    entry["svc_status"]  = svc.get("status", "")
-    entry["time_interval"] = interval
-
-    # Auto-cancel: if called but didn't respond in (time_interval/4) minutes
-    if entry.get("status") == "called" and entry.get("called_at"):
-        try:
-            called_at  = datetime.fromisoformat(entry["called_at"].replace("Z", "+00:00"))
-            grace_secs = max(60, (interval * 60) // 4)
-            if (datetime.now(timezone.utc) - called_at).total_seconds() > grace_secs:
-                db_update("queue_entries", {"id": entry_id}, {
-                    "status": "no_show",
-                    "completed_at": datetime.now(timezone.utc).isoformat(),
-                })
-                entry["status"] = "no_show"
-        except Exception:
-            pass
-
+    eta_mins = max(0, (ahead+1)*(svc.get("time_interval") or 5))
+    entry.update({"position": ahead+1, "ahead": ahead, "total": total, "eta_minutes": eta_mins, "svc_name": svc.get("name",""), "svc_status": svc.get("status",""), "time_interval": svc.get("time_interval",5), "estimated_time": (datetime.now(timezone.utc)+timedelta(minutes=eta_mins)).isoformat()})
     return jsonify(entry), 200
 
 @app.route("/api/user/leave-queue/<entry_id>", methods=["POST"])
 def api_leave_queue(entry_id):
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
+    if not uid: return jsonify({"error": "Not logged in"}), 401
     rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-    if not rows or rows[0].get("user_id") != uid:
-        return jsonify({"error": "Not found"}), 404
-    db_update("queue_entries", {"id": entry_id}, {
-        "status": "cancelled",
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-    })
+    if not rows or rows[0].get("user_id") != uid: return jsonify({"error": "Not found"}), 404
+    db_update("queue_entries", {"id": entry_id}, {"status": "cancelled", "completed_at": datetime.now(timezone.utc).isoformat()})
     return jsonify({"success": True}), 200
 
-@app.route("/api/user/history", methods=["GET"])
+@app.route("/api/user/history")
 def api_user_history():
     uid = session.get("user_id")
-    if not uid:
-        return jsonify({"error": "Not logged in"}), 401
-    rows      = db_select("queue_entries", {"user_id": f"eq.{uid}", "order": "joined_at.desc", "limit": "50"})
+    if not uid: return jsonify({"error": "Not logged in"}), 401
+    rows = db_select("queue_entries", {"user_id": f"eq.{uid}", "order": "joined_at.desc", "limit": "50"})
     svc_cache = {}
     for row in rows:
         sid = row.get("service_id")
@@ -663,392 +396,205 @@ def api_user_history():
             svcs = db_select("services", {"id": f"eq.{sid}"})
             if svcs:
                 org = db_select("profiles", {"id": f"eq.{svcs[0]['org_id']}"}, single=True) or {}
-                svc_cache[sid] = {"name": svcs[0]["name"], "org_name": org.get("org_name", "")}
-        if sid in svc_cache:
-            row["svc_name"] = svc_cache[sid]["name"]
-            row["org_name"] = svc_cache[sid]["org_name"]
+                svc_cache[sid] = {"name": svcs[0]["name"], "org_name": org.get("org_name","")}
+        if sid in svc_cache: row["svc_name"] = svc_cache[sid]["name"]; row["org_name"] = svc_cache[sid]["org_name"]
     return jsonify(rows), 200
 
-@app.route("/api/user/open-services", methods=["GET"])
+@app.route("/api/user/open-services")
 def api_open_services():
     svcs   = db_select("services", {"status": "eq.open", "deleted_at": "is.null", "order": "created_at.desc", "limit": "30"})
     result = []
     for svc in svcs:
         org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
-        if org.get("approval_status") != "approved":
-            continue
-        svc["org_name"]      = org.get("org_name", "")
-        svc["org_logo"]      = org.get("logo_url", "")
+        if org.get("approval_status") != "approved": continue
+        svc["org_name"]      = org.get("org_name","")
         svc["waiting_count"] = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
         result.append(svc)
     return jsonify(result), 200
 
-# ─── Submit feedback after queue ─────────────────────────────
 @app.route("/api/user/feedback", methods=["POST"])
-def api_submit_feedback():
-    d        = request.get_json() or {}
-    entry_id = d.get("entry_id")
-    rating   = d.get("rating")
-    comment  = d.get("comment", "")
-    uid      = session.get("user_id")
-    if not entry_id or rating is None:
-        return jsonify({"error": "entry_id and rating required"}), 400
-    db_insert("feedback", {
-        "entry_id": entry_id,
-        "user_id":  uid,
-        "rating":   rating,
-        "comment":  comment,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    })
+def api_user_feedback():
+    d = request.get_json() or {}
+    entry_id = d.get("entry_id"); rating = d.get("rating"); comment = (d.get("comment") or "").strip(); uid = session.get("user_id")
+    if not entry_id or not rating: return jsonify({"error": "entry_id and rating required"}), 400
+    db_insert("feedbacks", {"entry_id": entry_id, "user_id": uid, "rating": int(rating), "comment": comment or None, "created_at": datetime.now(timezone.utc).isoformat()})
     return jsonify({"success": True}), 201
 
-# ─── Verify end code ──────────────────────────────────────────
 @app.route("/api/user/verify-end-code", methods=["POST"])
 def api_verify_end_code():
-    d        = request.get_json() or {}
-    entry_id = d.get("entry_id")
-    code     = (d.get("end_code") or "").strip().upper()
-    uid      = session.get("user_id")
-
+    d = request.get_json() or {}; entry_id = d.get("entry_id"); end_code = (d.get("end_code") or "").strip().upper(); uid = session.get("user_id")
     rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-    if not rows:
-        return jsonify({"error": "Entry not found"}), 404
+    if not rows: return jsonify({"error": "Entry not found"}), 404
     entry = rows[0]
-
-    # Allow org to verify too
-    if entry.get("end_code", "").upper() != code:
-        return jsonify({"error": "Invalid end code"}), 400
-
-    db_update("queue_entries", {"id": entry_id}, {
-        "status": "completed",
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-    })
+    if uid != entry.get("user_id") and session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    if (entry.get("end_code") or "").upper() != end_code: return jsonify({"error": "Invalid end code"}), 400
+    db_update("queue_entries", {"id": entry_id}, {"status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()})
     return jsonify({"success": True}), 200
 
-# ─────────────────────────────────────────────
-# GUEST JOIN & STATUS
-# ─────────────────────────────────────────────
-@app.route("/api/guest/join", methods=["POST"])
-def api_guest_join():
-    d          = request.get_json() or {}
-    svc_id     = d.get("service_id")
-    guest_name = (d.get("guest_name") or "").strip()
+@app.route("/api/system/auto-cancel", methods=["POST"])
+def api_auto_cancel():
+    called = db_select("queue_entries", {"status": "eq.called"})
+    cancelled = []
+    for entry in called:
+        called_at_str = entry.get("called_at")
+        if not called_at_str: continue
+        svcs = db_select("services", {"id": f"eq.{entry.get('service_id')}"})
+        if not svcs: continue
+        grace_min = max(1, (svcs[0].get("time_interval",5) // 4))
+        called_at = datetime.fromisoformat(called_at_str.replace("Z","+00:00"))
+        if (datetime.now(timezone.utc)-called_at).total_seconds() > grace_min*60:
+            db_update("queue_entries", {"id": entry["id"]}, {"status": "no_show", "completed_at": datetime.now(timezone.utc).isoformat()})
+            cancelled.append(entry["id"])
+    return jsonify({"cancelled": cancelled, "count": len(cancelled)}), 200
 
-    if not svc_id:
-        return jsonify({"error": "service_id required"}), 400
-    if not guest_name:
-        return jsonify({"error": "Guest name required"}), 400
-
-    svcs = db_select("services", {"id": f"eq.{svc_id}"})
-    if not svcs:
-        return jsonify({"error": "Service not found"}), 404
-    svc = svcs[0]
-    if svc["status"] != "open":
-        return jsonify({"error": f"Queue is {svc['status']}."}), 400
-
-    n     = (svc.get("ticket_counter") or 0) + 1
-    label = f"{svc.get('ticket_prefix', 'Q')}{str(n).zfill(3)}"
-    db_update("services", {"id": svc_id}, {"ticket_counter": n})
-
-    pos      = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
-    interval = svc.get("time_interval") or 5
-    eta_mins = pos * interval
-    eta_time = datetime.now(timezone.utc) + timedelta(minutes=eta_mins)
-
-    chars    = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-    end_code = "".join(random.choices(chars, k=6))
-
-    res = db_insert("queue_entries", {
-        "service_id":     svc_id,
-        "user_id":        None,
-        "guest_name":     guest_name,
-        "ticket_label":   label,
-        "ticket_number":  n,
-        "status":         "waiting",
-        "estimated_time": eta_time.isoformat(),
-        "join_method":    "web",
-        "end_code":       end_code,
-    })
-    if not res["ok"]:
-        return jsonify({"error": "Failed to join queue."}), 500
-
-    entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
-    entry["position"]      = pos
-    entry["svc_name"]      = svc["name"]
-    entry["org_name"]      = (db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}).get("org_name", "")
-    entry["eta_minutes"]   = eta_mins
-    entry["eta_time"]      = eta_time.isoformat()
-    entry["time_interval"] = interval
-    return jsonify({"success": True, "entry": entry, "service": svc}), 201
-
-@app.route("/api/guest/status/<entry_id>", methods=["GET"])
-def api_guest_status(entry_id):
-    rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-    if not rows:
-        return jsonify({"error": "Not found"}), 404
-    entry = rows[0]
-    svcs  = db_select("services", {"id": f"eq.{entry['service_id']}"})
-    svc   = svcs[0] if svcs else {}
-
-    interval = svc.get("time_interval") or 5
-    ahead    = db_count("queue_entries", {
-        "service_id":    f"eq.{entry['service_id']}",
-        "status":        "eq.waiting",
-        "ticket_number": f"lt.{entry['ticket_number']}",
-    })
-    total    = db_count("queue_entries", {"service_id": f"eq.{entry['service_id']}", "status": "eq.waiting"})
-    pos      = ahead + 1
-    eta_mins = max(0, ahead * interval)
-    eta_time = datetime.now(timezone.utc) + timedelta(minutes=eta_mins)
-
-    # Auto-cancel
-    if entry.get("status") == "called" and entry.get("called_at"):
-        try:
-            called_at  = datetime.fromisoformat(entry["called_at"].replace("Z", "+00:00"))
-            grace_secs = max(60, (interval * 60) // 4)
-            if (datetime.now(timezone.utc) - called_at).total_seconds() > grace_secs:
-                db_update("queue_entries", {"id": entry_id}, {
-                    "status": "no_show",
-                    "completed_at": datetime.now(timezone.utc).isoformat(),
-                })
-                entry["status"] = "no_show"
-        except Exception:
-            pass
-
-    entry["position"]      = pos
-    entry["ahead"]         = ahead
-    entry["total"]         = total
-    entry["eta_minutes"]   = eta_mins
-    entry["eta_time"]      = eta_time.isoformat()
-    entry["svc_name"]      = svc.get("name", "")
-    entry["svc_status"]    = svc.get("status", "")
-    entry["time_interval"] = interval
-    return jsonify(entry), 200
-
-# ─────────────────────────────────────────────
-# ORG DASHBOARD API
-# ─────────────────────────────────────────────
+# ─── ORG APIs ──────────────────────────────────────────────────
 @app.route("/api/org/profile", methods=["GET"])
 def api_org_profile():
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
     return jsonify(get_profile(uid)), 200
 
 @app.route("/api/org/profile", methods=["POST"])
 def api_org_profile_update():
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    d = request.get_json() or {}
-    upd = {}
-    if "phone"    in d: upd["phone"]    = d["phone"] or None
-    if "logo_url" in d: upd["logo_url"] = d["logo_url"] or None
-    if upd:
-        db_update("profiles", {"id": uid}, upd)
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    d = request.get_json() or {}; upd = {}
+    for k in ("phone","logo_url"):
+        if k in d: upd[k] = d[k] or None
+    if upd: db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
 
 @app.route("/api/org/services", methods=["GET"])
 def api_org_services():
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
     svcs = db_select("services", {"org_id": f"eq.{uid}", "deleted_at": "is.null", "order": "created_at.desc"})
     for svc in svcs:
-        for s in ("waiting", "called", "serving", "completed", "no_show"):
+        for s in ("waiting","called","serving","completed","no_show"):
             svc[f"count_{s}"] = db_count("queue_entries", {"service_id": f"eq.{svc['id']}", "status": f"eq.{s}"})
     return jsonify(svcs), 200
 
 @app.route("/api/org/services", methods=["POST"])
 def api_org_create_service():
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    d    = request.get_json() or {}
-    name = (d.get("name") or "").strip()
-    if not name:
-        return jsonify({"error": "Service name is required"}), 400
-
-    chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    d = request.get_json() or {}; name = (d.get("name") or "").strip()
+    if not name: return jsonify({"error": "Service name is required"}), 400
     for _ in range(20):
-        code = "".join(random.choices(chars, k=6))
-        if not db_select("services", {"service_code": f"eq.{code}"}):
-            break
-
-    res = db_insert("services", {
-        "org_id":          uid,
-        "name":            name,
-        "staff_name":      d.get("staff_name") or None,
-        "description":     d.get("description") or None,
-        "service_code":    code,
-        "ticket_prefix":   (d.get("ticket_prefix") or "A").upper()[:3],
-        "ticket_counter":  0,
-        "time_interval":   int(d.get("time_interval") or 5),
-        "max_users":       int(d.get("max_users")) if d.get("max_users") else None,
-        "status":          "open",
-        "user_info_form":  json.dumps(d.get("user_info_form") or []),
-        "schedule_start":  d.get("schedule_start") or None,
-        "schedule_end":    d.get("schedule_end") or None,
-        "break_times":     json.dumps(d.get("break_times") or []),
-    })
-    if not res["ok"]:
-        return jsonify({"error": "Failed to create service"}), 500
+        code = _rcode(6)
+        if not db_select("services", {"service_code": f"eq.{code}"}): break
+    end_code = _rcode(4)
+    res = db_insert("services", {"org_id": uid, "name": name, "staff_name": d.get("staff_name") or None, "description": d.get("description") or None, "service_code": code, "end_code": end_code, "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3], "ticket_counter": 0, "time_interval": int(d.get("time_interval") or 5), "max_users": int(d.get("max_users")) if d.get("max_users") else None, "status": "open", "user_info_form": json.dumps(d.get("user_info_form") or []), "queue_start": d.get("queue_start") or None, "queue_end": d.get("queue_end") or None, "break_times": json.dumps(d.get("break_times") or [])})
+    if not res["ok"]: return jsonify({"error": "Failed to create service"}), 500
     svc = res["data"][0] if isinstance(res["data"], list) else res["data"]
-    return jsonify({"success": True, "service": svc}), 201
+    return jsonify({"success": True, "service": svc, "service_code": code, "end_code": end_code}), 201
 
 @app.route("/api/org/services/<svc_id>/status", methods=["POST"])
 def api_org_service_status(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
     status = (request.get_json() or {}).get("status")
-    if status not in ("open", "paused", "closed"):
-        return jsonify({"error": "Invalid status"}), 400
+    if status not in ("open","paused","closed"): return jsonify({"error": "Invalid status"}), 400
     db_update("services", {"id": svc_id}, {"status": status})
     return jsonify({"success": True}), 200
 
 @app.route("/api/org/services/<svc_id>/delete", methods=["POST"])
 def api_org_delete_service(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
     db_update("services", {"id": svc_id}, {"deleted_at": datetime.now(timezone.utc).isoformat(), "status": "closed"})
     return jsonify({"success": True}), 200
 
 @app.route("/api/org/services/<svc_id>/restore", methods=["POST"])
 def api_org_restore_service(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
     db_update("services", {"id": svc_id}, {"deleted_at": None})
     return jsonify({"success": True}), 200
 
-@app.route("/api/org/services/deleted", methods=["GET"])
+@app.route("/api/org/services/deleted")
 def api_org_deleted_services():
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    svcs = db_select("services", {"org_id": f"eq.{uid}", "deleted_at": "not.is.null", "order": "deleted_at.desc"})
-    return jsonify(svcs), 200
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    return jsonify(db_select("services", {"org_id": f"eq.{uid}", "deleted_at": "not.is.null", "order": "deleted_at.desc"})), 200
 
-@app.route("/api/org/queue/<svc_id>", methods=["GET"])
+@app.route("/api/org/queue/<svc_id>")
 def api_org_queue(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    entries = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "status":     "in.(waiting,called,serving)",
-        "order":      "ticket_number.asc",
-    })
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    entries = db_select("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(waiting,called,serving)", "order": "ticket_number.asc"})
     for e in entries:
         if e.get("user_id"):
             p = db_select("profiles", {"id": f"eq.{e['user_id']}"}, single=True) or {}
-            e["user_name"]   = p.get("full_name") or p.get("email") or "User"
-            e["user_online"] = p.get("is_online", False)
+            e["user_name"] = p.get("full_name") or p.get("email") or "User"; e["user_online"] = p.get("is_online",False); e["user_phone"] = p.get("phone","")
         else:
-            e["user_name"]   = e.get("guest_name") or "Guest"
-            e["user_online"] = False
+            e["user_name"] = e.get("guest_name") or "Guest"; e["user_online"] = False; e["user_phone"] = e.get("guest_phone","")
     return jsonify(entries), 200
 
 @app.route("/api/org/queue/call-next/<svc_id>", methods=["POST"])
 def api_org_call_next(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    waiting = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "status":     "eq.waiting",
-        "order":      "ticket_number.asc",
-        "limit":      "1",
-    })
-    if not waiting:
-        return jsonify({"error": "No one waiting"}), 404
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    waiting = db_select("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting", "order": "ticket_number.asc", "limit": "1"})
+    if not waiting: return jsonify({"error": "No one waiting"}), 404
     entry = waiting[0]
-    db_update("queue_entries", {"id": entry["id"]}, {
-        "status":    "called",
-        "called_at": datetime.now(timezone.utc).isoformat(),
-    })
+    db_update("queue_entries", {"id": entry["id"]}, {"status": "called", "called_at": datetime.now(timezone.utc).isoformat()})
     entry["status"] = "called"
+    phone = entry.get("guest_phone") or ""
+    if phone: send_sms(phone, f"📢 Your ticket {entry['ticket_label']} is being called! Please go to the counter now.")
     return jsonify({"success": True, "entry": entry}), 200
 
 @app.route("/api/org/queue/entry/<entry_id>", methods=["POST"])
 def api_org_update_entry(entry_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    d      = request.get_json() or {}
-    status = d.get("status")
-    if status not in ("serving", "completed", "no_show", "waiting", "called", "cancelled"):
-        return jsonify({"error": "Invalid status"}), 400
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    status = (request.get_json() or {}).get("status")
+    if status not in ("serving","completed","no_show","waiting","called","cancelled"): return jsonify({"error": "Invalid status"}), 400
     upd = {"status": status}
-    if status in ("completed", "no_show", "cancelled"):
-        upd["completed_at"] = datetime.now(timezone.utc).isoformat()
+    if status in ("completed","no_show","cancelled"): upd["completed_at"] = datetime.now(timezone.utc).isoformat()
     db_update("queue_entries", {"id": entry_id}, upd)
     return jsonify({"success": True}), 200
 
-@app.route("/api/org/report/<svc_id>", methods=["GET"])
+@app.route("/api/org/report/<svc_id>")
 def api_org_report(svc_id):
     uid = session.get("user_id")
-    if not uid or session.get("role") != "organization":
-        return jsonify({"error": "Unauthorized"}), 403
-    entries = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "status":     "in.(completed,no_show,cancelled)",
-        "order":      "ticket_number.desc",
-        "limit":      "200",
-    })
-    return jsonify(entries), 200
+    if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
+    return jsonify(db_select("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(completed,no_show,cancelled)", "order": "ticket_number.desc", "limit": "200"})), 200
 
-# ─────────────────────────────────────────────
-# ADMIN API
-# ─────────────────────────────────────────────
+# ─── ADMIN APIs ────────────────────────────────────────────────
 def require_admin(f):
     @wraps(f)
-    def wrapper(*args, **kwargs):
-        if session.get("role") != "super_admin":
-            return jsonify({"error": "Unauthorized"}), 403
-        return f(*args, **kwargs)
+    def wrapper(*a, **kw):
+        if session.get("role") != "super_admin": return jsonify({"error": "Unauthorized"}), 403
+        return f(*a, **kw)
     return wrapper
 
 @app.route("/api/admin/stats")
 @require_admin
 def api_admin_stats():
-    return jsonify({
-        "total_orgs":    db_count("profiles", {"role": "eq.organization"}),
-        "approved_orgs": db_count("profiles", {"role": "eq.organization", "approval_status": "eq.approved"}),
-        "pending_orgs":  db_count("profiles", {"role": "eq.organization", "approval_status": "eq.pending"}),
-        "total_users":   db_count("profiles", {"role": "eq.user"}),
-        "total_served":  db_count("queue_entries", {"status": "eq.completed"}),
-    }), 200
+    return jsonify({"total_orgs": db_count("profiles",{"role":"eq.organization"}), "approved_orgs": db_count("profiles",{"role":"eq.organization","approval_status":"eq.approved"}), "pending_orgs": db_count("profiles",{"role":"eq.organization","approval_status":"eq.pending"}), "total_users": db_count("profiles",{"role":"eq.user"}), "total_served": db_count("queue_entries",{"status":"eq.completed"})}), 200
 
 @app.route("/api/admin/orgs")
 @require_admin
-def api_admin_orgs():
-    return jsonify(db_select("profiles", {"role": "eq.organization", "order": "created_at.desc"})), 200
+def api_admin_orgs(): return jsonify(db_select("profiles",{"role":"eq.organization","order":"created_at.desc"})), 200
 
 @app.route("/api/admin/users")
 @require_admin
-def api_admin_users():
-    return jsonify(db_select("profiles", {"role": "eq.user", "order": "created_at.desc"})), 200
+def api_admin_users(): return jsonify(db_select("profiles",{"role":"eq.user","order":"created_at.desc"})), 200
 
 @app.route("/api/admin/approve-org", methods=["POST"])
 @require_admin
 def api_approve_org():
     org_id = (request.get_json() or {}).get("org_id")
-    if not org_id:
-        return jsonify({"error": "org_id required"}), 400
+    if not org_id: return jsonify({"error": "org_id required"}), 400
     db_update("profiles", {"id": org_id}, {"approval_status": "approved"})
     return jsonify({"success": True}), 200
 
 @app.route("/api/admin/reject-org", methods=["POST"])
 @require_admin
 def api_reject_org():
-    d      = request.get_json() or {}
-    org_id = d.get("org_id")
-    reason = (d.get("reason") or "").strip()
-    if not org_id or not reason:
-        return jsonify({"error": "org_id and reason required"}), 400
+    d = request.get_json() or {}; org_id = d.get("org_id"); reason = (d.get("reason") or "").strip()
+    if not org_id or not reason: return jsonify({"error": "org_id and reason required"}), 400
     db_update("profiles", {"id": org_id}, {"approval_status": "suspended", "rejection_reason": reason})
     return jsonify({"success": True}), 200
 
@@ -1056,304 +602,181 @@ def api_reject_org():
 @require_admin
 def api_suspend_org():
     org_id = (request.get_json() or {}).get("org_id")
-    if not org_id:
-        return jsonify({"error": "org_id required"}), 400
+    if not org_id: return jsonify({"error": "org_id required"}), 400
     db_update("profiles", {"id": org_id}, {"approval_status": "suspended"})
     return jsonify({"success": True}), 200
 
-@app.route("/api/admin/analytics", methods=["GET"])
+@app.route("/api/admin/analytics")
 @require_admin
 def admin_analytics():
-    return jsonify({
-        "total_orgs":    db_count("profiles", {"role": "eq.organization"}),
-        "approved_orgs": db_count("profiles", {"role": "eq.organization", "approval_status": "eq.approved"}),
-        "pending_orgs":  db_count("profiles", {"role": "eq.organization", "approval_status": "eq.pending"}),
-        "total_users":   db_count("profiles", {"role": "eq.user"}),
-        "total_served":  db_count("queue_entries", {"status": "eq.completed"}),
-        "sms_joins":     db_count("queue_entries", {"join_method": "eq.sms"}),
-        "total_noshow":  db_count("queue_entries", {"status": "eq.no_show"}),
-    }), 200
+    return jsonify({"total_orgs": db_count("profiles",{"role":"eq.organization"}), "approved_orgs": db_count("profiles",{"role":"eq.organization","approval_status":"eq.approved"}), "pending_orgs": db_count("profiles",{"role":"eq.organization","approval_status":"eq.pending"}), "total_users": db_count("profiles",{"role":"eq.user"}), "total_served": db_count("queue_entries",{"status":"eq.completed"})}), 200
 
 @app.route("/api/admin/reinstate-org", methods=["POST"])
 @require_admin
 def api_reinstate_org():
     org_id = (request.get_json() or {}).get("org_id")
-    if not org_id:
-        return jsonify({"error": "org_id required"}), 400
+    if not org_id: return jsonify({"error": "org_id required"}), 400
     db_update("profiles", {"id": org_id}, {"approval_status": "approved", "rejection_reason": None})
-    db_insert("admin_logs", {
-        "admin_id": session.get("user_id"), "action": "REINSTATE_ORG",
-        "target_id": org_id, "target_type": "organization",
-        "details": json.dumps({"action": "reinstated"}),
-    })
     return jsonify({"success": True}), 200
 
 @app.route("/api/admin/ban-user", methods=["POST"])
 @require_admin
 def api_ban_user():
     user_id = (request.get_json() or {}).get("user_id")
-    if not user_id:
-        return jsonify({"error": "user_id required"}), 400
+    if not user_id: return jsonify({"error": "user_id required"}), 400
     db_update("profiles", {"id": user_id}, {"approval_status": "suspended"})
-    db_insert("admin_logs", {
-        "admin_id": session.get("user_id"), "action": "BAN_USER",
-        "target_id": user_id, "target_type": "user",
-        "details": json.dumps({"action": "banned"}),
-    })
     return jsonify({"success": True}), 200
 
-@app.route("/api/admin/all-queues", methods=["GET"])
+@app.route("/api/admin/all-queues")
 @require_admin
 def api_admin_all_queues():
-    org_id  = request.args.get("org_id", "")
-    filters = {"order": "joined_at.desc", "limit": "200"}
+    org_id = request.args.get("org_id",""); filters = {"order": "joined_at.desc", "limit": "200"}
     if org_id:
-        svcs    = db_select("services", {"org_id": f"eq.{org_id}"})
-        svc_ids = ",".join(s["id"] for s in svcs)
-        if svc_ids:
-            filters["service_id"] = f"in.({svc_ids})"
-        else:
-            return jsonify([]), 200
-    entries    = db_select("queue_entries", filters)
-    svc_cache  = {}
-    user_cache = {}
+        svcs = db_select("services", {"org_id": f"eq.{org_id}"}); svc_ids = ",".join(s["id"] for s in svcs)
+        if svc_ids: filters["service_id"] = f"in.({svc_ids})"
+        else: return jsonify([]), 200
+    entries = db_select("queue_entries", filters); svc_cache = {}; user_cache = {}
     for e in entries:
         sid = e.get("service_id")
         if sid and sid not in svc_cache:
             svcs = db_select("services", {"id": f"eq.{sid}"})
             if svcs:
-                s   = svcs[0]
-                org = db_select("profiles", {"id": f"eq.{s['org_id']}"}, single=True) or {}
-                svc_cache[sid] = {"svc_name": s.get("name", ""), "svc_code": s.get("service_code", ""), "org_name": org.get("org_name", "")}
-        if sid in svc_cache:
-            e.update(svc_cache[sid])
-        uid = e.get("user_id")
-        if uid and uid not in user_cache:
-            p             = db_select("profiles", {"id": f"eq.{uid}"}, single=True) or {}
-            user_cache[uid] = p.get("full_name") or p.get("email") or "User"
-        if uid:
-            e["user_name"] = user_cache.get(uid, "User")
-        else:
-            e["user_name"] = e.get("guest_name") or "Guest"
+                s = svcs[0]; org = db_select("profiles",{"id":f"eq.{s['org_id']}"},single=True) or {}
+                svc_cache[sid] = {"svc_name": s.get("name",""), "svc_code": s.get("service_code",""), "org_name": org.get("org_name","")}
+        if sid in svc_cache: e.update(svc_cache[sid])
+        uid2 = e.get("user_id")
+        if uid2 and uid2 not in user_cache:
+            p = db_select("profiles",{"id":f"eq.{uid2}"},single=True) or {}; user_cache[uid2] = p.get("full_name") or p.get("email") or "User"
+        e["user_name"] = user_cache.get(uid2,"User") if uid2 else (e.get("guest_name") or "Guest")
     return jsonify(entries), 200
 
-@app.route("/api/admin/all-services", methods=["GET"])
+@app.route("/api/admin/all-services")
 @require_admin
 def api_admin_all_services():
     svcs = db_select("services", {"deleted_at": "is.null", "order": "created_at.desc"})
     for s in svcs:
-        org        = db_select("profiles", {"id": f"eq.{s['org_id']}"}, single=True) or {}
-        s["org_name"]  = org.get("org_name", "")
-        s["total"]     = db_count("queue_entries", {"service_id": f"eq.{s['id']}"})
-        s["waiting"]   = db_count("queue_entries", {"service_id": f"eq.{s['id']}", "status": "eq.waiting"})
-        s["completed"] = db_count("queue_entries", {"service_id": f"eq.{s['id']}", "status": "eq.completed"})
+        org = db_select("profiles",{"id":f"eq.{s['org_id']}"},single=True) or {}
+        s["org_name"] = org.get("org_name",""); s["total"] = db_count("queue_entries",{"service_id":f"eq.{s['id']}"}); s["waiting"] = db_count("queue_entries",{"service_id":f"eq.{s['id']}","status":"eq.waiting"}); s["completed"] = db_count("queue_entries",{"service_id":f"eq.{s['id']}","status":"eq.completed"})
     return jsonify(svcs), 200
 
-@app.route("/api/admin/sms-joins", methods=["GET"])
+@app.route("/api/admin/sms-joins")
 @require_admin
 def api_admin_sms_joins():
     rows = db_select("sms_joins", {"order": "created_at.desc", "limit": "100"})
     for r in rows:
         eid = r.get("queue_entry_id")
         if eid:
-            entries = db_select("queue_entries", {"id": f"eq.{eid}"})
-            if entries:
-                r["ticket_label"] = entries[0].get("ticket_label", "—")
-                r["entry_status"] = entries[0].get("status", "—")
+            entries = db_select("queue_entries",{"id":f"eq.{eid}"})
+            if entries: r["ticket_label"] = entries[0].get("ticket_label","—"); r["entry_status"] = entries[0].get("status","—")
     return jsonify(rows), 200
 
-@app.route("/api/admin/logs", methods=["GET"])
+@app.route("/api/admin/logs")
 @require_admin
-def api_admin_logs():
-    return jsonify(db_select("admin_logs", {"order": "created_at.desc", "limit": "100"})), 200
+def api_admin_logs(): return jsonify(db_select("admin_logs",{"order":"created_at.desc","limit":"100"})), 200
 
 @app.route("/api/admin/log-action", methods=["POST"])
 @require_admin
 def api_admin_log_action():
     d = request.get_json() or {}
-    db_insert("admin_logs", {
-        "admin_id": session.get("user_id"),
-        "action":      d.get("action", ""),
-        "target_id":   d.get("target_id", ""),
-        "target_type": d.get("target_type", ""),
-        "details":     json.dumps(d.get("details") or {}),
-    })
+    db_insert("admin_logs", {"admin_id": session.get("user_id"), "action": d.get("action",""), "target_id": d.get("target_id",""), "target_type": d.get("target_type",""), "details": json.dumps(d.get("details") or {})})
     return jsonify({"success": True}), 200
 
-# ─────────────────────────────────────────────
-# SMS WEBHOOK
-# ─────────────────────────────────────────────
+# ─── SMS WEBHOOK ───────────────────────────────────────────────
 @app.route("/api/sms/receive", methods=["POST"])
 def receive_sms():
-    if request.is_json:
-        payload = request.get_json() or {}
-    else:
-        payload = request.form.to_dict()
-
-    print(f"[SMS In] {payload}")
-
-    from_phone = (payload.get("phoneNumber") or payload.get("from") or payload.get("From") or payload.get("sender") or payload.get("msisdn") or payload.get("mobile") or payload.get("phone") or "Unknown")
-    message_body = (payload.get("message") or payload.get("text") or payload.get("Text") or payload.get("Body") or payload.get("body") or payload.get("sms") or "").strip()
-
-    if not message_body:
-        return "", 200
-
+    payload = request.get_json() or {} if request.is_json else request.form.to_dict()
+    from_phone   = payload.get("phoneNumber") or payload.get("from") or payload.get("From") or payload.get("sender") or payload.get("msisdn") or "Unknown"
+    message_body = (payload.get("message") or payload.get("text") or payload.get("Text") or payload.get("Body") or payload.get("body") or "").strip()
+    if not message_body: return "", 200
     code_match = re.search(r'\b(QC[-\s]?[A-Z0-9]{6})\b', message_body.upper())
     if not code_match:
         bare = re.search(r'\b([A-Z0-9]{6})\b', message_body.upper())
-        if bare:
-            service_code = "QC-" + bare.group(1)
-            name_part    = re.sub(r'\b' + bare.group(1) + r'\b', '', message_body, flags=re.IGNORECASE).strip()
-        else:
-            _log_sms(from_phone, message_body, None, None, "invalid_code")
-            send_sms(from_phone, "Invalid code. Text your QCode service code e.g. QC-ABC123 to join a queue.")
-            return "", 200
+        if bare: service_code = "QC-"+bare.group(1); name_part = re.sub(r'\b'+bare.group(1)+r'\b','',message_body,flags=re.IGNORECASE).strip()
+        else: _log_sms(from_phone,message_body,None,None,"invalid_code"); send_sms(from_phone,"Invalid code. Text your QCode service code e.g. QC-ABC123 to join."); return "",200
     else:
-        raw          = code_match.group(1).replace(" ", "-")
-        service_code = raw if raw.startswith("QC-") else "QC-" + raw[-6:]
-        name_part    = re.sub(r'\b' + re.escape(code_match.group(1)) + r'\b', '', message_body, flags=re.IGNORECASE).strip()
-
+        raw = code_match.group(1).replace(" ","-"); service_code = raw if raw.startswith("QC-") else "QC-"+raw[-6:]
+        name_part = re.sub(r'\b'+re.escape(code_match.group(1))+r'\b','',message_body,flags=re.IGNORECASE).strip()
     guest_name = name_part.title() if name_part else f"SMS User ({from_phone[-4:]})"
-
     try:
-        svcs = db_select("services", {"service_code": f"eq.{service_code}", "status": "eq.open"})
-        if not svcs:
-            _log_sms(from_phone, message_body, service_code, None, "invalid_code")
-            send_sms(from_phone, f"Code {service_code} not found or inactive.")
-            return "", 200
-
-        service  = svcs[0]
-        svc_id   = service["id"]
-        max_u    = service.get("max_users") or 9999
-        current  = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(waiting,called,serving)"})
-
-        if current >= max_u:
-            _log_sms(from_phone, message_body, service_code, None, "failed")
-            send_sms(from_phone, f"Sorry, {service['name']} queue is full.")
-            return "", 200
-
-        n        = (service.get("ticket_counter") or 0) + 1
-        label    = f"{service.get('ticket_prefix', 'Q')}{str(n).zfill(3)}"
-        db_update("services", {"id": svc_id}, {"ticket_counter": n})
-
-        pos      = current + 1
-        interval = service.get("time_interval") or 5
-        wait_min = pos * interval
-        eta      = (datetime.now(timezone.utc) + timedelta(minutes=wait_min)).isoformat()
-        eta_time = datetime.now(timezone.utc) + timedelta(minutes=wait_min)
-
-        res = db_insert("queue_entries", {
-            "service_id":     svc_id,
-            "user_id":        None,
-            "guest_name":     guest_name,
-            "guest_phone":    from_phone,
-            "ticket_label":   label,
-            "ticket_number":  n,
-            "status":         "waiting",
-            "estimated_time": eta,
-            "join_method":    "sms",
-        })
-
+        svcs = db_select("services",{"service_code":f"eq.{service_code}","status":"eq.open"})
+        if not svcs: _log_sms(from_phone,message_body,service_code,None,"invalid_code"); send_sms(from_phone,f"Code {service_code} not found or inactive."); return "",200
+        service = svcs[0]; svc_id = service["id"]
+        max_u = service.get("max_users") or 9999; current = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"in.(waiting,called,serving)"})
+        if current >= max_u: _log_sms(from_phone,message_body,service_code,None,"failed"); send_sms(from_phone,f"Sorry, {service['name']} queue is full."); return "",200
+        n = (service.get("ticket_counter") or 0)+1; label = f"{service.get('ticket_prefix','Q')}{str(n).zfill(3)}"
+        db_update("services",{"id":svc_id},{"ticket_counter":n})
+        pos = current+1; wait_min = pos*(service.get("time_interval") or 5); eta = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).isoformat(); eta_time = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).strftime("%I:%M %p")
+        end_code = _rcode(4)
+        res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"guest_phone":from_phone,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta,"join_method":"sms","end_code":end_code})
         entry_id = res["data"][0]["id"] if res.get("ok") and res["data"] else None
-        _log_sms(from_phone, message_body, service_code, entry_id, "processed")
-
-        org   = db_select("profiles", {"id": f"eq.{service['org_id']}"}, single=True) or {}
-        reply = (
-            f"QCode Confirmed!\n"
-            f"Service: {service['name']} @ {org.get('org_name', 'the organization')}\n"
-            f"Your ticket: {label}\n"
-            f"Position: #{pos}\n"
-            f"Your turn at: {eta_time.strftime('%I:%M %p')}\n"
-            f"Wait: ~{wait_min} mins."
-        )
-        send_sms(from_phone, reply)
-        return "", 200
-
+        _log_sms(from_phone,message_body,service_code,entry_id,"processed")
+        org = db_select("profiles",{"id":f"eq.{service['org_id']}"},single=True) or {}
+        send_sms(from_phone, f"QCode Confirmed!\nService: {service['name']} @ {org.get('org_name','')}\nTicket: {label} | End code: {end_code}\nPosition: #{pos}\nYour turn at: ~{eta_time}\nWait: ~{wait_min} mins. Stay nearby.")
+        return "",200
     except Exception as e:
-        print(f"[SMS Error] {e}")
-        _log_sms(from_phone, message_body, service_code, None, "failed")
-        send_sms(from_phone, "Something went wrong. Please try again.")
-        return "", 200
+        print(f"[SMS Error] {e}"); _log_sms(from_phone,message_body,service_code,None,"failed"); send_sms(from_phone,"Something went wrong. Please try again."); return "",200
 
-# ─────────────────────────────────────────────
-# SEND SMS
-# ─────────────────────────────────────────────
-def send_sms(to_phone, message):
-    if ANDROID_GW_URL:
-        try:
-            url  = ANDROID_GW_URL.rstrip("/") + "/message"
-            body = {"phoneNumbers": [to_phone], "message": message}
-            if ANDROID_GW_DEVICE:
-                body["simNumber"] = ANDROID_GW_DEVICE
-            auth = (ANDROID_GW_LOGIN, ANDROID_GW_PASSWORD) if ANDROID_GW_LOGIN and ANDROID_GW_PASSWORD else None
-            resp = requests.post(url, json=body, auth=auth, timeout=10)
-            print(f"[SMS Sent via Android] To: {to_phone} | {resp.status_code}")
-            return
-        except Exception as e:
-            print(f"[Android GW Error] {e}")
+# ─── GUEST APIs ────────────────────────────────────────────────
+@app.route("/api/guest/join", methods=["POST"])
+def api_guest_join():
+    d = request.get_json() or {}; svc_id = d.get("service_id"); guest_name = (d.get("guest_name") or "").strip()
+    if not svc_id: return jsonify({"error": "service_id required"}), 400
+    if not guest_name: return jsonify({"error": "Guest name required"}), 400
+    svcs = db_select("services",{"id":f"eq.{svc_id}"})
+    if not svcs: return jsonify({"error": "Service not found"}), 404
+    svc = svcs[0]
+    if svc["status"] != "open": return jsonify({"error": f"Queue is {svc['status']}."}), 400
+    max_u = svc.get("max_users") or 9999; current = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"in.(waiting,called,serving)"})
+    if current >= max_u: return jsonify({"error": "Queue is full."}), 400
+    n = (svc.get("ticket_counter") or 0)+1; label = f"{svc.get('ticket_prefix','Q')}{str(n).zfill(3)}"
+    db_update("services",{"id":svc_id},{"ticket_counter":n})
+    pos = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"eq.waiting"})+1
+    eta_t = (datetime.now(timezone.utc)+timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
+    end_code = _rcode(4)
+    res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta_t,"join_method":"web","end_code":end_code})
+    if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
+    entry = res["data"][0] if isinstance(res["data"],list) else res["data"]
+    entry["position"] = pos; entry["svc_name"] = svc["name"]; entry["time_interval"] = svc.get("time_interval",5)
+    org = db_select("profiles",{"id":f"eq.{svc['org_id']}"},single=True) or {}; entry["org_name"] = org.get("org_name","")
+    return jsonify({"success":True,"entry":entry,"end_code":end_code}), 201
 
-    if FALLBACK_SMS_URL:
-        try:
-            payload = {
-                FALLBACK_KEY_FLD:   FALLBACK_SMS_KEY,
-                FALLBACK_PHONE_FLD: to_phone,
-                FALLBACK_MSG_FLD:   message,
-                "sender":           SMS_SENDER_ID,
-            }
-            requests.post(FALLBACK_SMS_URL, data=payload, timeout=10)
-            return
-        except Exception as e:
-            print(f"[Fallback SMS Error] {e}")
+@app.route("/api/guest/queue-status/<entry_id>")
+def api_guest_queue_status(entry_id):
+    rows = db_select("queue_entries",{"id":f"eq.{entry_id}"})
+    if not rows: return jsonify({"error":"Not found"}),404
+    entry = rows[0]
+    ahead = db_count("queue_entries",{"service_id":f"eq.{entry['service_id']}","status":"eq.waiting","ticket_number":f"lt.{entry['ticket_number']}"})
+    total = db_count("queue_entries",{"service_id":f"eq.{entry['service_id']}","status":"eq.waiting"})
+    svcs  = db_select("services",{"id":f"eq.{entry['service_id']}"}); svc = svcs[0] if svcs else {}
+    eta_mins = max(0,(ahead+1)*(svc.get("time_interval") or 5))
+    entry.update({"position":ahead+1,"ahead":ahead,"total":total,"eta_minutes":eta_mins,"svc_name":svc.get("name",""),"svc_status":svc.get("status",""),"time_interval":svc.get("time_interval",5),"estimated_time":(datetime.now(timezone.utc)+timedelta(minutes=eta_mins)).isoformat()})
+    return jsonify(entry), 200
 
-    print(f"\n[SMS — no gateway]\nTo: {to_phone}\n{message}\n")
+@app.route("/api/guest/leave/<entry_id>", methods=["POST"])
+def api_guest_leave(entry_id):
+    rows = db_select("queue_entries",{"id":f"eq.{entry_id}"})
+    if not rows: return jsonify({"error":"Not found"}),404
+    db_update("queue_entries",{"id":entry_id},{"status":"cancelled","completed_at":datetime.now(timezone.utc).isoformat()})
+    return jsonify({"success":True}), 200
 
-# ─────────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────────
-def _log_sms(from_phone, message_body, service_code, entry_id, status):
-    try:
-        db_insert("sms_joins", {
-            "from_phone": from_phone, "message_body": message_body,
-            "service_code": service_code, "queue_entry_id": entry_id,
-            "status": status, "created_at": datetime.now(timezone.utc).isoformat(),
-        })
-    except Exception as e:
-        print(f"[Log Error] {e}")
+@app.route("/api/guest/feedback", methods=["POST"])
+def api_guest_feedback():
+    d = request.get_json() or {}; entry_id = d.get("entry_id"); rating = d.get("rating"); comment = (d.get("comment") or "").strip()
+    if not entry_id or not rating: return jsonify({"error":"entry_id and rating required"}), 400
+    db_insert("feedbacks",{"entry_id":entry_id,"user_id":None,"rating":int(rating),"comment":comment or None,"created_at":datetime.now(timezone.utc).isoformat()})
+    return jsonify({"success":True}), 201
 
-def _format_time(iso_string):
-    try:
-        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
-        return dt.strftime("%I:%M %p")
-    except Exception:
-        return iso_string
+# ─── PUBLIC ────────────────────────────────────────────────────
+@app.route("/api/public/stats")
+def api_public_stats():
+    return jsonify({"approved_orgs": db_count("profiles",{"role":"eq.organization","approval_status":"eq.approved"}), "total_served": db_count("queue_entries",{"status":"eq.completed"}), "active_services": db_count("services",{"status":"eq.open","deleted_at":"is.null"})}), 200
 
 @app.route("/api/notify/org", methods=["POST"])
-def notify_org():
-    data = request.get_json()
-    print(f"[Notify] Org {data.get('org_id')} → {data.get('status')}")
-    return jsonify({"sent": True})
+def notify_org(): return jsonify({"sent": True})
 
-# ─────────────────────────────────────────────
-# PUBLIC STATS
-# ─────────────────────────────────────────────
-@app.route("/api/public/stats", methods=["GET"])
-def api_public_stats():
-    return jsonify({
-        "approved_orgs":   db_count("profiles", {"role": "eq.organization", "approval_status": "eq.approved"}),
-        "total_served":    db_count("queue_entries", {"status": "eq.completed"}),
-        "active_services": db_count("services", {"status": "eq.open", "deleted_at": "is.null"}),
-    }), 200
-
-# ─────────────────────────────────────────────
-# HEALTH CHECK
-# ─────────────────────────────────────────────
 @app.route("/health")
-def health():
-    return jsonify({"status": "ok", "supabase_url": bool(SUPABASE_URL), "time": datetime.now().isoformat()})
+def health(): return jsonify({"status":"ok","time":datetime.now().isoformat()})
 
-# ─────────────────────────────────────────────
-# RUN
-# ─────────────────────────────────────────────
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port, debug=False)
