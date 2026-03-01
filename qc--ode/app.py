@@ -184,7 +184,7 @@ def ai_faq():
     if not messages: return jsonify({"error": "No messages"}), 400
     try:
         client   = get_groq()
-        response = client.chat.completions.create(model="llama3-70b-8192", messages=[{"role": "system", "content": system_prompt}, *messages], max_tokens=600, temperature=0.7)
+        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "system", "content": system_prompt}, *messages], max_tokens=600, temperature=0.7)
         return jsonify({"response": response.choices[0].message.content})
     except Exception as e:
         print(f"Groq error: {e}")
@@ -350,7 +350,7 @@ def api_join_queue():
     pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
     eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    res = db_insert("queue_entries", {"service_id": svc_id, "user_id": uid, "ticket_label": label, "ticket_number": n, "status": "waiting", "estimated_time": eta_t, "join_method": "web", "custom_form_data": json.dumps(d.get("custom_form_data") or {}), "end_code": end_code})
+    res = db_insert("queue_entries", {"service_id": svc_id, "user_id": uid, "ticket_label": label, "ticket_number": n, "status": "waiting", "estimated_time": eta_t, "join_method": "web", "custom_form_data": json.dumps(d.get("custom_form_data") or {}), "end_code": end_code, "joined_at": datetime.now(timezone.utc).isoformat()})
     if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
     entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
     entry["position"]      = pos
@@ -484,7 +484,7 @@ def api_org_create_service():
         code = _rcode(6)
         if not db_select("services", {"service_code": f"eq.{code}"}): break
     end_code = _rcode(4)
-    res = db_insert("services", {"org_id": uid, "name": name, "staff_name": d.get("staff_name") or None, "description": d.get("description") or None, "service_code": code, "end_code": end_code, "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3], "ticket_counter": 0, "time_interval": int(d.get("time_interval") or 5), "max_users": int(d.get("max_users")) if d.get("max_users") else None, "status": "open", "user_info_form": json.dumps(d.get("user_info_form") or []), "queue_start": d.get("queue_start") or None, "queue_end": d.get("queue_end") or None, "break_times": json.dumps(d.get("break_times") or [])})
+    res = db_insert("services", {"org_id": uid, "name": name, "staff_name": d.get("staff_name") or None, "description": d.get("description") or None, "service_code": code, "end_code": end_code, "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3], "ticket_counter": 0, "time_interval": int(d.get("time_interval") or 5), "max_users": int(d.get("max_users")) if d.get("max_users") else None, "status": "open", "user_info_form": json.dumps(d.get("user_info_form") or []), "queue_start": d.get("queue_start") or d.get("schedule_start") or None, "queue_end": d.get("queue_end") or d.get("schedule_end") or None, "break_times": json.dumps(d.get("break_times") or [])})
     if not res["ok"]: return jsonify({"error": "Failed to create service"}), 500
     svc = res["data"][0] if isinstance(res["data"], list) else res["data"]
     return jsonify({"success": True, "service": svc, "service_code": code, "end_code": end_code}), 201
@@ -707,7 +707,7 @@ def receive_sms():
         db_update("services",{"id":svc_id},{"ticket_counter":n})
         pos = current+1; wait_min = pos*(service.get("time_interval") or 5); eta = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).isoformat(); eta_time = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).strftime("%I:%M %p")
         end_code = _rcode(4)
-        res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"guest_phone":from_phone,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta,"join_method":"sms","end_code":end_code})
+        res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"guest_phone":from_phone,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta,"join_method":"sms","end_code":end_code,"joined_at":datetime.now(timezone.utc).isoformat()})
         entry_id = res["data"][0]["id"] if res.get("ok") and res["data"] else None
         _log_sms(from_phone,message_body,service_code,entry_id,"processed")
         org = db_select("profiles",{"id":f"eq.{service['org_id']}"},single=True) or {}
@@ -733,7 +733,7 @@ def api_guest_join():
     pos = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"eq.waiting"})+1
     eta_t = (datetime.now(timezone.utc)+timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta_t,"join_method":"web","end_code":end_code})
+    res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta_t,"join_method":"web","end_code":end_code,"joined_at":datetime.now(timezone.utc).isoformat()})
     if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
     entry = res["data"][0] if isinstance(res["data"],list) else res["data"]
     entry["position"] = pos; entry["svc_name"] = svc["name"]; entry["time_interval"] = svc.get("time_interval",5)
