@@ -761,7 +761,7 @@ function renderLiveTable(entries) {
     return `<tr>
       <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
       <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
-      <td>${e.user_name||'Guest'}${!e.user_id?'<span style="font-size:.7rem;color:var(--muted)"> (guest)</span>':''}</td>
+      <td style="display:flex;align-items:center;gap:.5rem">${e.user_name||'Guest'}${!e.user_id?'<span style="font-size:.7rem;color:var(--muted)"> (guest)</span>':''} <button class="info-btn" onclick="showUserInfo('${e.id}')" title="View details">ℹ</button></td>
       <td>${method}</td>
       <td>${badge(e.status)}</td>
       <td style="text-align:center">${online}</td>
@@ -964,7 +964,44 @@ function printReport() {
   if (!reportData.length) { toast('Load a report first.','e'); return; }
   const win  = window.open('','_blank');
   const rows = reportData.map(e => `<tr><td>${e.ticket_label}</td><td>${e.guest_name||'User'}</td><td>${e.join_method}</td><td>${e.status}</td><td>${fmt(e.joined_at)}</td><td>${fmt(e.completed_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
-  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}
+/* ── USER INFO BUTTON & MODAL ── */
+.info-btn{background:rgba(67,97,238,.1);border:none;color:var(--brand);cursor:pointer;width:26px;height:26px;border-radius:50%;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.info-btn:hover{background:var(--brand);color:#fff;transform:scale(1.1)}
+.ui-field{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
+.ui-field-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem}
+.ui-field-value{font-size:.875rem;color:var(--ink);font-weight:500;word-break:break-word}
+.ui-basic-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
+.ui-basic-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.2rem}
+.ui-basic-value{font-size:.85rem;color:var(--ink);font-weight:600}
+</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table>
+<!-- ═══ USER INFO MODAL ═══ -->
+<div id="modal-userinfo" class="overlay" style="display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeUserInfo()">
+  <div class="modal" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:2px solid var(--border)">
+      <div>
+        <div style="font-weight:800;font-size:1.05rem;color:var(--ink)" id="ui-title">User Information</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem" id="ui-subtitle"></div>
+      </div>
+      <button onclick="closeUserInfo()" style="background:var(--surface);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--muted)">✕</button>
+    </div>
+
+    <!-- Basic info -->
+    <div id="ui-basic" style="margin-bottom:1.25rem;background:var(--surface2);border-radius:var(--r);padding:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.625rem"></div>
+
+    <!-- Custom form answers -->
+    <div id="ui-form-wrap" style="display:none">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem">📋 Form Responses</div>
+      <div id="ui-form-fields" style="display:flex;flex-direction:column;gap:.625rem"></div>
+    </div>
+
+    <div style="margin-top:1.25rem;padding-top:1rem;border-top:2px solid var(--border);text-align:right">
+      <button class="btn bs" onclick="closeUserInfo()">Close</button>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
   win.document.close(); win.print();
 }
 
@@ -1093,6 +1130,60 @@ async function doLogout() {
 
 // ─── BOOT ───
 init();
+
+// ── USER INFO MODAL ──
+function showUserInfo(entryId) {
+  var entry = _liveEntries.find(function(e){ return e.id === entryId; });
+  if (!entry) return;
+
+  // Title
+  document.getElementById('ui-title').textContent = (entry.user_name || 'Guest') + ' — ' + (entry.ticket_label || '');
+  document.getElementById('ui-subtitle').textContent = (entry.join_method === 'sms' ? '📱 Joined via SMS' : '🌐 Joined via Web') + (entry.user_id ? '' : ' · Guest');
+
+  // Basic info grid
+  var basics = [
+    {label: 'Ticket', value: entry.ticket_label || '—'},
+    {label: 'Name', value: entry.user_name || 'Guest'},
+    {label: 'Phone', value: entry.guest_phone || entry.user_phone || '—'},
+    {label: 'Status', value: (entry.status || '—').replace('_', ' ')},
+    {label: 'Position', value: entry.position != null ? '#' + entry.position : '—'},
+    {label: 'Joined', value: entry.joined_at ? new Date(entry.joined_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—'},
+  ];
+  document.getElementById('ui-basic').innerHTML = basics.map(function(b){
+    return '<div class="ui-basic-item"><div class="ui-basic-label">'+b.label+'</div><div class="ui-basic-value">'+b.value+'</div></div>';
+  }).join('');
+
+  // Custom form answers
+  var formWrap = document.getElementById('ui-form-wrap');
+  var formFields = document.getElementById('ui-form-fields');
+  var formData = null;
+  try {
+    formData = typeof entry.custom_form_data === 'string'
+      ? JSON.parse(entry.custom_form_data)
+      : entry.custom_form_data;
+  } catch(e) { formData = null; }
+
+  if (formData && typeof formData === 'object' && Object.keys(formData).length > 0) {
+    formWrap.style.display = 'block';
+    formFields.innerHTML = Object.entries(formData).map(function(pair){
+      var key = pair[0];
+      var val = pair[1];
+      // val can be {label, value} or a plain string
+      var label = (val && val.label) ? val.label : key;
+      var value = (val && val.value !== undefined) ? val.value : (typeof val === 'string' ? val : JSON.stringify(val));
+      return '<div class="ui-field"><div class="ui-field-label">'+label+'</div><div class="ui-field-value">'+(value||'<em style="color:var(--muted)">Not provided</em>')+'</div></div>';
+    }).join('');
+  } else {
+    formWrap.style.display = 'none';
+  }
+
+  document.getElementById('modal-userinfo').style.display = 'flex';
+}
+
+function closeUserInfo() {
+  document.getElementById('modal-userinfo').style.display = 'none';
+}
 </script>
+
 </body>
 </html>
