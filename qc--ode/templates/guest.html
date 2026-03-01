@@ -107,7 +107,7 @@ input,select,textarea,button{font-size:16px !important}
     <div class="et-val" id="et-val">—</div>
     <div class="et-date" id="et-date">—</div>
   </div>
-  <div class="endcode-box" id="endcode-box" style="display:none"></div>
+  <div class="endcode-box" id="endcode-box" style="display:none">Ask the staff for the End Code when it's your turn</div>
   <div class="divider"></div>
   <div class="stats-grid">
     <div class="sg"><div class="sg-n" id="stat-ahead">—</div><div class="sg-l">Ahead of You</div></div>
@@ -125,14 +125,19 @@ input,select,textarea,button{font-size:16px !important}
 <!-- End Code Modal -->
 <div id="modal-endcode" class="overlay" style="display:none">
   <div class="modal">
-    <div class="modal-title">✅ It's Your Turn!</div>
-    <p style="font-size:.875rem;color:#64748b;margin-bottom:1.25rem;line-height:1.65">Enter the <strong>End Code</strong> from the service staff to confirm you've been served.</p>
-    <label class="lbl">End Code</label>
+    <div class="modal-title">📢 It's Your Turn!</div>
+    <p style="font-size:.875rem;color:#64748b;margin-bottom:1rem;line-height:1.65">You are being called. <strong>Ask the staff for your End Code</strong> to confirm your service and avoid being removed from the queue.</p>
+    <div style="background:rgba(6,214,160,.1);border:2px solid rgba(6,214,160,.3);border-radius:var(--r2);padding:1rem;text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.5rem;margin-bottom:.25rem">🎫</div>
+      <div style="font-weight:800;color:#047857;font-size:.95rem">Your ticket: <span id="modal-ticket-num">—</span></div>
+      <div style="font-size:.8rem;color:#064e3b;margin-top:.25rem">Show this to the staff and ask for the End Code</div>
+    </div>
+    <label class="lbl">End Code (from staff)</label>
     <input id="end-code-inp" class="inp code-inp" type="text" placeholder="XXXX" maxlength="4"/>
     <div id="end-code-err" class="ferr"></div>
     <div class="modal-footer">
       <button onclick="document.getElementById('modal-endcode').style.display='none'" style="background:var(--mist);border:2px solid var(--mist2);color:#475569;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Later</button>
-      <button onclick="submitEndCode()" style="background:var(--teal);color:var(--ink);border:none;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Confirm →</button>
+      <button onclick="submitEndCode()" style="background:var(--teal);color:var(--ink);border:none;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Submit End Code →</button>
     </div>
   </div>
 </div>
@@ -178,31 +183,66 @@ async function api(url,opts){
 }
 
 async function init(){
-  var stored=sessionStorage.getItem('guestEntry');
+  var stored=localStorage.getItem('qc_guest');
+  // Also check old key name for backwards compat
+  if(!stored) stored=localStorage.getItem('guestEntry');
   if(!stored){window.location.href='/';return;}
-  try{var p=JSON.parse(stored);entry=p.entry||p;svc={name:entry.svc_name,id:entry.service_id};}
-  catch(e){window.location.href='/';return;}
-  document.getElementById('ticket-num').textContent=entry.ticket_label||'—';
-  document.getElementById('svc-name').textContent=entry.svc_name||'—';
-  document.getElementById('org-name').textContent=entry.org_name||'';
-  if(entry.end_code){
-    var eb=document.getElementById('endcode-box');
-    eb.textContent='🔑 End Code: '+entry.end_code+' (show to staff when done)';
-    eb.style.display='';
+  var p;
+  try{p=JSON.parse(stored);}
+  catch(e){
+    localStorage.removeItem('qc_guest');
+    localStorage.removeItem('guestEntry');
+    window.location.href='/';return;
   }
-  await refresh();
-  pollTimer=setInterval(refresh,12000);
+  // Handle both {entry:{...}}, {data:{entry:{...}}} and flat object shapes
+  entry=p.entry||(p.data&&p.data.entry)||p;
+  if(!entry||!entry.id){
+    localStorage.removeItem('qc_guest');
+    localStorage.removeItem('guestEntry');
+    window.location.href='/';return;
+  }
+  // Normalise storage to one key
+  localStorage.setItem('qc_guest',JSON.stringify(entry));
+  localStorage.removeItem('guestEntry');
+  svc={name:entry.svc_name||entry.service_name,id:entry.service_id};
+  document.getElementById('ticket-num').textContent=entry.ticket_label||entry.ticket||'—';
+  document.getElementById('svc-name').textContent=entry.svc_name||entry.service_name||'—';
+  document.getElementById('org-name').textContent=entry.org_name||'';
+  // End code NOT shown — user must ask org staff when called
+  // Poll with back-off — allow DB a moment to replicate before first check
+  var attempts=0;
+  async function tryRefresh(){
+    attempts++;
+    var r=await api('/api/guest/queue-status/'+entry.id);
+    if(!r.ok){
+      if(attempts<5){
+        var delay=attempts*1500;
+        setTimeout(tryRefresh,delay);
+        return;
+      }
+      // 5 failed attempts — could be a network blip. Keep polling slowly.
+      pollTimer=setInterval(refresh,15000);
+      return;
+    }
+    updateUI(r.data);
+    pollTimer=setInterval(refresh,12000);
+  }
+  // Small delay before first check so the DB write has time to propagate
+  setTimeout(tryRefresh,800);
 }
 
 async function refresh(){
   if(!entry)return;
   var r=await api('/api/guest/queue-status/'+entry.id);
   if(!r.ok)return;
-  var d=r.data;
+  updateUI(r.data);
+}
+function updateUI(d){
+  if(!d)return;
 
   // Handle terminal states
   if(['completed','no_show','cancelled'].includes(d.status)){
-    clearInterval(pollTimer);sessionStorage.removeItem('guestEntry');
+    clearInterval(pollTimer);localStorage.removeItem('qc_guest');localStorage.removeItem('guestEntry');
     var emo=d.status==='completed'?'✅':'❌';
     var msg=d.status==='completed'?'You were served!':d.status==='no_show'?'Marked as no-show':'You left the queue';
     document.getElementById('main-card').innerHTML='<div style="text-align:center;padding:1.5rem"><div style="font-size:3.5rem;margin-bottom:1rem">'+emo+'</div><h2 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:1.5rem;font-weight:800;color:#0d1117;margin-bottom:.875rem">'+msg+'</h2><p style="color:#64748b;line-height:1.65;margin-bottom:2rem">Ticket '+entry.ticket_label+' is now closed.</p><a href="/register-user" style="display:block;padding:.875rem;background:#4361ee;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center;margin-bottom:.75rem">Create Free Account</a><a href="/" style="display:block;padding:.875rem;color:#64748b;border:2px solid #e8eeff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center">← Back to Home</a></div>';
@@ -226,17 +266,24 @@ async function refresh(){
 
   // Called
   document.getElementById('called-box').style.display=d.status==='called'?'block':'none';
-  if(d.status==='called'&&!endCodePrompted){
-    endCodePrompted=true;
-    toast('📢 You are being called! Go to the counter now.','w',12000);
-    setTimeout(function(){document.getElementById('modal-endcode').style.display='flex';},600);
+  if(d.status==='called'){
+    document.getElementById('endcode-box').style.display='';
+    document.getElementById('endcode-box').textContent='Ask the staff for your End Code to confirm service';
+    if(!endCodePrompted){
+      endCodePrompted=true;
+      toast('📢 You are being called! Go to the counter and ask for your End Code.','w',12000);
+      setTimeout(function(){
+        document.getElementById('modal-ticket-num').textContent=entry.ticket_label||'—';
+        document.getElementById('modal-endcode').style.display='flex';
+      },600);
+    }
   }
 }
 
 async function leaveQueue(){
   if(!confirm('Leave this queue?'))return;
   await api('/api/guest/leave/'+entry.id,{method:'POST'});
-  sessionStorage.removeItem('guestEntry');window.location.href='/';
+  localStorage.removeItem('qc_guest');window.location.href='/';
 }
 
 async function submitEndCode(){
@@ -246,7 +293,7 @@ async function submitEndCode(){
   // Guest can't call verify-end-code (no session), so just show completion state
   // The org will mark as complete via their dashboard
   document.getElementById('modal-endcode').style.display='none';
-  clearInterval(pollTimer);sessionStorage.removeItem('guestEntry');
+  clearInterval(pollTimer);localStorage.removeItem('qc_guest');localStorage.removeItem('guestEntry');
   toast('Thank you! Staff will confirm your service.','w',5000);
   setTimeout(function(){document.getElementById('modal-feedback').style.display='flex';},800);
 }
@@ -264,10 +311,6 @@ async function submitFeedback(){
   setTimeout(function(){window.location.href='/';},2000);
 }
 
-function skipFeedback() {
-  document.getElementById('modal-feedback').style.display = 'none';
-  window.location.href = '/';
-}
 init();
 </script>
 </body>
