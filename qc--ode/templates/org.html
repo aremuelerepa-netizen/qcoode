@@ -205,10 +205,40 @@ tr:hover td{background:var(--bg)}
 @media(max-width:700px){
   .shell{flex-direction:column}
   .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}
-  .sb-section{display:none}
-  .main{padding:1rem}
+}
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:480px){
+  /* Topbar */
+  .topbar{padding:.625rem .875rem;gap:.5rem}
+  .tb-org{max-width:120px;font-size:.75rem}
+  /* Sidebar becomes scrollable top bar */
+  .sidebar{padding:.5rem .625rem;overflow-x:auto;flex-wrap:nowrap;gap:.2rem}
+  .sb-item{font-size:.72rem;padding:.4rem .625rem;flex-shrink:0;white-space:nowrap;border-radius:.5rem}
+  .sb-btn{font-size:.78rem;padding:.5rem .75rem;flex-shrink:0}
+  /* Main */
+  .main{padding:.875rem .75rem}
+  .ph h1{font-size:1.25rem}
+  /* Service cards */
   .svc-grid{grid-template-columns:1fr}
-  .inp-row{grid-template-columns:1fr}
+  .svc-card{padding:1.125rem}
+  /* Stats row */
+  .stats-row{gap:.625rem}
+  .stat-box{padding:.625rem .75rem}
+  .stat-box .n{font-size:1.4rem}
+  /* Queue table */
+  .tbl-wrap{font-size:.78rem}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem}
+  /* Modal */
+  .modal{padding:1.5rem 1rem;border-radius:1.25rem;max-width:calc(100vw - 1.25rem)}
+  .modal-footer{flex-direction:column;gap:.5rem}
+  .modal-footer .btn{width:100%}
+  /* Form builder */
+  .form-builder{font-size:.82rem}
+  /* Code display */
+  .code-display{font-size:1.75rem;letter-spacing:.15em}
 }
 </style>
 </head>
