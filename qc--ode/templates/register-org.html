@@ -1,59 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Register Organization — QCode</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s50:#f8fafc;--s100:#f1f5f9;--s200:#e2e8f0;--s300:#cbd5e1;--s400:#94a3b8;--s500:#64748b;--s700:#334155;--s900:#0f172a;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--t:.2s ease}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--navy),var(--blue) 55%,#0f172a);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    h1,h2{font-family:var(--fh);letter-spacing:-.02em}
-    a{color:var(--accent);text-decoration:none}
-    .wrap{width:100%;max-width:520px}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem}
-    .logo span{color:var(--cyan)}
-    .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:0 16px 48px rgba(10,22,40,.2)}
-    .title{font-size:1.5rem;color:var(--navy);margin-bottom:.375rem}
-    .sub{font-size:.875rem;color:var(--s500);margin-bottom:1.5rem;line-height:1.5}
-    /* Progress */
-    .progress{display:flex;gap:.375rem;margin-bottom:2rem}
-    .prog-step{flex:1;height:4px;background:var(--s200);border-radius:99px;transition:background var(--t)}
-    .prog-step.active{background:var(--accent)}.prog-step.done{background:var(--green)}
-    .prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--s400);margin-top:.375rem;margin-bottom:1.75rem}
-    /* Form */
-    .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
-    .lbl{font-size:.85rem;font-weight:600;color:var(--s700)}.hint{font-size:.78rem;color:var(--s500)}
-    .inp{padding:.8rem 1rem;background:var(--s50);border:1.5px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.9rem;color:var(--s900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
-    .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
-    .inp::placeholder{color:var(--s300)}
-    select.inp{cursor:pointer}
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
-    /* Upload */
-    .upload-zone{border:2px dashed var(--s300);border-radius:var(--r);padding:2rem;text-align:center;cursor:pointer;transition:all var(--t);position:relative}
-    .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(37,99,235,.04)}
-    .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-    .upload-icon{font-size:2rem;margin-bottom:.5rem}
-    .upload-text{font-size:.875rem;color:var(--s500)}.upload-text strong{color:var(--accent)}
-    .upload-hint{font-size:.75rem;color:var(--s400);margin-top:.25rem}
-    .preview{display:none;align-items:center;gap:.75rem;background:var(--s50);border:1px solid var(--s200);border-radius:var(--r);padding:.75rem 1rem;margin-top:.75rem}
-    .preview-name{font-size:.875rem;font-weight:600;color:var(--navy);flex:1}
-    .preview-size{font-size:.78rem;color:var(--s400)}
-    /* Alerts */
-    .err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
-    /* Button */
-    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all var(--t);margin-top:1.5rem}
-    .btn:hover:not(:disabled){background:#1d4ed8}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--s500)}
-    .back{display:block;text-align:center;margin-top:.75rem;font-size:.8rem;color:rgba(255,255,255,.4)}
-    @media(max-width:480px){.row2{grid-template-columns:1fr}}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Register Organization — QCode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--ink:#0d0f14;--ink2:#1e2230;--ink3:#323848;--muted:#8892a4;--border:#e4e8f0;--bg:#f4f6fb;--white:#fff;--brand:#4361ee;--brand2:#3a0ca3;--cyan:#4cc9f0;--green:#06d6a0;--amber:#ffd166;--red:#ef4565;--fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--r:.75rem;--rxl:1.75rem;--shl:0 16px 48px rgba(13,15,20,.18);--t:.2s cubic-bezier(.4,0,.2,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--ink2) 0%,var(--brand2) 55%,#0f172a 100%);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+h1,h2{font-family:var(--fh);letter-spacing:-.03em}
+a{color:var(--brand);text-decoration:none}
+.wrap{width:100%;max-width:560px}
+.logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.2rem;font-weight:700;color:#fff;text-decoration:none;margin-bottom:2rem}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pd 2s ease infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
+.card{background:var(--white);border-radius:var(--rxl);padding:2.5rem;box-shadow:var(--shl)}
+.title{font-size:1.5rem;color:var(--ink);margin-bottom:.25rem}
+.sub{font-size:.875rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.5}
+/* PROGRESS */
+.progress{display:flex;gap:.375rem;margin-bottom:1.25rem}
+.prog-step{flex:1;height:4px;background:var(--border);border-radius:99px;transition:background var(--t)}
+.prog-step.active{background:var(--brand)}.prog-step.done{background:var(--green)}
+.prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:.375rem;margin-bottom:1.75rem}
+/* SECTION DIVIDER */
+.section-hdr{font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.12em;margin:1.25rem 0 1rem;padding-bottom:.5rem;border-bottom:1.5px solid rgba(67,97,238,.12)}
+.fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+.lbl{font-size:.82rem;font-weight:700;color:var(--ink3)}.hint{font-size:.75rem;color:var(--muted)}
+.inp{padding:.8rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.9rem;color:var(--ink);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+.inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(67,97,238,.15);background:var(--white)}
+.inp::placeholder{color:var(--muted)}
+select.inp{cursor:pointer}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
+.err{background:rgba(239,69,101,.07);border:1.5px solid rgba(239,69,101,.25);border-radius:var(--r);padding:.75rem 1rem;font-size:.82rem;color:#b91c1c;display:none;margin-bottom:1rem}
+/* LOGO PREVIEW */
+.logo-preview{width:64px;height:64px;border-radius:var(--r);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.75rem;overflow:hidden;flex-shrink:0;background:var(--bg)}
+.logo-preview img{width:100%;height:100%;object-fit:cover}
+.logo-row{display:flex;align-items:center;gap:.875rem}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;transition:all var(--t);margin-top:1.25rem}
+.btn:hover:not(:disabled){background:var(--brand2);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--muted)}
+.back{display:block;text-align:center;margin-top:.875rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+.back:hover{color:rgba(255,255,255,.7)}
+@media(max-width:480px){.row2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="wrap">
-  <a href="../" class="logo">
-    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#2563eb"/><rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/><rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/><rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/></svg>
-    <span>Q<span style="color:#fff">Code</span></span>
+  <a href="/" class="logo">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#4361ee"/><rect x="7" y="9" width="16" height="3" rx="1.5" fill="white"/><rect x="7" y="14" width="11" height="3" rx="1.5" fill="#a8c8ff"/><rect x="7" y="19" width="7" height="3" rx="1.5" fill="#7ea8ff"/></svg>
+    QCode<span class="logo-dot"></span>
   </a>
   <div class="card" id="main-card">
     <h1 class="title">Register your organization</h1>
@@ -64,15 +61,16 @@
       <div class="prog-step" id="p2"></div>
       <div class="prog-step" id="p3"></div>
     </div>
-    <div class="prog-labels"><span>Organization</span><span>Account</span><span>Documents</span></div>
+    <div class="prog-labels"><span>Organization</span><span>Account</span><span>Done</span></div>
 
     <div id="err" class="err"></div>
 
+    <div class="section-hdr">Organization Details</div>
     <div class="row2">
       <div class="fg"><label class="lbl">Organization Name *</label><input id="org-name" class="inp" placeholder="Acme Corp"/></div>
       <div class="fg"><label class="lbl">Industry / Type *</label>
         <select id="org-type" class="inp">
-          <option value="">Select…</option>
+          <option value="">Select type…</option>
           <option>Government</option><option>Healthcare</option><option>Banking</option>
           <option>Education</option><option>Retail</option><option>Hospitality</option><option>Other</option>
         </select>
@@ -81,73 +79,49 @@
     <div class="fg"><label class="lbl">Physical Address *</label><input id="org-address" class="inp" placeholder="123 Main St, City, Country"/></div>
     <div class="row2">
       <div class="fg"><label class="lbl">Phone Number *</label><input id="org-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/></div>
-      <div class="fg"><label class="lbl">Website (optional)</label><input id="org-website" class="inp" type="url" placeholder="https://example.com"/></div>
+      <div class="fg"><label class="lbl">Website <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="org-website" class="inp" type="url" placeholder="https://example.com"/></div>
     </div>
 
-    <div style="border-top:1px solid #e2e8f0;margin:1.25rem 0 1.5rem"></div>
-
-    <div class="fg"><label class="lbl">Account Email *</label><input id="email" class="inp" type="email" placeholder="admin@yourorg.com"/></div>
-    <div class="row2">
-      <div class="fg"><label class="lbl">Password *</label><input id="password" class="inp" type="password" placeholder="Min 8 characters"/></div>
-      <div class="fg"><label class="lbl">Confirm Password *</label><input id="confirm" class="inp" type="password" placeholder="Repeat password"/></div>
-    </div>
-
-    <div style="border-top:1px solid #e2e8f0;margin:1.25rem 0 1.5rem"></div>
-
+    <div class="section-hdr">Organization Logo</div>
     <div class="fg">
-      <label class="lbl">Verification Document (optional)</label>
-      <span class="hint">Business registration certificate, license, or official letter (PDF/JPG/PNG, max 10MB)</span>
-      <div class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
-        <input type="file" id="doc-file" accept=".pdf,.jpg,.jpeg,.png" onchange="fileSelected(event)"/>
-        <div class="upload-icon">📄</div>
-        <div class="upload-text">Drop your file here or <strong>browse</strong></div>
-        <div class="upload-hint">PDF, JPG or PNG · Max 10MB</div>
-      </div>
-      <div class="preview" id="preview">
-        <span style="font-size:1.5rem">📄</span>
-        <span class="preview-name" id="fname">—</span>
-        <span class="preview-size" id="fsize">—</span>
-        <button onclick="clearFile()" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:1.1rem">✕</button>
+      <label class="lbl">Logo URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+      <div class="logo-row">
+        <div class="logo-preview" id="logo-preview">🏢</div>
+        <div style="flex:1">
+          <input id="org-logo" class="inp" type="url" placeholder="https://yoursite.com/logo.png" oninput="previewLogo(this.value)"/>
+          <span class="hint">Link to your organization logo image. Will be shown on your public queue page.</span>
+        </div>
       </div>
     </div>
 
-    <button id="btn" class="btn" onclick="doRegister()">Submit Registration</button>
-    <div class="sw">Already registered? <a href="login-org">Sign in →</a></div>
-    <div class="sw" style="margin-top:.375rem"><a href="register-user" style="color:#94a3b8;font-size:.8rem">Registering as a user? →</a></div>
+    <div class="section-hdr">Account Credentials</div>
+    <div class="fg"><label class="lbl">Account Email *</label><input id="email" class="inp" type="email" placeholder="admin@yourorg.com" autocomplete="email"/></div>
+    <div class="row2">
+      <div class="fg"><label class="lbl">Password *</label><input id="password" class="inp" type="password" placeholder="Min 8 characters" autocomplete="new-password"/></div>
+      <div class="fg"><label class="lbl">Confirm Password *</label><input id="confirm" class="inp" type="password" placeholder="Repeat password" autocomplete="new-password"/></div>
+    </div>
+
+    <button id="btn" class="btn" onclick="doRegister()">Submit Registration →</button>
+    <div class="sw">Already registered? <a href="/login-org">Sign in →</a></div>
+    <div class="sw" style="margin-top:.375rem"><a href="/register-user" style="color:var(--muted);font-size:.82rem">Registering as a user? →</a></div>
   </div>
-  <a href="../" class="back">← Back to home</a>
+  <a href="/" class="back">← Back to home</a>
 </div>
 <script>
-let selectedFile = null;
+function previewLogo(url) {
+  const el = document.getElementById('logo-preview');
+  if (url && url.startsWith('http')) {
+    el.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='🏢'" alt="logo"/>`;
+  } else {
+    el.textContent = '🏢';
+  }
+}
 
 function setProgress(step) {
   for (let i = 1; i <= 3; i++) {
     const el = document.getElementById('p' + i);
     el.className = 'prog-step' + (i < step ? ' done' : i === step ? ' active' : '');
   }
-}
-function fileSelected(e) { handleFile(e.target.files[0]); }
-function dragOver(e)  { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
-function dragLeave()  { document.getElementById('upload-zone').classList.remove('drag'); }
-function dropFile(e)  { e.preventDefault(); dragLeave(); handleFile(e.dataTransfer.files[0]); }
-function handleFile(file) {
-  if (!file) return;
-  if (file.size > 10 * 1024 * 1024) { alert('File too large. Max 10MB.'); return; }
-  selectedFile = file;
-  document.getElementById('fname').textContent = file.name;
-  document.getElementById('fsize').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-  document.getElementById('preview').style.display = 'flex';
-}
-function clearFile() {
-  selectedFile = null;
-  document.getElementById('doc-file').value = '';
-  document.getElementById('preview').style.display = 'none';
-}
-function showErr(msg) {
-  const el = document.getElementById('err');
-  el.textContent   = msg;
-  el.style.display = 'block';
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 async function doRegister() {
@@ -159,6 +133,7 @@ async function doRegister() {
   const address  = document.getElementById('org-address').value.trim();
   const phone    = document.getElementById('org-phone').value.trim();
   const website  = document.getElementById('org-website').value.trim();
+  const logo_url = document.getElementById('org-logo').value.trim();
   const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   const confirm  = document.getElementById('confirm').value;
@@ -169,59 +144,41 @@ async function doRegister() {
   if (password.length < 8) { showErr('Password must be at least 8 characters.'); return; }
   if (password !== confirm) { showErr('Passwords do not match.'); return; }
 
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
-  setProgress(1);
-
-  // Build FormData (so document file uploads too)
-  const fd = new FormData();
-  fd.append('org_name',   orgName);
-  fd.append('org_type',   orgType);
-  fd.append('org_address',address);
-  fd.append('org_phone',  phone);
-  fd.append('org_website',website);
-  fd.append('email',      email);
-  fd.append('password',   password);
-  fd.append('confirm',    confirm);
-  if (selectedFile) fd.append('document', selectedFile);
-
+  btn.disabled = true; btn.textContent = 'Submitting…';
   setProgress(2);
 
-  try {
-    const res  = await fetch('/api/register-org', { method: 'POST', body: fd });
-    const data = await res.json();
+  const r = await fetch('/api/register-org', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({org_name:orgName, org_type:orgType, org_address:address, org_phone:phone, org_website:website, logo_url, email, password, confirm})
+  });
+  const data = await r.json().catch(() => ({}));
 
-    if (!res.ok) {
-      showErr(data.error || 'Registration failed. Please try again.');
-      btn.disabled    = false;
-      btn.textContent = 'Submit Registration';
-      setProgress(1);
-      return;
-    }
-
-    setProgress(3);
-
-    // Show success screen
-    document.getElementById('main-card').innerHTML = `
-      <div style="text-align:center;padding:2rem 1rem">
-        <div style="font-size:4rem;margin-bottom:1.5rem">⏳</div>
-        <h2 style="font-family:'Syne',sans-serif;font-size:1.75rem;color:#0a1628;margin-bottom:1rem">Registration Submitted!</h2>
-        <p style="color:#64748b;line-height:1.7;margin-bottom:2rem">
-          Your organization <strong>${data.org_name || orgName}</strong> has been registered.
-          A QCode admin will review your details. You'll be notified by email once approved.
-        </p>
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:.625rem;padding:1.25rem;margin-bottom:2rem">
-          <p style="font-size:.875rem;color:#92400e">⚠ Your account is <strong>pending approval</strong>. You cannot log in until approved by QCode admin.</p>
-        </div>
-        <a href="../" style="display:inline-flex;align-items:center;gap:.5rem;padding:.875rem 2rem;background:#2563eb;color:#fff;border-radius:.625rem;font-weight:600;text-decoration:none">← Back to Home</a>
-      </div>`;
-
-  } catch(e) {
-    showErr('Network error. Please check your connection and try again.');
-    btn.disabled    = false;
-    btn.textContent = 'Submit Registration';
-    setProgress(1);
+  if (!r.ok) {
+    showErr(data.error || 'Registration failed. Please try again.');
+    btn.disabled = false; btn.textContent = 'Submit Registration →';
+    setProgress(1); return;
   }
+
+  setProgress(3);
+  document.getElementById('main-card').innerHTML = `
+    <div style="text-align:center;padding:1.75rem 0">
+      <div style="font-size:4rem;margin-bottom:1.5rem">⏳</div>
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.75rem;color:var(--ink);margin-bottom:1rem">Registration Submitted!</h2>
+      <p style="color:var(--muted);line-height:1.7;margin-bottom:2rem">
+        Your organization <strong style="color:var(--ink)">${data.org_name || orgName}</strong> has been registered.
+        A QCode admin will review your details and notify you by email once approved.
+      </p>
+      <div style="background:rgba(255,209,102,.1);border:1.5px solid rgba(255,209,102,.3);border-radius:var(--r);padding:1.125rem 1.25rem;margin-bottom:2rem">
+        <p style="font-size:.875rem;color:#92400e">⚠ Your account is <strong>pending approval</strong>. You cannot log in until a QCode admin approves your registration.</p>
+      </div>
+      <a href="/" style="display:inline-flex;align-items:center;gap:.5rem;padding:.875rem 2rem;background:var(--brand);color:#fff;border-radius:var(--r);font-weight:700;text-decoration:none;font-family:'Space Grotesk',sans-serif">← Back to Home</a>
+    </div>`;
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg; el.style.display = 'block';
+  el.scrollIntoView({behavior:'smooth', block:'center'});
 }
 </script>
 </body>
