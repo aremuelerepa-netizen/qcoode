@@ -44,6 +44,23 @@ select.inp{cursor:pointer}
 .back{display:block;text-align:center;margin-top:.875rem;font-size:.8rem;color:rgba(255,255,255,.4)}
 .back:hover{color:rgba(255,255,255,.7)}
 @media(max-width:480px){.row2{grid-template-columns:1fr}}
+
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:480px){
+  body{padding:1.25rem .75rem;align-items:flex-start;padding-top:2rem}
+  .wrap,.card{max-width:100%}
+  .card{padding:1.5rem 1.25rem;border-radius:1.25rem}
+  .stepper{gap:.25rem}
+  .step-label{display:none}
+  .step-circle{width:32px;height:32px;font-size:.8rem}
+  .step-line{flex:1;height:2px}
+  .row2{grid-template-columns:1fr}
+  .title{font-size:1.2rem}
+  .btn{padding:.875rem}
+}
 </style>
 </head>
 <body>
