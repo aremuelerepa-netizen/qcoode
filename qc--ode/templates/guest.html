@@ -61,6 +61,27 @@ body{font-family:var(--fd);min-height:100vh;background:linear-gradient(135deg,va
 .stars{display:flex;gap:.375rem;justify-content:center;margin:1rem 0}
 .star{font-size:2rem;cursor:pointer;opacity:.3;transition:all .15s}
 .star.active{opacity:1}
+
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:480px){
+  body{padding:1.25rem .75rem;justify-content:flex-start;padding-top:2rem}
+  .logo{margin-bottom:1.25rem}
+  .card{padding:1.5rem 1.25rem;border-radius:1.25rem}
+  .ticket-num{font-size:4rem}
+  .pill-row{flex-direction:row;flex-wrap:wrap;justify-content:center}
+  .stats-grid{gap:.5rem}
+  .sg{padding:.75rem .5rem}
+  .sg-n{font-size:1.4rem}
+  .modal{padding:1.5rem 1.25rem;border-radius:1.25rem;max-width:100%}
+  .modal-footer{flex-direction:column}
+  .modal-footer button{width:100%;padding:.875rem}
+  .stars .star{font-size:2.5rem}
+  .cta{padding:1rem}
+  .btn{padding:.875rem 1rem;font-size:.95rem}
+}
 </style>
 </head>
 <body>
