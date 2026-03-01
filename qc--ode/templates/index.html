@@ -343,6 +343,7 @@ function cancelFind(){
   document.getElementById('code-inp').value='';
   document.getElementById('code-err').style.display='none';
   document.getElementById('login-strip').style.display='flex';
+  if(document.getElementById('guest-name'))document.getElementById('guest-name').value='';
 }
 
 async function joinAsGuest(){
@@ -358,7 +359,7 @@ async function joinAsGuest(){
   const data=await r.json().catch(()=>({}));
   btn.disabled=false;btn.textContent='Join Queue as Guest';
   if(!r.ok){toast(data.error||'Failed to join queue.','e');return;}
-  sessionStorage.setItem('qc_guest',JSON.stringify(data));
+  localStorage.setItem('qc_guest',JSON.stringify(data));
   window.location.href='/guest';
 }
 
@@ -407,6 +408,29 @@ document.getElementById('guest-name').addEventListener('keydown',e=>{if(e.key===
 
 const sl=localStorage.getItem('qcode_lang');
 if(sl&&TRANSLATIONS[sl])setLang(sl);
+
+// On index.html load - reset join card (fix viewport switch showing stale UI)
+(function(){
+  // Always reset join card to fresh state - fixes issue 5
+  var sf=document.getElementById('step-found');
+  if(sf) sf.style.display='none';
+  var sc=document.getElementById('step-code');
+  if(sc) sc.style.display='block';
+  var ci=document.getElementById('code-inp');
+  if(ci) ci.value='';
+  // Clear stale guest session ONLY after 8s delay (so redirect to /guest completes first)
+  setTimeout(function(){
+    var gd=localStorage.getItem('qc_guest');
+    if(!gd) return;
+    try{
+      var p=JSON.parse(gd);
+      var entry=p.entry||p;
+      var joinedAt=new Date(entry.joined_at||0);
+      var age=(Date.now()-joinedAt.getTime())/1000;
+      if(age > 60) localStorage.removeItem('qc_guest');
+    }catch(e){ localStorage.removeItem('qc_guest'); }
+  }, 8000);
+})();
 
 checkSession();
 loadStats();
