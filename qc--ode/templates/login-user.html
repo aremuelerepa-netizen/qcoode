@@ -1,168 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Sign In — QCode</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
-    :root{--navy:#0a1628;--blue:#1a3a6b;--accent:#2563eb;--cyan:#06b6d4;--s50:#f8fafc;--s300:#cbd5e1;--s500:#64748b;--s700:#334155;--s900:#0f172a;--red:#ef4444;--amber:#f59e0b;--fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--r:.625rem;--t:.2s ease}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--navy),var(--blue) 55%,#0f172a);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
-    h1{font-family:var(--fh);letter-spacing:-.02em}
-    a{color:var(--accent);text-decoration:none}
-    .wrap{width:100%;max-width:420px}
-    .logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.4rem;font-weight:800;color:#fff;margin-bottom:2rem;text-decoration:none}
-    .logo span{color:var(--cyan)}
-    .card{background:#fff;border-radius:1.25rem;padding:2.5rem;box-shadow:0 16px 48px rgba(10,22,40,.2)}
-    .title{font-size:1.5rem;color:var(--navy);margin-bottom:.375rem}
-    .sub{font-size:.875rem;color:var(--s500);margin-bottom:2rem;line-height:1.5}
-    .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
-    .lbl{font-size:.85rem;font-weight:600;color:var(--s700)}
-    .inp{padding:.8rem 1rem;background:var(--s50);border:1.5px solid var(--s300);border-radius:var(--r);font-family:var(--fb);font-size:.9rem;color:var(--s900);width:100%;transition:border-color var(--t),box-shadow var(--t)}
-    .inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12);background:#fff}
-    .inp::placeholder{color:var(--s300)}
-    .err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#b91c1c;display:none;margin-bottom:1rem}
-    .pending{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.825rem;color:#92400e;display:none;margin-bottom:1rem}
-    .btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all var(--t);text-decoration:none}
-    .btn:hover:not(:disabled){background:#1d4ed8}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .btn-org{background:transparent;border:1.5px solid var(--s300);color:var(--s700)}
-    .btn-org:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:transparent}
-    .divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--s300);font-size:.8rem}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--s300)}
-    .sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--s500)}
-    .back{display:block;text-align:center;margin-top:.75rem;font-size:.8rem;color:rgba(255,255,255,.4);text-decoration:none}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sign In — QCode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--ink:#0d0f14;--ink2:#1e2230;--ink3:#323848;--muted:#8892a4;--border:#e4e8f0;--bg:#f4f6fb;--white:#fff;--brand:#4361ee;--brand2:#3a0ca3;--cyan:#4cc9f0;--green:#06d6a0;--red:#ef4565;--fh:'Space Grotesk',sans-serif;--fb:'Plus Jakarta Sans',sans-serif;--r:.75rem;--rl:1.25rem;--rxl:1.75rem;--shl:0 16px 48px rgba(13,15,20,.18);--t:.2s cubic-bezier(.4,0,.2,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);min-height:100vh;background:linear-gradient(135deg,var(--ink2) 0%,var(--brand2) 55%,#0f172a 100%);display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+h1{font-family:var(--fh);letter-spacing:-.03em}
+a{color:var(--brand);text-decoration:none}
+.wrap{width:100%;max-width:440px}
+.logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.2rem;font-weight:700;color:#fff;text-decoration:none;margin-bottom:2rem}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pd 2s ease infinite}
+@keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
+.card{background:var(--white);border-radius:var(--rxl);padding:2.5rem;box-shadow:var(--shl)}
+.title{font-size:1.5rem;color:var(--ink);margin-bottom:.25rem}
+.sub{font-size:.875rem;color:var(--muted);margin-bottom:2rem;line-height:1.5}
+.fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
+.lbl{font-size:.82rem;font-weight:700;color:var(--ink3)}
+.inp{padding:.8rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.9rem;color:var(--ink);width:100%;transition:border-color var(--t),box-shadow var(--t)}
+.inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(67,97,238,.15);background:var(--white)}
+.inp::placeholder{color:var(--muted)}
+.err{background:rgba(239,69,101,.07);border:1.5px solid rgba(239,69,101,.25);border-radius:var(--r);padding:.75rem 1rem;font-size:.82rem;color:#b91c1c;display:none;margin-bottom:1rem}
+.warn{background:rgba(255,209,102,.1);border:1.5px solid rgba(255,209,102,.3);border-radius:var(--r);padding:.75rem 1rem;font-size:.82rem;color:#92400e;display:none;margin-bottom:1rem}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:1rem;font-weight:700;cursor:pointer;background:var(--brand);color:#fff;transition:all var(--t)}
+.btn:hover:not(:disabled){background:var(--brand2);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sw{text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--muted)}
+.back{display:block;text-align:center;margin-top:.875rem;font-size:.8rem;color:rgba(255,255,255,.4)}
+.back:hover{color:rgba(255,255,255,.7)}
+.divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--muted);font-size:.78rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+</style>
 </head>
 <body>
 <div class="wrap">
   <a href="/" class="logo">
-    <svg width="28" height="28" viewBox="0 0 30 30" fill="none">
-      <rect width="30" height="30" rx="8" fill="#2563eb"/>
-      <rect x="8" y="9" width="14" height="3" rx="1.5" fill="white"/>
-      <rect x="8" y="14" width="10" height="3" rx="1.5" fill="#93c5fd"/>
-      <rect x="8" y="19" width="6" height="3" rx="1.5" fill="#60a5fa"/>
-    </svg>
-    <span>Q<span style="color:#fff">Code</span></span>
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="7" fill="#4361ee"/><rect x="7" y="9" width="16" height="3" rx="1.5" fill="white"/><rect x="7" y="14" width="11" height="3" rx="1.5" fill="#a8c8ff"/><rect x="7" y="19" width="7" height="3" rx="1.5" fill="#7ea8ff"/></svg>
+    QCode<span class="logo-dot"></span>
   </a>
-
   <div class="card">
     <h1 class="title">Welcome back</h1>
     <p class="sub">Sign in to your QCode account to track your queues.</p>
-
-    <div id="err"     class="err"></div>
-    <div id="pending" class="pending">
-      ⏳ Your organization account is pending admin approval. You will be notified once approved.
-    </div>
-
-    <div class="fg">
-      <label class="lbl">Email Address</label>
-      <input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/>
-    </div>
-    <div class="fg">
-      <label class="lbl">Password</label>
-      <input id="password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password"/>
-    </div>
-
+    <div id="err" class="err"></div>
+    <div id="warn" class="warn"></div>
+    <div class="fg"><label class="lbl">Email Address</label><input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+    <div class="fg"><label class="lbl">Password</label><input id="password" class="inp" type="password" placeholder="Your password" autocomplete="current-password"/></div>
     <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
-
     <div class="divider">or</div>
-    <a href="/login-org" class="btn btn-org">Sign in as Organization →</a>
-
     <div class="sw">Don't have an account? <a href="/register-user">Create one →</a></div>
+    <div class="sw" style="margin-top:.375rem"><a href="/login-org" style="color:var(--muted);font-size:.82rem">Signing in as an organization? →</a></div>
   </div>
   <a href="/" class="back">← Back to home</a>
 </div>
-
 <script>
-async function doLogin(){
-  const errEl   = document.getElementById('err');
-  const pending = document.getElementById('pending');
-  const btn     = document.getElementById('btn');
-  errEl.style.display   = 'none';
-  pending.style.display = 'none';
-
-  const email    = document.getElementById('email').value.trim().toLowerCase();
+async function doLogin() {
+  const email    = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
+  const err      = document.getElementById('err');
+  const warn     = document.getElementById('warn');
+  const btn      = document.getElementById('btn');
+  err.style.display = 'none'; warn.style.display = 'none';
 
-  if (!email || !password){ showErr('Email and password are required.'); return; }
+  if (!email || !password) { err.textContent = 'Email and password are required.'; err.style.display = 'block'; return; }
 
-  btn.disabled    = true;
-  btn.textContent = 'Signing in…';
+  btn.disabled = true; btn.textContent = 'Signing in…';
 
-  try {
-    const res  = await fetch('/api/auth/login', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ email, password }),
-    });
-    const data = await res.json();
+  const r = await fetch('/api/auth/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({email, password}), credentials:'include'
+  });
+  const d = await r.json().catch(() => ({}));
+  btn.disabled = false; btn.textContent = 'Sign In';
 
-    if (!res.ok){
-      if (res.status === 403 && data.error?.toLowerCase().includes('pending')){
-        pending.style.display = 'block';
-      } else {
-        showErr(data.error || 'Invalid email or password.');
-      }
-      btn.disabled    = false;
-      btn.textContent = 'Sign In';
-      return;
+  if (!r.ok) {
+    if (d.error && d.error.toLowerCase().includes('pending')) {
+      warn.textContent = '⚠ Your organization account is pending admin approval.'; warn.style.display = 'block';
+    } else {
+      err.textContent = d.error || 'Login failed.'; err.style.display = 'block';
     }
-
-    // Role check — this page is for users only
-    // Orgs that accidentally land here get sent to the right page
-    if (data.role === 'organization'){
-      window.location.href = '/org';
-      return;
-    }
-    if (data.role === 'super_admin'){
-      window.location.href = '/super-admin';
-      return;
-    }
-
-    if (data.preferred_lang) localStorage.setItem('qcode_lang', data.preferred_lang);
-    btn.textContent = '✓ Redirecting…';
-    window.location.href = data.redirect || '/user';
-
-  } catch(e){
-    showErr('Network error. Please try again.');
-    btn.disabled    = false;
-    btn.textContent = 'Sign In';
+    return;
   }
+
+  window.location.href = d.redirect || '/user';
 }
 
-function showErr(msg){
-  const el = document.getElementById('err');
-  el.textContent   = msg;
-  el.style.display = 'block';
-}
-
-// ─────────────────────────────────────────────────────────────
-// SESSION CHECK
-// Only redirect if ALREADY logged in — prevents the login page
-// from being the destination after a redirect loop.
-// We check for a special flag: if the URL has ?force=1 we skip
-// the session check so users can always reach the login page.
-// ─────────────────────────────────────────────────────────────
-async function checkSession(){
-  const force = new URLSearchParams(window.location.search).get('force');
-  if (force === '1') return; // allow reaching login even if logged in
-
+async function checkSession() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('force') === '1') return;
   try {
-    const res  = await fetch('/api/auth/me');
-    const data = await res.json();
-    if (!data.logged_in) return; // not logged in — show the form normally
-
-    // Already logged in → send them to their correct dashboard
-    const dest = data.role === 'organization' ? '/org'
-               : data.role === 'super_admin'  ? '/super-admin'
-               : '/user';
-    window.location.href = dest;
-  } catch(e){}
+    const r = await fetch('/api/auth/me', {credentials:'include'});
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.logged_in) {
+      if (d.role === 'organization') window.location.href = '/org';
+      else if (d.role === 'super_admin') window.location.href = '/super-admin';
+      else if (d.role === 'user') window.location.href = '/user';
+    }
+  } catch(e) {}
 }
 
-document.getElementById('email').addEventListener('keydown',    e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 checkSession();
 </script>
 </body>
