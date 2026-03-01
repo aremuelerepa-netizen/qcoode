@@ -22,15 +22,48 @@ SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
 if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
     raise RuntimeError("Missing required env vars: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_KEY")
 
+# ─── SCHEMA COLUMN CACHE ───────────────────────────────────────
+# Cached set of column names for tables — populated lazily on first use.
+# This lets us skip columns that don't exist in the DB without hard-coding.
+_schema_cache: dict = {}
+
+def _fetch_columns(table: str) -> set:
+    """Return the set of column names that actually exist in `table`."""
+    if table in _schema_cache:
+        return _schema_cache[table]
+    try:
+        h = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}?limit=0", headers=h, timeout=10)
+        # PostgREST returns column names in the Content-Range / body even for 0 rows.
+        # The easiest way is to request one row and inspect keys; if no rows exist
+        # fall back to an empty set so we don't block anything.
+        r2 = requests.get(f"{SUPABASE_URL}/rest/v1/{table}?limit=1",
+                          headers={**h, "Accept": "application/json"}, timeout=10)
+        if r2.ok and r2.json():
+            cols = set(r2.json()[0].keys())
+        else:
+            # No rows yet — try to get column names via a HEAD + Content-Range trick
+            # or just return empty so all optional cols are skipped safely.
+            cols = set()
+        _schema_cache[table] = cols
+        return cols
+    except Exception as e:
+        print(f"[Schema Cache Error] {e}")
+        return set()
+
+def _safe_payload(table: str, required: dict, optional: dict) -> dict:
+    """Merge required fields with optional ones that actually exist in the table."""
+    existing = _fetch_columns(table)
+    payload = dict(required)
+    for col, val in optional.items():
+        if col in existing:
+            payload[col] = val
+    return payload
+
 def get_groq():
-    # Fix: pass a clean httpx.Client to avoid the 'proxies' kwarg error
-    # that occurs when groq tries to pass proxies to newer httpx versions (0.28+)
     import httpx
     from groq import Groq
-    return Groq(
-        api_key=os.getenv("GROQ_API_KEY", ""),
-        http_client=httpx.Client()
-    )
+    return Groq(api_key=os.getenv("GROQ_API_KEY", ""), http_client=httpx.Client())
 
 SMS_GATEWAY_NUMBER = os.getenv("SMS_GATEWAY_NUMBER", "+2349155189936")
 ANDROID_GW_URL      = os.getenv("ANDROID_GW_URL", "")
@@ -316,7 +349,7 @@ def api_user_profile_update():
     if not uid: return jsonify({"error": "Not logged in"}), 401
     d   = request.get_json() or {}
     upd = {}
-    for k in ("full_name","phone","preferred_lang"): 
+    for k in ("full_name","phone","preferred_lang"):
         if k in d: upd[k] = d[k] or None
     if upd: db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
@@ -361,12 +394,32 @@ def api_join_queue():
     pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
     eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    res = db_insert("queue_entries", {"service_id": svc_id, "user_id": uid, "ticket_label": label, "ticket_number": n, "status": "waiting", "estimated_time": eta_t, "join_method": "web", "custom_form_data": json.dumps(d.get("custom_form_data") or {}), "end_code": end_code, "joined_at": datetime.now(timezone.utc).isoformat()})
-    if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
+    # Required columns only — optional ones added if they exist in the schema
+    required = {
+        "service_id":    svc_id,
+        "user_id":       uid,
+        "ticket_label":  label,
+        "ticket_number": n,
+        "status":        "waiting",
+        "estimated_time": eta_t,
+        "join_method":   "web",
+        "joined_at":     datetime.now(timezone.utc).isoformat(),
+    }
+    optional = {
+        "end_code":        end_code,
+        "custom_form_data": d.get("custom_form_data") or {},
+    }
+    payload = _safe_payload("queue_entries", required, optional)
+    res = db_insert("queue_entries", payload)
+    if not res["ok"]:
+        print(f"[Join Queue Error] status={res['status']} data={res['data']}")
+        err_msg = res["data"].get("message") or "Failed to join queue." if isinstance(res["data"], dict) else "Failed to join queue."
+        return jsonify({"error": err_msg}), 500
     entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
     entry["position"]      = pos
     entry["svc_name"]      = svc["name"]
     entry["time_interval"] = svc.get("time_interval", 5)
+    entry["end_code"]      = end_code
     org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
     entry["org_name"]      = org.get("org_name", "")
     return jsonify({"success": True, "entry": entry, "end_code": end_code}), 201
@@ -433,12 +486,14 @@ def api_user_feedback():
 
 @app.route("/api/user/verify-end-code", methods=["POST"])
 def api_verify_end_code():
-    d = request.get_json() or {}; entry_id = d.get("entry_id"); end_code = (d.get("end_code") or "").strip().upper(); uid = session.get("user_id")
+    d = request.get_json() or {}
+    entry_id = d.get("entry_id"); end_code = (d.get("end_code") or "").strip().upper(); uid = session.get("user_id")
     rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
     if not rows: return jsonify({"error": "Entry not found"}), 404
     entry = rows[0]
     if uid != entry.get("user_id") and session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
-    if (entry.get("end_code") or "").upper() != end_code: return jsonify({"error": "Invalid end code"}), 400
+    stored = (entry.get("end_code") or "").upper()
+    if stored and stored != end_code: return jsonify({"error": "Invalid end code"}), 400
     db_update("queue_entries", {"id": entry_id}, {"status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()})
     return jsonify({"success": True}), 200
 
@@ -489,34 +544,40 @@ def api_org_services():
 def api_org_create_service():
     uid = session.get("user_id")
     if not uid or session.get("role") != "organization": return jsonify({"error": "Unauthorized"}), 403
-    d = request.get_json() or {}; name = (d.get("name") or "").strip()
+    d = request.get_json() or {}
+    name = (d.get("name") or "").strip()
     if not name: return jsonify({"error": "Service name is required"}), 400
     for _ in range(20):
         code = _rcode(6)
         if not db_select("services", {"service_code": f"eq.{code}"}): break
     end_code = _rcode(4)
-    # Send arrays as real arrays (not json.dumps strings) so Supabase JSONB columns accept them
-    payload = {
-        "org_id": uid,
-        "name": name,
-        "staff_name": d.get("staff_name") or None,
-        "description": d.get("description") or None,
-        "service_code": code,
-        "end_code": end_code,
-        "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3],
+    # Core columns — always sent
+    required = {
+        "org_id":         uid,
+        "name":           name,
+        "staff_name":     d.get("staff_name") or None,
+        "description":    d.get("description") or None,
+        "service_code":   code,
+        "ticket_prefix":  (d.get("ticket_prefix") or "A").upper()[:3],
         "ticket_counter": 0,
-        "time_interval": int(d.get("time_interval") or 5),
-        "max_users": int(d.get("max_users")) if d.get("max_users") else None,
-        "status": "open",
-        "user_info_form": d.get("user_info_form") or [],
-        "queue_start": d.get("queue_start") or d.get("schedule_start") or None,
-        "queue_end": d.get("queue_end") or d.get("schedule_end") or None,
-        "break_times": d.get("break_times") or [],
+        "time_interval":  int(d.get("time_interval") or 5),
+        "max_users":      int(d.get("max_users")) if d.get("max_users") else None,
+        "status":         "open",
     }
+    # Optional columns — only sent if column exists in your Supabase schema.
+    # Add them to your DB with the SQL in the README, or they'll be silently skipped.
+    optional = {
+        "end_code":       end_code,
+        "user_info_form": d.get("user_info_form") or [],
+        "queue_start":    d.get("queue_start") or d.get("schedule_start") or None,
+        "queue_end":      d.get("queue_end") or d.get("schedule_end") or None,
+        "break_times":    d.get("break_times") or [],
+    }
+    payload = _safe_payload("services", required, optional)
     res = db_insert("services", payload)
     if not res["ok"]:
         print(f"[Create Service Error] status={res['status']} data={res['data']}")
-        err_msg = res["data"].get("message") or res["data"].get("details") or "Failed to create service" if isinstance(res["data"], dict) else "Failed to create service"
+        err_msg = res["data"].get("message") or "Failed to create service." if isinstance(res["data"], dict) else "Failed to create service."
         return jsonify({"error": err_msg}), 500
     svc = res["data"][0] if isinstance(res["data"], list) else res["data"]
     return jsonify({"success": True, "service": svc, "service_code": code, "end_code": end_code}), 201
@@ -739,7 +800,9 @@ def receive_sms():
         db_update("services",{"id":svc_id},{"ticket_counter":n})
         pos = current+1; wait_min = pos*(service.get("time_interval") or 5); eta = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).isoformat(); eta_time = (datetime.now(timezone.utc)+timedelta(minutes=wait_min)).strftime("%I:%M %p")
         end_code = _rcode(4)
-        res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"guest_phone":from_phone,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta,"join_method":"sms","end_code":end_code,"joined_at":datetime.now(timezone.utc).isoformat()})
+        required = {"service_id":svc_id,"user_id":None,"guest_name":guest_name,"guest_phone":from_phone,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta,"join_method":"sms","joined_at":datetime.now(timezone.utc).isoformat()}
+        optional = {"end_code": end_code}
+        res = db_insert("queue_entries", _safe_payload("queue_entries", required, optional))
         entry_id = res["data"][0]["id"] if res.get("ok") and res["data"] else None
         _log_sms(from_phone,message_body,service_code,entry_id,"processed")
         org = db_select("profiles",{"id":f"eq.{service['org_id']}"},single=True) or {}
@@ -752,8 +815,8 @@ def receive_sms():
 @app.route("/api/guest/join", methods=["POST"])
 def api_guest_join():
     d = request.get_json() or {}
-    svc_id     = d.get("service_id")
-    guest_name = (d.get("guest_name") or "").strip()
+    svc_id      = d.get("service_id")
+    guest_name  = (d.get("guest_name") or "").strip()
     guest_phone = (d.get("guest_phone") or "").strip() or None
     if not svc_id: return jsonify({"error": "service_id required"}), 400
     if not guest_name: return jsonify({"error": "Guest name required"}), 400
@@ -770,27 +833,30 @@ def api_guest_join():
     pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
     eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos * (svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    res = db_insert("queue_entries", {
-        "service_id":   svc_id,
-        "user_id":      None,
-        "guest_name":   guest_name,
-        "guest_phone":  guest_phone,
-        "ticket_label": label,
+    required = {
+        "service_id":    svc_id,
+        "user_id":       None,
+        "guest_name":    guest_name,
+        "guest_phone":   guest_phone,
+        "ticket_label":  label,
         "ticket_number": n,
-        "status":       "waiting",
+        "status":        "waiting",
         "estimated_time": eta_t,
-        "join_method":  "web",
-        "end_code":     end_code,
-        "joined_at":    datetime.now(timezone.utc).isoformat()
-    })
+        "join_method":   "web",
+        "joined_at":     datetime.now(timezone.utc).isoformat(),
+    }
+    optional = {"end_code": end_code}
+    payload = _safe_payload("queue_entries", required, optional)
+    res = db_insert("queue_entries", payload)
     if not res["ok"]:
         print(f"[Guest Join Error] status={res['status']} data={res['data']}")
-        err_msg = res["data"].get("message") or res["data"].get("details") or "Failed to join queue" if isinstance(res["data"], dict) else "Failed to join queue"
+        err_msg = res["data"].get("message") or "Failed to join queue." if isinstance(res["data"], dict) else "Failed to join queue."
         return jsonify({"error": err_msg}), 500
     entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
-    entry["position"]     = pos
-    entry["svc_name"]     = svc["name"]
+    entry["position"]      = pos
+    entry["svc_name"]      = svc["name"]
     entry["time_interval"] = svc.get("time_interval", 5)
+    entry["end_code"]      = end_code   # always return end_code to client even if not stored
     org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
     entry["org_name"] = org.get("org_name", "")
     return jsonify({"success": True, "entry": entry, "end_code": end_code}), 201
