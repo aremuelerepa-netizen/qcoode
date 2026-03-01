@@ -139,7 +139,37 @@ textarea.inp{resize:vertical;min-height:80px}
 @keyframes tIn{from{opacity:0;transform:translateX(1rem)}to{opacity:1;transform:none}}
 
 @media(max-width:900px){.chart-grid{grid-template-columns:1fr}}
-@media(max-width:700px){.shell{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}.sb-section{display:none}.main{padding:1rem}}
+@media(max-width:700px){
+  .shell{flex-direction:column}
+  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}
+  .sb-section{display:none}
+  .main{padding:1rem}
+}
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:480px){
+  /* Topbar */
+  .topbar{padding:.625rem .875rem}
+  /* Sidebar as scrollable top nav */
+  .sidebar{overflow-x:auto;flex-wrap:nowrap;padding:.5rem .625rem;gap:.2rem}
+  .sb-item{font-size:.72rem;padding:.4rem .625rem;flex-shrink:0;white-space:nowrap;border-radius:.5rem}
+  /* Main */
+  .main{padding:.875rem .75rem}
+  .ph h1{font-size:1.25rem}
+  /* Stats grid */
+  .stats-grid{grid-template-columns:1fr 1fr;gap:.625rem}
+  .stat-card{padding:1rem .875rem}
+  .stat-card .n{font-size:1.75rem}
+  /* Tables */
+  .tbl-wrap{font-size:.75rem}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem}
+  /* Charts */
+  .chart-grid{grid-template-columns:1fr}
+  /* Buttons in table rows */
+  .tbl-wrap .btn{padding:.35rem .625rem;font-size:.72rem}
+}
 </style>
 </head>
 <body>
