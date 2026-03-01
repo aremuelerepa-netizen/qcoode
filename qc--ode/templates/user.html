@@ -11,8 +11,8 @@
   --accent:#4361ee;--accent2:#3a0ca3;--vivid:#7209b7;
   --teal:#06d6a0;--amber:#ffbe0b;--rose:#ef233c;
   --white:#ffffff;
-  --fd:'Plus Jakarta Sans',sans-serif;
-  --fi:'Instrument Serif',serif;
+  --fd:"Plus Jakarta Sans",sans-serif;
+  --fi:"Instrument Serif",serif;
   --r:10px;--r2:16px;--r3:24px;
   --sh:0 2px 12px rgba(13,17,23,.08);
   --shm:0 8px 32px rgba(13,17,23,.12);
@@ -23,8 +23,6 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--fd);background:var(--mist);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;line-height:1.6}
 h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
-
-/* ── TOPBAR ── */
 .topbar{background:var(--ink);height:62px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(255,255,255,.06)}
 .tb-logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.2rem;color:#fff;text-decoration:none;letter-spacing:-.03em}
 .tb-logo em{color:var(--teal);font-style:normal}
@@ -33,11 +31,7 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fd);font-size:.8rem;font-weight:600;color:rgba(255,255,255,.6);transition:all var(--t)}
 .tb-btn:hover{background:rgba(255,255,255,.08);color:#fff}
 .tb-logout{color:var(--rose)!important}.tb-logout:hover{background:rgba(239,35,60,.12)!important}
-
-/* ── SHELL ── */
 .shell{display:flex;flex:1;min-height:0}
-
-/* ── SIDEBAR ── */
 .sidebar{width:250px;background:var(--white);border-right:1px solid rgba(13,17,23,.06);padding:1.25rem 1rem;flex-shrink:0;display:flex;flex-direction:column;gap:.15rem;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto}
 .sb-sect{font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.12em;padding:.625rem .75rem;margin-top:.75rem}
 .sb-item{display:flex;align-items:center;gap:.625rem;padding:.625rem .875rem;border-radius:var(--r);font-size:.875rem;font-weight:500;color:#475569;cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--t)}
@@ -45,34 +39,22 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .sb-item .ico{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
 .sb-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);margin-left:auto;animation:pulse-dot 2s ease infinite}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* ── MAIN ── */
 .main{flex:1;padding:2rem;overflow-y:auto;max-height:calc(100vh - 62px)}
-
-/* ── PANELS ── */
 .panel{display:none;animation:fadeUp .25s ease}.panel.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* ── PANEL HEADER ── */
 .ph{margin-bottom:2rem}
 .ph h1{font-size:1.75rem;font-weight:800;color:var(--ink)}
 .ph p{color:#64748b;margin-top:.25rem;font-size:.9rem}
-
-/* ── CARDS ── */
 .card{background:var(--white);border:1px solid rgba(13,17,23,.06);border-radius:var(--r2);padding:1.75rem;box-shadow:var(--sh);margin-bottom:1.25rem}
 .card-title{font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.05em}
-
-/* ── PROFILE HERO ── */
 .profile-hero{background:linear-gradient(135deg,var(--ink2) 0%,var(--accent2) 60%,var(--vivid) 100%);border-radius:var(--r3);padding:2rem;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;position:relative;overflow:hidden}
-.profile-hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none}
+.profile-hero::after{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none}
 .avatar{width:60px;height:60px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--fi);font-size:1.5rem;font-weight:800;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.3);font-style:italic}
 .pf-name{font-size:1.1rem;font-weight:800;margin-bottom:.2rem}
 .pf-sub{font-size:.8rem;opacity:.6}
 .pf-stats{margin-left:auto;text-align:right;flex-shrink:0}
 .pf-n{font-family:var(--fi);font-size:2rem;font-weight:800;line-height:1;font-style:italic}
 .pf-l{font-size:.7rem;opacity:.55;text-transform:uppercase;letter-spacing:.06em}
-
-/* ── FORM ELEMENTS ── */
 .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
 .lbl{font-size:.8rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em}
 .inp{padding:.8rem 1rem;background:var(--mist);border:2px solid transparent;border-radius:var(--r);font-family:var(--fd);font-size:.9rem;color:var(--ink);width:100%;transition:all var(--t)}
@@ -81,8 +63,6 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .inp-row{display:flex;gap:.625rem}.inp-row .inp{flex:1}
 .code-inp{text-transform:uppercase;letter-spacing:.2em;font-weight:800;font-size:1.1rem;text-align:center}
 .ferr{font-size:.8rem;color:var(--rose);margin-top:.375rem;display:none;padding:.5rem .75rem;background:rgba(239,35,60,.06);border-radius:var(--r)}
-
-/* ── BUTTONS ── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:var(--r);border:none;font-family:var(--fd);font-size:.875rem;font-weight:700;cursor:pointer;transition:all var(--t);white-space:nowrap;letter-spacing:-.01em}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover:not(:disabled){background:#3451d1;transform:translateY(-1px);box-shadow:0 6px 20px rgba(67,97,238,.35)}
@@ -91,14 +71,10 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .btn-ghost{background:var(--mist);color:var(--ink3);border:2px solid rgba(13,17,23,.08)}.btn-ghost:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
 .btn-full{width:100%;display:flex}.btn-lg{padding:.875rem 2rem;font-size:1rem}
 .btn-sm{padding:.35rem .75rem;font-size:.75rem}
-
-/* ── FOUND BOX ── */
 .found-box{background:linear-gradient(135deg,rgba(67,97,238,.07),rgba(114,9,183,.04));border:2px solid rgba(67,97,238,.18);border-radius:var(--r2);padding:1.25rem;margin-bottom:1rem}
 .found-name{font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:.375rem}
 .found-meta{display:flex;gap:.875rem;flex-wrap:wrap;font-size:.8rem;color:#64748b}
 .found-logo{width:40px;height:40px;border-radius:var(--r);object-fit:cover;margin-right:.5rem}
-
-/* ── TICKET DISPLAY ── */
 .ticket-display{background:linear-gradient(135deg,var(--ink2),var(--accent2));border-radius:var(--r3);color:#fff;text-align:center;padding:2.5rem 2rem;margin-bottom:1.25rem;position:relative;overflow:hidden}
 .td-bg{position:absolute;inset:0;opacity:.05;background:repeating-linear-gradient(-45deg,#fff 0,#fff 1px,transparent 1px,transparent 12px)}
 .td-inner{position:relative}
@@ -109,8 +85,6 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .td-pos{background:rgba(255,255,255,.15)}
 .td-eta{background:rgba(6,214,160,.2);border:1px solid rgba(6,214,160,.35);color:var(--teal)}
 .td-endcode{background:rgba(255,190,11,.15);border:1px solid rgba(255,190,11,.3);border-radius:var(--r);padding:.5rem 1rem;display:inline-block;margin-top:.875rem;font-size:.78rem;color:var(--amber)}
-
-/* ── STATUS BOX ── */
 .status-box{border-radius:var(--r2);padding:1.25rem 1.5rem;margin-bottom:1.25rem;border:2px solid transparent;display:flex;align-items:center;gap:1rem;transition:all .3s ease}
 .sb-wait{background:rgba(67,97,238,.05);border-color:rgba(67,97,238,.15)}
 .sb-call{background:rgba(6,214,160,.08);border-color:var(--teal);animation:pBorder 1.8s ease infinite}
@@ -119,28 +93,20 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .sbi-ico{font-size:2rem;flex-shrink:0}
 .sbi-title{font-weight:700;font-size:1rem;color:var(--ink)}
 .sbi-desc{font-size:.825rem;color:#64748b;margin-top:.125rem}
-
-/* ── STAT PAIR ── */
 .stat-pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem}
 .sp{background:var(--mist);border-radius:var(--r2);padding:1.25rem;text-align:center}
 .sp-n{font-family:var(--fi);font-size:2rem;font-weight:800;color:var(--accent);line-height:1;font-style:italic}
 .sp-l{font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-top:.25rem}
-
-/* ── EXACT TIME ── */
 .exact-time{background:linear-gradient(135deg,rgba(255,190,11,.12),rgba(255,190,11,.06));border:2px solid rgba(255,190,11,.25);border-radius:var(--r2);padding:1rem 1.25rem;margin-bottom:1.25rem;text-align:center}
 .et-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#92400e;margin-bottom:.375rem}
 .et-time{font-family:var(--fi);font-size:2.25rem;font-weight:800;color:var(--ink);font-style:italic}
 .et-date{font-size:.78rem;color:#64748b;margin-top:.125rem}
-
-/* ── NEARBY ── */
 .nearby-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
 .nb-card{background:var(--white);border:2px solid rgba(13,17,23,.06);border-radius:var(--r2);padding:1.25rem;cursor:pointer;transition:all var(--t)}
 .nb-card:hover{border-color:var(--accent);box-shadow:var(--shm);transform:translateY(-2px)}
 .nb-name{font-weight:700;color:var(--ink);margin-bottom:.25rem}
 .nb-meta{font-size:.78rem;color:#64748b;line-height:1.7}
 .nb-code{font-weight:800;color:var(--accent);letter-spacing:.15em;margin-top:.625rem;font-size:1.1rem}
-
-/* ── TABLE ── */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
 thead{border-bottom:2px solid rgba(13,17,23,.06)}
@@ -148,72 +114,54 @@ th{text-align:left;padding:.75rem 1rem;font-size:.7rem;font-weight:700;color:#94
 td{padding:.875rem 1rem;font-size:.875rem;border-bottom:1px solid rgba(13,17,23,.04);color:#475569}
 tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .ticket-tag{font-weight:800;color:var(--accent);font-size:.95rem}
-
-/* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;padding:.2rem .625rem;border-radius:999px;font-size:.7rem;font-weight:700;letter-spacing:.02em}
 .b-waiting{background:rgba(67,97,238,.1);color:var(--accent)}
 .b-called{background:rgba(255,190,11,.15);color:#92400e}
 .b-serving{background:rgba(6,214,160,.12);color:#065f46}
 .b-completed{background:rgba(13,17,23,.06);color:#64748b}
 .b-no_show,.b-cancelled{background:rgba(239,35,60,.08);color:var(--rose)}
-
-/* ── MODALS ── */
 .overlay{position:fixed;inset:0;z-index:400;background:rgba(13,17,23,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fIn .2s ease}
 @keyframes fIn{from{opacity:0}to{opacity:1}}
 .modal{background:var(--white);border-radius:var(--r3);padding:2rem;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);animation:sUp .25s cubic-bezier(.16,1,.3,1)}
 @keyframes sUp{from{opacity:0;transform:translateY(1.5rem)}to{opacity:1;transform:none}}
 .modal-title{font-size:1.25rem;font-weight:800;color:var(--ink);margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--mist)}
 .modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;padding-top:1rem;border-top:2px solid var(--mist)}
-
-/* ── STARS ── */
 .stars{display:flex;gap:.375rem;justify-content:center;margin:1rem 0}
 .star{font-size:2rem;cursor:pointer;transition:transform .15s ease;opacity:.35}
 .star.active,.star:hover{opacity:1;transform:scale(1.2)}
-
-/* ── SMS INFO ── */
 .sms-info{background:linear-gradient(135deg,rgba(6,214,160,.07),rgba(67,97,238,.04));border:2px solid rgba(6,214,160,.2);border-radius:var(--r2);padding:1.125rem 1.25rem;display:flex;align-items:center;gap:.875rem;margin-top:.875rem}
 .sms-icon{font-size:1.75rem;flex-shrink:0}
 .sms-text{font-size:.8rem;color:#475569;line-height:1.5}
 .sms-text strong{color:var(--ink);display:block;font-size:.875rem;margin-bottom:.125rem}
-
-/* ── TOASTS ── */
-#toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+#toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:9999;pointer-events:none}
 .toast{padding:.75rem 1.125rem;border-radius:var(--r);box-shadow:var(--shm);font-size:.825rem;font-weight:600;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease;border-left:4px solid}
 .t-s{background:#f0fdf4;border-color:var(--teal);color:#065f46}
 .t-e{background:#fef2f2;border-color:var(--rose);color:#b91c1c}
 .t-i{background:#eff6ff;border-color:var(--accent);color:#1d4ed8}
 .t-w{background:#fffbeb;border-color:var(--amber);color:#92400e}
 @keyframes tIn{from{opacity:0;transform:translateX(2rem)}to{opacity:1;transform:none}}
-
-/* ── SPINNER ── */
 .spin{width:20px;height:20px;border:2.5px solid rgba(13,17,23,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:#64748b}
 
-/* ── NOTIFICATION PREF ── */
-.notif-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--mist);border-radius:var(--r);margin-bottom:.625rem}
-.toggle{position:relative;width:48px;height:26px;cursor:pointer}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;transition:.3s}
-.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.toggle input:checked + .toggle-slider{background:var(--accent)}
-.toggle input:checked + .toggle-slider::before{transform:translateX(22px)}
+/* ── FAQ WIDGET DRAGGABLE ── */
+#faq-widget{position:fixed;bottom:5.5rem;right:2rem;z-index:500;cursor:grab;user-select:none;touch-action:none}
+#faq-widget.dragging{cursor:grabbing}
+#faq-btn{display:flex;align-items:center;gap:.5rem;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:.75rem 1.25rem;font-family:var(--fd);font-weight:700;font-size:.875rem;box-shadow:0 4px 20px rgba(67,97,238,.4);transition:box-shadow var(--t);pointer-events:none}
+#faq-widget:not(.dragging):hover #faq-btn{box-shadow:0 8px 30px rgba(67,97,238,.5)}
 
-/* ── FAQ WIDGET ── */
-#faq-widget{position:fixed;bottom:2rem;right:2rem;z-index:500}
-#faq-btn{display:flex;align-items:center;gap:.5rem;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:.75rem 1.25rem;font-family:var(--fd);font-weight:700;font-size:.875rem;cursor:pointer;box-shadow:0 4px 20px rgba(67,97,238,.4);transition:all var(--t)}
-#faq-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(67,97,238,.5)}
-.faq-panel{position:absolute;bottom:calc(100% + 1rem);right:0;width:360px;background:var(--white);border:2px solid rgba(13,17,23,.08);border-radius:var(--r3);box-shadow:var(--shl);display:flex;flex-direction:column;overflow:hidden;max-height:500px}
-.faq-panel.hidden{display:none}
+/* ── FAQ CENTERED OVERLAY ── */
+#faq-overlay{position:fixed;inset:0;z-index:600;background:rgba(13,17,23,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fIn .2s ease}
+#faq-overlay.hidden{display:none}
+.faq-panel{width:100%;max-width:420px;max-height:80vh;background:var(--white);border:2px solid rgba(13,17,23,.08);border-radius:var(--r3);box-shadow:var(--shl);display:flex;flex-direction:column;overflow:hidden;animation:sUp .25s cubic-bezier(.16,1,.3,1)}
 .faq-hdr{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:var(--ink);color:#fff}
 .faq-hdr-left{display:flex;align-items:center;gap:.75rem}
 .faq-title{font-weight:700;font-size:.9rem}
 .faq-sub{font-size:.7rem;opacity:.55}
 .faq-hdr-btns button{background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:.25rem .5rem;border-radius:var(--r);font-size:.85rem;transition:all var(--t)}
 .faq-hdr-btns button:hover{background:rgba(255,255,255,.2);color:#fff}
-.faq-msgs{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.625rem;min-height:200px;max-height:260px}
-.faq-msg{display:flex}
-.faq-msg.user{justify-content:flex-end}
+.faq-msgs{flex:1;padding:1rem;overflow-y:auto;display:flex;flex-direction:column;gap:.625rem;min-height:200px;max-height:320px}
+.faq-msg{display:flex}.faq-msg.user{justify-content:flex-end}
 .faq-bubble{max-width:85%;padding:.625rem .875rem;border-radius:var(--r2);font-size:.85rem;line-height:1.55}
 .faq-msg.ai .faq-bubble{background:var(--mist);color:var(--ink);border-bottom-left-radius:4px}
 .faq-msg.user .faq-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px;font-weight:500}
@@ -226,31 +174,16 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 #faq-send{background:var(--accent);color:#fff;border:none;border-radius:var(--r);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--t);flex-shrink:0}
 #faq-send:hover{background:#3451d1}#faq-send:disabled{opacity:.5}
 
-/* ── RESPONSIVE ── */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
-
 @media(max-width:768px){
-  /* Full screen layout */
   html,body{height:100%;overflow-x:hidden}
   .shell{flex-direction:column;flex:1;min-height:calc(100vh - 62px)}
-  /* Hide desktop sidebar - replaced by bottom nav */
   .sidebar{display:none!important}
-  /* Main scrollable area fills screen above bottom nav */
-  .main{
-    flex:1;
-    max-height:none;
-    height:auto;
-    min-height:calc(100vh - 62px - 60px);
-    overflow-y:auto;
-    padding:1rem 1rem 5.5rem 1rem;
-    -webkit-overflow-scrolling:touch;
-  }
-  /* Cards */
+  .main{flex:1;max-height:none;height:auto;min-height:calc(100vh - 62px - 60px);overflow-y:auto;padding:1rem 1rem 5.5rem 1rem;-webkit-overflow-scrolling:touch}
   .card{padding:1.25rem 1rem}
-  .ph h1{font-size:1.25rem}
-  .ph p{font-size:.82rem}
+  .ph h1{font-size:1.25rem}.ph p{font-size:.82rem}
   .td-num{font-size:3rem}
   .stat-pair{grid-template-columns:1fr 1fr;gap:.625rem}
   .inp-row .inp{min-width:0}
@@ -259,44 +192,19 @@ input,select,textarea,button{font-size:16px !important}
   .tbl-wrap{font-size:.78rem;overflow-x:auto}
   .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem;white-space:nowrap}
   .profile-hero{flex-direction:column;text-align:center;padding:1.5rem 1rem}
-  .faq-panel{width:calc(100vw - 2rem);right:auto;left:50%;transform:translateX(-50%);bottom:5rem}
-  .faq-btn{bottom:5rem;right:1rem}
+  #faq-widget{bottom:5rem;right:1rem}
+  .faq-panel{max-width:calc(100vw - 2rem)}
   .modal{padding:1.5rem 1.125rem;max-width:calc(100vw - 1.5rem)}
-  .modal-footer{flex-direction:column}
-  .modal-footer .btn{width:100%}
+  .modal-footer{flex-direction:column}.modal-footer .btn{width:100%}
   .ticket-display{padding:1.75rem 1rem}
 }
-
-/* ── BOTTOM NAV (mobile only) ── */
-.bottom-nav{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;z-index:300;
-  background:var(--white);
-  border-top:2px solid rgba(13,17,23,.08);
-  padding:.25rem 0 env(safe-area-inset-bottom,.25rem);
-  box-shadow:0 -4px 20px rgba(13,17,23,.12);
-}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:2px solid rgba(13,17,23,.08);padding:.25rem 0 env(safe-area-inset-bottom,.25rem);box-shadow:0 -4px 20px rgba(13,17,23,.12)}
 .bn-items{display:flex;align-items:stretch}
-.bn-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:.15rem;padding:.5rem .25rem;
-  font-size:.6rem;font-weight:600;color:#94a3b8;
-  cursor:pointer;border:none;background:none;
-  transition:all .15s;position:relative;
-  font-family:var(--fd);
-}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;color:#94a3b8;cursor:pointer;border:none;background:none;transition:all .15s;position:relative;font-family:var(--fd)}
 .bn-item.active{color:var(--accent)}
 .bn-item .bn-ico{font-size:1.25rem;line-height:1}
-.bn-dot{
-  position:absolute;top:.4rem;right:calc(50% - .8rem);
-  width:8px;height:8px;border-radius:50%;
-  background:var(--teal);border:2px solid var(--white);
-  display:none;
-  animation:pulse-dot 2s ease infinite;
-}
-@media(max-width:768px){
-  .bottom-nav{display:block}
-}
+.bn-dot{position:absolute;top:.4rem;right:calc(50% - .8rem);width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--white);display:none;animation:pulse-dot 2s ease infinite}
+@media(max-width:768px){.bottom-nav{display:block}}
 </style>
 </head>
 <body>
@@ -306,34 +214,30 @@ input,select,textarea,button{font-size:16px !important}
     <em>Q</em>Code
   </a>
   <div class="tb-right">
-    <span class="tb-chip" id="tb-name">—</span>
-    <button class="tb-btn tb-logout" onclick="doLogout()">↩ Logout</button>
+    <span class="tb-chip" id="tb-name">&#8212;</span>
+    <button class="tb-btn tb-logout" onclick="doLogout()">&#8617; Logout</button>
   </div>
 </div>
-
 <div class="shell">
   <div class="sidebar">
     <div class="sb-sect">Queue</div>
-    <button class="sb-item active" onclick="show('join')"    id="nav-join">  <span class="ico">🎫</span> Join Queue</button>
-    <button class="sb-item"        onclick="show('active')"  id="nav-active"><span class="ico">📡</span> Active Queue <span class="sb-dot" id="active-dot" style="display:none"></span></button>
+    <button class="sb-item active" onclick="show('join')" id="nav-join"><span class="ico">&#127915;</span> Join Queue</button>
+    <button class="sb-item" onclick="show('active')" id="nav-active"><span class="ico">&#128225;</span> Active Queue <span class="sb-dot" id="active-dot" style="display:none"></span></button>
     <div class="sb-sect">History</div>
-    <button class="sb-item" onclick="show('history')" id="nav-history"><span class="ico">🕐</span> My History</button>
-    <button class="sb-item" onclick="show('nearby')"  id="nav-nearby"><span class="ico">🗺</span> Open Services</button>
+    <button class="sb-item" onclick="show('history')" id="nav-history"><span class="ico">&#128336;</span> My History</button>
+    <button class="sb-item" onclick="show('nearby')" id="nav-nearby"><span class="ico">&#128506;</span> Open Services</button>
     <div class="sb-sect">Account</div>
-    <button class="sb-item" onclick="show('account')" id="nav-account"><span class="ico">👤</span> Account</button>
+    <button class="sb-item" onclick="show('account')" id="nav-account"><span class="ico">&#128100;</span> Account</button>
   </div>
-
   <div class="main">
-
-    <!-- ═══ JOIN ═══ -->
     <div class="panel active" id="panel-join">
       <div class="ph"><h1>Join a Queue</h1><p>Enter the 6-character service code given to you</p></div>
       <div class="card">
-        <div class="card-title">🎫 Service Code</div>
+        <div class="card-title">&#127915; Service Code</div>
         <div id="step-code">
           <div class="inp-row">
             <input id="code-in" class="inp code-inp" type="text" placeholder="VISA24" maxlength="8"/>
-            <button class="btn btn-primary" onclick="findService()" id="find-btn">Find →</button>
+            <button class="btn btn-primary" onclick="findService()" id="find-btn">Find &#8594;</button>
           </div>
           <div id="code-err" class="ferr"></div>
         </div>
@@ -345,45 +249,43 @@ input,select,textarea,button{font-size:16px !important}
             </div>
             <div class="found-meta">
               <span id="found-org"></span><span id="found-staff"></span>
-              <span id="found-eta"><strong>⏱</strong> Calculating…</span>
-              <span id="found-waiting">👥 — waiting</span>
+              <span id="found-eta"><strong>&#9201;</strong> Calculating&#8230;</span>
+              <span id="found-waiting">&#128101; &#8212; waiting</span>
             </div>
           </div>
           <div id="custom-form-wrap" style="display:none;margin-bottom:1rem">
-            <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">📋 Please fill in the required information</div>
+            <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">&#128203; Please fill in the required information</div>
             <div id="custom-form-fields"></div>
           </div>
-          <button class="btn btn-success btn-full btn-lg" onclick="confirmJoin()">✓ Join This Queue</button>
-          <button class="btn btn-ghost btn-full" onclick="cancelFind()" style="margin-top:.625rem">← Back</button>
+          <button class="btn btn-success btn-full btn-lg" onclick="confirmJoin()">&#10003; Join This Queue</button>
+          <button class="btn btn-ghost btn-full" onclick="cancelFind()" style="margin-top:.625rem">&#8592; Back</button>
         </div>
       </div>
       <div class="sms-info">
-        <div class="sms-icon">📱</div>
+        <div class="sms-icon">&#128241;</div>
         <div class="sms-text"><strong>No internet? Join by SMS</strong>Text your service code to <strong id="sms-num" style="color:var(--accent)">+2349155189936</strong> to get your ticket instantly.</div>
       </div>
     </div>
-
-    <!-- ═══ ACTIVE ═══ -->
     <div class="panel" id="panel-active">
       <div class="ph"><h1>Active Queue</h1><p>Real-time position and wait time</p></div>
       <div id="no-active" class="card">
         <div style="text-align:center;padding:2rem">
-          <div style="font-size:3.5rem;margin-bottom:1rem">⏰</div>
+          <div style="font-size:3.5rem;margin-bottom:1rem">&#9200;</div>
           <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:.5rem;color:var(--ink)">Not in any queue</h3>
           <p style="color:#64748b;margin-bottom:1.5rem">Use "Join Queue" to enter a service code and join.</p>
-          <button class="btn btn-primary" onclick="show('join')">Join a Queue →</button>
+          <button class="btn btn-primary" onclick="show('join')">Join a Queue &#8594;</button>
         </div>
       </div>
       <div id="active-view" style="display:none">
         <div style="background:var(--ink2);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
           <div>
-            <div style="font-weight:800;font-size:1.05rem;color:#fff" id="a-svc-name">—</div>
-            <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.125rem" id="a-org-name">—</div>
+            <div style="font-weight:800;font-size:1.05rem;color:#fff" id="a-svc-name">&#8212;</div>
+            <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.125rem" id="a-org-name">&#8212;</div>
           </div>
           <span class="badge" id="a-svc-badge"></span>
         </div>
         <div class="status-box sb-wait" id="status-box">
-          <div class="sbi-ico" id="sb-ico">⏳</div>
+          <div class="sbi-ico" id="sb-ico">&#8987;</div>
           <div><div class="sbi-title" id="sb-title">Waiting in queue</div><div class="sbi-desc" id="sb-desc">Position updates automatically. Stay nearby.</div></div>
         </div>
         <div class="ticket-display">
@@ -391,48 +293,41 @@ input,select,textarea,button{font-size:16px !important}
           <div class="td-inner">
             <div class="td-svc" id="td-svc"></div>
             <div class="td-lbl">Your Ticket</div>
-            <div class="td-num" id="td-num">—</div>
-            <div>
-              <span class="td-pos">Position <strong id="td-pos" style="margin-left:.25rem">—</strong></span>
-            </div>
-            <div><span class="td-eta" id="td-eta">Calculating ETA…</span></div>
+            <div class="td-num" id="td-num">&#8212;</div>
+            <div><span class="td-pos">Position <strong id="td-pos" style="margin-left:.25rem">&#8212;</strong></span></div>
+            <div><span class="td-eta" id="td-eta">Calculating ETA&#8230;</span></div>
             <div class="td-endcode" id="td-endcode"></div>
           </div>
         </div>
         <div class="exact-time" id="exact-time-box" style="display:none">
-          <div class="et-label">⏰ Your estimated turn</div>
-          <div class="et-time" id="et-time">—</div>
-          <div class="et-date" id="et-date">—</div>
+          <div class="et-label">&#9200; Your estimated turn (fixed at join time)</div>
+          <div class="et-time" id="et-time">&#8212;</div>
+          <div class="et-date" id="et-date">&#8212;</div>
         </div>
         <div class="stat-pair">
-          <div class="sp"><div class="sp-n" id="sp-ahead">—</div><div class="sp-l">Ahead of You</div></div>
-          <div class="sp"><div class="sp-n" id="sp-total">—</div><div class="sp-l">Total Waiting</div></div>
+          <div class="sp"><div class="sp-n" id="sp-ahead">&#8212;</div><div class="sp-l">Ahead of You</div></div>
+          <div class="sp"><div class="sp-n" id="sp-total">&#8212;</div><div class="sp-l">Total Waiting</div></div>
         </div>
-        <button class="btn btn-danger btn-full btn-lg" id="leave-btn" onclick="leaveQueue()">✕ Leave Queue</button>
+        <button class="btn btn-danger btn-full btn-lg" id="leave-btn" onclick="leaveQueue()">&#10005; Leave Queue</button>
       </div>
     </div>
-
-    <!-- ═══ HISTORY ═══ -->
     <div class="panel" id="panel-history">
       <div class="ph"><h1>My History</h1><p>Every queue you have joined</p></div>
       <div class="card">
         <div class="tbl-wrap"><table>
           <thead><tr><th>Ticket</th><th>Service</th><th>Organization</th><th>Method</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody id="hist-tbody"><tr><td colspan="6"><div class="loading"><div class="spin"></div> Loading…</div></td></tr></tbody>
+          <tbody id="hist-tbody"><tr><td colspan="6"><div class="loading"><div class="spin"></div> Loading&#8230;</div></td></tr></tbody>
         </table></div>
       </div>
     </div>
-
-    <!-- ═══ NEARBY ═══ -->
     <div class="panel" id="panel-nearby">
       <div class="ph"><h1>Open Services</h1><p>Browse live queues or search by service code</p></div>
-      <!-- Search by code inside Open Services -->
       <div class="card" style="margin-bottom:1.25rem" id="nearby-search-card">
-        <div class="card-title">🔍 Find by Service Code</div>
+        <div class="card-title">&#128269; Find by Service Code</div>
         <div id="ns-step-code">
           <div class="inp-row">
             <input id="ns-code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8"/>
-            <button class="btn btn-primary" onclick="nearbyFindService()" id="ns-find-btn">Find →</button>
+            <button class="btn btn-primary" onclick="nearbyFindService()" id="ns-find-btn">Find &#8594;</button>
           </div>
           <div id="ns-code-err" class="ferr"></div>
         </div>
@@ -444,26 +339,23 @@ input,select,textarea,button{font-size:16px !important}
             </div>
             <div class="found-meta">
               <span id="ns-found-org"></span>
-              <span id="ns-found-eta">⏱ Calculating…</span>
-              <span id="ns-found-waiting">👥 — waiting</span>
+              <span id="ns-found-eta">&#9201; Calculating&#8230;</span>
+              <span id="ns-found-waiting">&#128101; &#8212; waiting</span>
             </div>
           </div>
           <div id="ns-custom-form-wrap" style="display:none;margin-bottom:1rem">
-            <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">📋 Please fill in the required information</div>
+            <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">&#128203; Please fill in the required information</div>
             <div id="ns-custom-form-fields"></div>
           </div>
-          <button class="btn btn-success btn-full btn-lg" onclick="nsConfirmJoin()">✓ Join This Queue</button>
-          <button class="btn btn-ghost btn-full" onclick="nsCancelFind()" style="margin-top:.625rem">← Back to list</button>
+          <button class="btn btn-success btn-full btn-lg" onclick="nsConfirmJoin()">&#10003; Join This Queue</button>
+          <button class="btn btn-ghost btn-full" onclick="nsCancelFind()" style="margin-top:.625rem">&#8592; Back to list</button>
         </div>
       </div>
-      <!-- Filter bar -->
       <div style="margin-bottom:1rem;display:flex;gap:.5rem;align-items:center">
-        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or organization…" style="max-width:320px" oninput="filterNearby(this.value)"/>
+        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or organization&#8230;" style="max-width:320px" oninput="filterNearby(this.value)"/>
       </div>
-      <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
+      <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading&#8230;</div></div>
     </div>
-
-    <!-- ═══ ACCOUNT ═══ -->
     <div class="panel" id="panel-account">
       <div class="ph"><h1>My Account</h1></div>
       <div class="profile-hero" id="profile-hero"></div>
@@ -474,16 +366,13 @@ input,select,textarea,button{font-size:16px !important}
         <button class="btn btn-primary" onclick="saveAccount()">Save Changes</button>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ═══ MODALS ═══ -->
-
-<!-- Notification pref modal -->
+<!-- Notification modal -->
 <div id="modal-notif" class="overlay" style="display:none">
   <div class="modal">
-    <h2 class="modal-title">🔔 Queue Notifications</h2>
+    <h2 class="modal-title">&#128276; Queue Notifications</h2>
     <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1.25rem">Do you want to be notified before your turn on the queue?</p>
     <div class="fg">
       <label class="lbl">Notify me when I have this many minutes left</label>
@@ -500,11 +389,11 @@ input,select,textarea,button{font-size:16px !important}
 <!-- End code modal -->
 <div id="modal-endcode" class="overlay" style="display:none">
   <div class="modal">
-    <h2 class="modal-title">📢 You're Being Called!</h2>
-    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1rem">Go to the counter now. <strong>Ask the staff for your End Code</strong> — you have 5 minutes before your slot is removed.</p>
+    <h2 class="modal-title">&#128226; You're Being Called!</h2>
+    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1rem">Go to the counter now. <strong>Ask the staff for your End Code</strong> &#8212; you have 5 minutes before your slot is removed.</p>
     <div style="background:rgba(67,97,238,.07);border:2px solid rgba(67,97,238,.2);border-radius:var(--r);padding:.875rem;text-align:center;margin-bottom:1.25rem">
-      <div style="font-size:1.75rem;margin-bottom:.2rem">🎫</div>
-      <div style="font-weight:800;font-size:1.1rem;color:var(--ink)">Your Ticket: <span id="modal-ticket-label">—</span></div>
+      <div style="font-size:1.75rem;margin-bottom:.2rem">&#127915;</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--ink)">Your Ticket: <span id="modal-ticket-label">&#8212;</span></div>
       <div style="font-size:.78rem;color:#64748b;margin-top:.2rem">Show this to the staff and request your End Code</div>
     </div>
     <div class="fg">
@@ -514,7 +403,7 @@ input,select,textarea,button{font-size:16px !important}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-endcode').style.display='none'">Later</button>
-      <button class="btn btn-success" onclick="submitEndCode()">Submit End Code →</button>
+      <button class="btn btn-success" onclick="submitEndCode()">Submit End Code &#8594;</button>
     </div>
   </div>
 </div>
@@ -522,16 +411,16 @@ input,select,textarea,button{font-size:16px !important}
 <!-- Feedback modal -->
 <div id="modal-feedback" class="overlay" style="display:none">
   <div class="modal">
-    <h2 class="modal-title">⭐ Rate Your Experience</h2>
+    <h2 class="modal-title">&#11088; Rate Your Experience</h2>
     <p style="font-size:.875rem;color:#64748b;margin-bottom:1rem">How was your experience with this service?</p>
     <div class="stars" id="stars-row">
-      <span class="star" data-v="1" onclick="setStar(1)">★</span>
-      <span class="star" data-v="2" onclick="setStar(2)">★</span>
-      <span class="star" data-v="3" onclick="setStar(3)">★</span>
-      <span class="star" data-v="4" onclick="setStar(4)">★</span>
-      <span class="star" data-v="5" onclick="setStar(5)">★</span>
+      <span class="star" data-v="1" onclick="setStar(1)">&#9733;</span>
+      <span class="star" data-v="2" onclick="setStar(2)">&#9733;</span>
+      <span class="star" data-v="3" onclick="setStar(3)">&#9733;</span>
+      <span class="star" data-v="4" onclick="setStar(4)">&#9733;</span>
+      <span class="star" data-v="5" onclick="setStar(5)">&#9733;</span>
     </div>
-    <div class="fg"><label class="lbl">Comment (optional)</label><textarea id="fb-comment" class="inp" style="resize:vertical;min-height:80px" placeholder="Tell us about your experience…"></textarea></div>
+    <div class="fg"><label class="lbl">Comment (optional)</label><textarea id="fb-comment" class="inp" style="resize:vertical;min-height:80px" placeholder="Tell us about your experience&#8230;"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeFeedbackModal()">Skip</button>
       <button class="btn btn-primary" onclick="submitFeedback()">Submit</button>
@@ -539,25 +428,29 @@ input,select,textarea,button{font-size:16px !important}
   </div>
 </div>
 
-<!-- FAQ Widget -->
+<!-- FAQ DRAGGABLE WIDGET BUTTON -->
 <div id="faq-widget">
-  <button id="faq-btn" onclick="toggleFAQ()">
+  <button id="faq-btn">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     Ask AI
   </button>
-  <div class="faq-panel hidden" id="faq-panel">
+</div>
+
+<!-- FAQ CENTERED MODAL OVERLAY -->
+<div id="faq-overlay" class="hidden" onclick="if(event.target===this)closeFAQ()">
+  <div class="faq-panel">
     <div class="faq-hdr">
       <div class="faq-hdr-left">
-        <div style="width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem">🤖</div>
-        <div><div class="faq-title">QCode Assistant</div><div class="faq-sub">Powered by Llama AI</div></div>
+        <div style="width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem">&#129302;</div>
+        <div><div class="faq-title">QCode Assistant</div><div class="faq-sub">Powered by AI</div></div>
       </div>
       <div class="faq-hdr-btns">
-        <button onclick="clearChat()" title="Clear">↺</button>
-        <button onclick="toggleFAQ()" title="Close">✕</button>
+        <button onclick="clearChat()" title="Clear">&#8635;</button>
+        <button onclick="closeFAQ()" title="Close">&#10005;</button>
       </div>
     </div>
     <div class="faq-msgs" id="faq-msgs">
-      <div class="faq-msg ai"><div class="faq-bubble">👋 Hi! I'm your QCode Assistant.<br><br>I can help with joining queues, checking your position, understanding wait times, and more. What do you need?</div></div>
+      <div class="faq-msg ai"><div class="faq-bubble">&#128075; Hi! I'm your QCode Assistant.<br><br>I can help with joining queues, checking your position, understanding wait times, and more. What do you need?</div></div>
     </div>
     <div class="faq-quickbtns">
       <button class="faq-qbtn" onclick="quickQ('How do I join a queue?')">How to join</button>
@@ -565,7 +458,7 @@ input,select,textarea,button{font-size:16px !important}
       <button class="faq-qbtn" onclick="quickQ('How does SMS queue joining work?')">SMS joining</button>
     </div>
     <div class="faq-input-row">
-      <input type="text" class="faq-inp" id="faq-inp" placeholder="Ask anything…" onkeydown="if(event.key==='Enter')sendFAQ()"/>
+      <input type="text" class="faq-inp" id="faq-inp" placeholder="Ask anything&#8230;" onkeydown="if(event.key==='Enter')sendFAQ()"/>
       <button id="faq-send" onclick="sendFAQ()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
@@ -576,518 +469,485 @@ input,select,textarea,button{font-size:16px !important}
 <div id="toasts"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CORE UTILITIES
-// ═══════════════════════════════════════════════════════
-async function api(url, opts){
+async function api(url,opts){
   try{
-    var r=await fetch(url,{headers:{'Content-Type':'application/json'},...opts,body:opts&&opts.body&&typeof opts.body==='object'?JSON.stringify(opts.body):(opts&&opts.body)});
+    var r=await fetch(url,{headers:{"Content-Type":"application/json"},...opts,body:opts&&opts.body&&typeof opts.body==="object"?JSON.stringify(opts.body):(opts&&opts.body)});
     var data=await r.json().catch(function(){return{};});
     return{ok:r.ok,status:r.status,data:data};
-  }catch(e){return{ok:false,status:0,data:{error:'Network error.'}};}
+  }catch(e){return{ok:false,status:0,data:{error:"Network error."}};}
 }
 function toast(msg,type,ms){
-  type=type||'i';ms=ms||4500;
-  var icons={s:'✓',e:'✕',i:'ℹ',w:'⚠'};
-  var el=document.createElement('div');
-  el.className='toast t-'+type;
-  el.innerHTML='<span>'+icons[type]+'</span><span>'+msg+'</span>';
-  document.getElementById('toasts').appendChild(el);
+  type=type||"i";ms=ms||4500;
+  var icons={s:"&#10003;",e:"&#10005;",i:"&#8505;",w:"&#9888;"};
+  var el=document.createElement("div");
+  el.className="toast t-"+type;
+  el.innerHTML="<span>"+icons[type]+"</span><span>"+msg+"</span>";
+  document.getElementById("toasts").appendChild(el);
   setTimeout(function(){el.remove();},ms);
 }
-function fmt(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
-function badge(s){var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return '<span class="badge '+(m[s]||'')+'">'+((s||'').replace('_',' '))+'</span>';}
+function fmt(ts){if(!ts)return"&#8212;";var d=new Date(ts);return d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});}
+function badge(s){var m={waiting:"b-waiting",called:"b-called",serving:"b-serving",completed:"b-completed",no_show:"b-no_show",cancelled:"b-cancelled"};return"<span class="badge "+(m[s]||"")+"">"+((s||"").replace("_"," "))+"</span>";}
 
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
+// ── STATE ──
 var profile=null,activeEntry=null,foundSvc=null,pollTimer=null;
 var fbEntryId=null,fbRating=0;
 var notifEnabled=false,notifMins=5,notifSent=false;
-var endCodePrompted=false;
-var faqHistory=[];
+var endCodePrompted=false,faqHistory=[];
+// FIX: locked ETA — set once at join, never changes
+var lockedETA=null;
 
-const FAQ_SYS=`You are QCode Assistant — the helpful AI for QCode, a digital queue management platform.
-QCode lets users join queues with a 6-character service code. Features: real-time position tracking, SMS joining, end codes to confirm service, automated slot cancellation if user doesn't respond within 25% of allotted time, guest mode, organization dashboards.
-Answer questions helpfully, concisely and accurately. If user writes in another language, respond in that language.`;
+const FAQ_SYS="You are QCode Assistant, the helpful AI for QCode, a digital queue management platform. QCode lets users join queues with a 6-character service code. Answer helpfully and concisely. If user writes in another language, respond in that language.";
 
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
+// ── INIT ──
 async function init(){
-  var session=await api('/api/auth/me');
-  if(!session.ok||!session.data.logged_in){window.location.href='/login-user';return;}
-  if(session.data.role!=='user'){window.location.href=session.data.role==='organization'?'/org':'/super-admin';return;}
-  var pr=await api('/api/user/profile');
-  if(!pr.ok){window.location.href='/login-user';return;}
+  var session=await api("/api/auth/me");
+  if(!session.ok||!session.data.logged_in){window.location.href="/login-user";return;}
+  if(session.data.role!=="user"){window.location.href=session.data.role==="organization"?"/org":"/super-admin";return;}
+  var pr=await api("/api/user/profile");
+  if(!pr.ok){window.location.href="/login-user";return;}
   profile=pr.data;
-  document.getElementById('tb-name').textContent=profile.full_name||profile.email||'—';
-  document.getElementById('acc-name').value=profile.full_name||'';
-  document.getElementById('acc-phone').value=profile.phone||'';
-  var initials=((profile.full_name||profile.email||'U').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2));
-  document.getElementById('profile-hero').innerHTML=
-    '<div class="avatar">'+initials+'</div>'+
-    '<div><div class="pf-name">'+(profile.full_name||profile.email)+'</div>'+
-    '<div class="pf-sub">'+(profile.email||'')+'</div>'+
-    (profile.phone?'<div class="pf-sub">📞 '+profile.phone+'</div>':'')+'</div>'+
-    '<div class="pf-stats"><div class="pf-n">'+(profile.total_queues||0)+'</div><div class="pf-l">Total Queues</div></div>';
-  // Restore active entry — use localStorage so it survives page navigation
-  var stored=localStorage.getItem('activeEntry_'+profile.id);
-  // Also check legacy key
-  if(!stored) stored=localStorage.getItem('qc_active_entry');
+  document.getElementById("tb-name").textContent=profile.full_name||profile.email||"&#8212;";
+  document.getElementById("acc-name").value=profile.full_name||"";
+  document.getElementById("acc-phone").value=profile.phone||"";
+  var initials=((profile.full_name||profile.email||"U").split(" ").map(function(w){return w[0];}).join("").toUpperCase().slice(0,2));
+  document.getElementById("profile-hero").innerHTML=
+    "<div class="avatar">"+initials+"</div>"+
+    "<div><div class="pf-name">"+(profile.full_name||profile.email)+"</div>"+
+    "<div class="pf-sub">"+(profile.email||"")+"</div>"+
+    (profile.phone?"<div class="pf-sub">&#128222; "+profile.phone+"</div>":"")+"</div>"+
+    "<div class="pf-stats"><div class="pf-n">"+(profile.total_queues||0)+"</div><div class="pf-l">Total Queues</div></div>";
+
+  // Restore active entry
+  var stored=localStorage.getItem("activeEntry_"+profile.id)||localStorage.getItem("qc_active_entry");
   if(stored){
     try{
       var parsed=JSON.parse(stored);
       activeEntry=parsed.entry||parsed;
+      lockedETA=localStorage.getItem("lockedETA_"+profile.id)||activeEntry.estimated_time||null;
     }catch(e){activeEntry=null;}
   }
   if(activeEntry&&activeEntry.id){
-    // Show IMMEDIATELY from stored data — never lose queue on page reload
-    document.getElementById('active-dot').style.display='';
-    if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
-    renderActive();
+    document.getElementById("active-dot").style.display="";
+    var bd=document.getElementById("bn-dot");if(bd)bd.style.display="";
+    // Show immediately from cache, then refresh in background
+    renderActiveStatic();
     startPolling();
-    // Verify in background — refreshActive() handles clearing if truly done
   }
-    await loadHistory();
+  await loadHistory();
+  initDraggable();
 }
 
-// ═══════════════════════════════════════════════════════
-// PANELS
-// ═══════════════════════════════════════════════════════
+// ── DRAGGABLE FAQ BUTTON ──
+function initDraggable(){
+  var widget=document.getElementById("faq-widget");
+  var dragging=false,moved=false,sx,sy,sl,st;
+  function getLeft(){return parseFloat(widget.style.left)||null;}
+  function getTop(){return parseFloat(widget.style.top)||null;}
+  function onStart(e){
+    dragging=true;moved=false;
+    widget.classList.add("dragging");
+    var cx=e.touches?e.touches[0].clientX:e.clientX;
+    var cy=e.touches?e.touches[0].clientY:e.clientY;
+    var rect=widget.getBoundingClientRect();
+    sx=cx;sy=cy;sl=rect.left;st=rect.top;
+    widget.style.left=sl+"px";widget.style.top=st+"px";
+    widget.style.right="auto";widget.style.bottom="auto";
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragging)return;
+    var cx=e.touches?e.touches[0].clientX:e.clientX;
+    var cy=e.touches?e.touches[0].clientY:e.clientY;
+    var dx=cx-sx,dy=cy-sy;
+    if(Math.abs(dx)>4||Math.abs(dy)>4)moved=true;
+    var nl=Math.max(8,Math.min(window.innerWidth-widget.offsetWidth-8,sl+dx));
+    var nt=Math.max(8,Math.min(window.innerHeight-widget.offsetHeight-8,st+dy));
+    widget.style.left=nl+"px";widget.style.top=nt+"px";
+    e.preventDefault();
+  }
+  function onEnd(){
+    if(!dragging)return;
+    dragging=false;widget.classList.remove("dragging");
+    if(!moved)openFAQ();
+  }
+  widget.addEventListener("mousedown",onStart);
+  document.addEventListener("mousemove",onMove);
+  document.addEventListener("mouseup",onEnd);
+  widget.addEventListener("touchstart",onStart,{passive:false});
+  document.addEventListener("touchmove",onMove,{passive:false});
+  document.addEventListener("touchend",onEnd);
+}
+
+function openFAQ(){document.getElementById("faq-overlay").classList.remove("hidden");setTimeout(function(){document.getElementById("faq-inp").focus();},100);}
+function closeFAQ(){document.getElementById("faq-overlay").classList.add("hidden");}
+
+// ── PANELS ──
 function show(name){
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
-  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('active');});
-  document.getElementById('panel-'+name).classList.add('active');
-  if(document.getElementById('nav-'+name)) document.getElementById('nav-'+name).classList.add('active');
-  if(document.getElementById('bn-'+name)) document.getElementById('bn-'+name).classList.add('active');
-  if(name==='history')loadHistory();
-  if(name==='nearby')loadNearby();
+  document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("active");});
+  document.querySelectorAll(".sb-item").forEach(function(b){b.classList.remove("active");});
+  document.querySelectorAll(".bn-item").forEach(function(b){b.classList.remove("active");});
+  document.getElementById("panel-"+name).classList.add("active");
+  var nb=document.getElementById("nav-"+name);if(nb)nb.classList.add("active");
+  var bb=document.getElementById("bn-"+name);if(bb)bb.classList.add("active");
+  if(name==="history")loadHistory();
+  if(name==="nearby")loadNearby();
+  if(name==="active"&&activeEntry)renderActiveStatic();
 }
 
-// ═══════════════════════════════════════════════════════
-// FIND SERVICE
-// ═══════════════════════════════════════════════════════
+// ── FIND SERVICE ──
 async function findService(){
-  var code=document.getElementById('code-in').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-  var err=document.getElementById('code-err');var btn=document.getElementById('find-btn');
-  err.style.display='none';
-  if(!code){err.textContent='Please enter a service code.';err.style.display='block';return;}
-  btn.disabled=true;btn.textContent='…';
-  var r=await api('/api/user/find-service?code='+encodeURIComponent(code));
-  btn.disabled=false;btn.textContent='Find →';
-  if(!r.ok){err.textContent=r.data.error||'Service not found.';err.style.display='block';return;}
+  var code=document.getElementById("code-in").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+  var err=document.getElementById("code-err");var btn=document.getElementById("find-btn");
+  err.style.display="none";
+  if(!code){err.textContent="Please enter a service code.";err.style.display="block";return;}
+  btn.disabled=true;btn.textContent="&#8230;";
+  var r=await api("/api/user/find-service?code="+encodeURIComponent(code));
+  btn.disabled=false;btn.textContent="Find &#8594;";
+  if(!r.ok){err.textContent=r.data.error||"Service not found.";err.style.display="block";return;}
   foundSvc=r.data;
-  document.getElementById('found-name').textContent=r.data.name;
-  document.getElementById('found-org').textContent=r.data.org_name?'🏢 '+r.data.org_name:'';
-  document.getElementById('found-staff').textContent=r.data.staff_name?'👤 '+r.data.staff_name:'';
-  document.getElementById('found-eta').innerHTML='<strong>⏱</strong> ~'+r.data.eta_minutes+' min wait';
-  document.getElementById('found-waiting').textContent='👥 '+(r.data.waiting_count||0)+' waiting';
-  if(r.data.org_logo){var li=document.getElementById('found-logo');li.src=r.data.org_logo;li.style.display='';}
-  document.getElementById('step-code').style.display='none';
-  document.getElementById('step-found').style.display='block';
-  var fields=[];try{fields=JSON.parse(r.data.user_info_form||'[]');}catch(e){}
+  document.getElementById("found-name").textContent=r.data.name;
+  document.getElementById("found-org").textContent=r.data.org_name?"&#127970; "+r.data.org_name:"";
+  document.getElementById("found-staff").textContent=r.data.staff_name?"&#128100; "+r.data.staff_name:"";
+  document.getElementById("found-eta").innerHTML="<strong>&#9201;</strong> ~"+r.data.eta_minutes+" min wait";
+  document.getElementById("found-waiting").textContent="&#128101; "+(r.data.waiting_count||0)+" waiting";
+  if(r.data.org_logo){var li=document.getElementById("found-logo");li.src=r.data.org_logo;li.style.display="";}
+  document.getElementById("step-code").style.display="none";
+  document.getElementById("step-found").style.display="block";
+  var fields=[];try{fields=JSON.parse(r.data.user_info_form||"[]");}catch(e){}
   if(fields.length){
-    document.getElementById('custom-form-wrap').style.display='block';
-    document.getElementById('custom-form-fields').innerHTML=fields.map(function(f){
-      return '<div class="fg"><label class="lbl">'+f.label+(f.required?' *':'')+'</label>'+
-        (f.type==='textarea'?'<textarea id="cf-'+f.id+'" class="inp" rows="3"></textarea>':
-         f.type==='select'?'<select id="cf-'+f.id+'" class="inp"><option value="">Select…</option>'+(f.options||[]).map(function(o){return'<option>'+o+'</option>';}).join('')+'</select>':
-         '<input id="cf-'+f.id+'" class="inp" type="'+(f.type||'text')+'"/>')+'</div>';
-    }).join('');
+    document.getElementById("custom-form-wrap").style.display="block";
+    document.getElementById("custom-form-fields").innerHTML=fields.map(function(f){
+      return "<div class="fg"><label class="lbl">"+f.label+(f.required?" *":"")+"</label>"+
+        (f.type==="textarea"?"<textarea id="cf-"+f.id+"" class="inp" rows="3"></textarea>":
+         f.type==="select"?"<select id="cf-"+f.id+"" class="inp"><option value="">Select&#8230;</option>"+(f.options||[]).map(function(o){return"<option>"+o+"</option>";}).join("")+"</select>":
+         "<input id="cf-"+f.id+"" class="inp" type=""+(f.type||"text")+"" />")+"</div>";
+    }).join("");
   }
 }
-function cancelFind(){foundSvc=null;document.getElementById('step-found').style.display='none';document.getElementById('step-code').style.display='block';document.getElementById('code-in').value='';document.getElementById('code-err').style.display='none';document.getElementById('custom-form-wrap').style.display='none';}
+function cancelFind(){foundSvc=null;document.getElementById("step-found").style.display="none";document.getElementById("step-code").style.display="block";document.getElementById("code-in").value="";document.getElementById("code-err").style.display="none";document.getElementById("custom-form-wrap").style.display="none";}
 
-// ═══════════════════════════════════════════════════════
-// JOIN QUEUE
-// ═══════════════════════════════════════════════════════
+// ── JOIN QUEUE ──
 async function confirmJoin(){
   if(!foundSvc)return;
   var formData={};
-  try{var fields=JSON.parse(foundSvc.user_info_form||'[]');for(var i=0;i<fields.length;i++){var f=fields[i];var el=document.getElementById('cf-'+f.id);if(!el)continue;if(f.required&&!el.value){toast('"'+f.label+'" is required.','e');return;}formData[f.id]={label:f.label,value:el.value};}}catch(e){}
-  var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:foundSvc.id,custom_form_data:formData}});
-  if(!r.ok){toast(r.data.error||'Failed to join queue.','e');return;}
+  try{
+    var fields=JSON.parse(foundSvc.user_info_form||"[]");
+    for(var i=0;i<fields.length;i++){
+      var f=fields[i];var el=document.getElementById("cf-"+f.id);
+      if(!el)continue;
+      if(f.required&&!el.value){toast('"'+f.label+'" is required.',"e");return;}
+      formData[f.id]={label:f.label,value:el.value};
+    }
+  }catch(e){}
+  var r=await api("/api/user/join-queue",{method:"POST",body:{service_id:foundSvc.id,custom_form_data:formData}});
+  if(!r.ok){toast(r.data.error||"Failed to join queue.","e");return;}
   activeEntry=r.data.entry||r.data;
+
+  // FIX: lock estimated_time exactly at join — never touch it again
+  lockedETA=activeEntry.estimated_time||null;
+
   if(profile){
-    localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
-    // Also save to legacy key for compatibility
-    localStorage.removeItem('qc_active_entry');
+    localStorage.setItem("activeEntry_"+profile.id,JSON.stringify(activeEntry));
+    if(lockedETA)localStorage.setItem("lockedETA_"+profile.id,lockedETA);
+    localStorage.removeItem("qc_active_entry");
   }
   cancelFind();
-  renderActive();
-  show('active');
-  document.getElementById('active-dot').style.display='';if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
-  toast("You've joined the queue!",'s');
+
+  // FIX: show active immediately before navigating
+  document.getElementById("no-active").style.display="none";
+  document.getElementById("active-view").style.display="block";
+  renderActiveStatic();
+  show("active");
+
+  document.getElementById("active-dot").style.display="";
+  var bd=document.getElementById("bn-dot");if(bd)bd.style.display="";
+  endCodePrompted=false;
+  toast("You've joined the queue!","s");
   startPolling();
-  // Show notification modal
-  setTimeout(function(){document.getElementById('modal-notif').style.display='flex';},700);
+  setTimeout(function(){document.getElementById("modal-notif").style.display="flex";},700);
 }
 
-// ═══════════════════════════════════════════════════════
-// ACTIVE QUEUE
-// ═══════════════════════════════════════════════════════
-function renderActive(){
+// ── RENDER ACTIVE (static from cache — instant) ──
+function renderActiveStatic(){
   if(!activeEntry)return;
-  document.getElementById('no-active').style.display='none';
-  document.getElementById('active-view').style.display='block';
-  document.getElementById('a-svc-name').textContent=activeEntry.svc_name||'—';
-  document.getElementById('a-org-name').textContent=activeEntry.org_name||'';
-  document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
-  document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
-  // End code hidden from user — they must get it from org staff when called
-  refreshActive();
+  document.getElementById("no-active").style.display="none";
+  document.getElementById("active-view").style.display="block";
+  document.getElementById("a-svc-name").textContent=activeEntry.svc_name||activeEntry.service_name||"&#8212;";
+  document.getElementById("a-org-name").textContent=activeEntry.org_name||"";
+  document.getElementById("td-svc").textContent=activeEntry.svc_name||"";
+  document.getElementById("td-num").textContent=activeEntry.ticket_label||"&#8212;";
+  // Show locked ETA — never changes
+  renderLockedETA();
+  // Initial position hint
+  if(activeEntry.position){
+    document.getElementById("td-pos").textContent=activeEntry.position;
+    document.getElementById("sp-ahead").textContent=Math.max(0,(activeEntry.position||1)-1);
+    var wm=(activeEntry.position||1)*(activeEntry.time_interval||5);
+    document.getElementById("td-eta").textContent="&#9201; ~"+wm+" min";
+  }
 }
 
+function renderLockedETA(){
+  // FIX: display the locked-in estimated time; never recalculate
+  if(!lockedETA)return;
+  var d=new Date(lockedETA);
+  document.getElementById("et-time").textContent=d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("et-date").textContent=d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+  document.getElementById("exact-time-box").style.display="";
+}
+
+// ── REFRESH ACTIVE (background polling — position/status only, ETA locked) ──
 async function refreshActive(){
   if(!activeEntry)return;
-  var r=await api('/api/user/queue-status/'+activeEntry.id);
+  var r=await api("/api/user/queue-status/"+activeEntry.id);
   if(!r.ok){
-    // Entry might no longer exist — clear it
     if(r.status===404){clearActiveEntry();return;}
     return;
   }
   var d=r.data;
-  // If done
-  if(['completed','cancelled','no_show'].includes(d.status)){
+  if(["completed","cancelled","no_show"].includes(d.status)){
     clearInterval(pollTimer);
-    if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-    activeEntry=null;
-    document.getElementById('no-active').style.display='';
-    document.getElementById('active-view').style.display='none';
-    document.getElementById('active-dot').style.display='none';if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
-    toast('Your queue session has ended.','i');
-    if(d.status==='completed'&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
+    if(profile){localStorage.removeItem("activeEntry_"+profile.id);localStorage.removeItem("lockedETA_"+profile.id);}
+    activeEntry=null;lockedETA=null;
+    document.getElementById("no-active").style.display="";
+    document.getElementById("active-view").style.display="none";
+    document.getElementById("active-dot").style.display="none";
+    var bd=document.getElementById("bn-dot");if(bd)bd.style.display="none";
+    toast("Your queue session has ended.","i");
+    if(d.status==="completed"&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
     return;
   }
-
   var pos=d.position||1;
-  document.getElementById('td-pos').textContent=pos;
-  document.getElementById('sp-ahead').textContent=Math.max(0,pos-1);
-  document.getElementById('sp-total').textContent=d.total||0;
-  document.getElementById('td-eta').textContent='⏱ ~'+(d.eta_minutes||0)+' min';
-
-  // Exact time
-  if(d.estimated_time){
-    var etaDate=new Date(d.estimated_time);
-    document.getElementById('et-time').textContent=etaDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('et-date').textContent=etaDate.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
-    document.getElementById('exact-time-box').style.display='';
+  document.getElementById("td-pos").textContent=pos;
+  document.getElementById("sp-ahead").textContent=Math.max(0,pos-1);
+  document.getElementById("sp-total").textContent=d.total||0;
+  document.getElementById("td-eta").textContent="&#9201; ~"+(d.eta_minutes||0)+" min";
+  // FIX: always show locked ETA, never update it from server
+  renderLockedETA();
+  // Status box
+  var box=document.getElementById("status-box");
+  var ico=document.getElementById("sb-ico");
+  var title=document.getElementById("sb-title");
+  var desc=document.getElementById("sb-desc");
+  box.className="status-box";
+  var badge_el=document.getElementById("a-svc-badge");
+  badge_el.textContent=d.svc_status||"";
+  badge_el.className="badge b-"+(d.svc_status||"");
+  if(d.status==="called"){
+    box.classList.add("sb-call");ico.textContent="&#128226;";title.textContent="You're being called!";desc.textContent="Please proceed to the counter immediately!";
+    toast("&#128226; You are being called! Go to the counter NOW.","w",10000);
+    if(!endCodePrompted){
+      endCodePrompted=true;
+      setTimeout(function(){
+        if(document.getElementById("modal-ticket-label"))document.getElementById("modal-ticket-label").textContent=activeEntry.ticket_label||"&#8212;";
+        document.getElementById("modal-endcode").style.display="flex";
+      },500);
+    }
+  }else if(d.status==="serving"){
+    box.classList.add("sb-serv");ico.textContent="&#9989;";title.textContent="Being served";desc.textContent="You are currently at the counter.";
+  }else{
+    box.classList.add("sb-wait");
+    if(pos===1){ico.textContent="&#128276;";title.textContent="You're next!";desc.textContent="You will be called very soon.";}
+    else if(pos<=3){ico.textContent="&#9200;";title.textContent="Nearly your turn";desc.textContent="Only a few people ahead of you.";}
+    else{ico.textContent="&#8987;";title.textContent="Waiting in queue";desc.textContent="Position updates automatically. Stay nearby.";}
   }
-
-  // Status styling
-  var box=document.getElementById('status-box');
-  var ico=document.getElementById('sb-ico');
-  var title=document.getElementById('sb-title');
-  var desc=document.getElementById('sb-desc');
-  box.className='status-box';
-  var badge_el=document.getElementById('a-svc-badge');
-  badge_el.textContent=d.svc_status||'';
-  badge_el.className='badge b-'+(d.svc_status||'');
-
-  if(d.status==='called'){
-    box.classList.add('sb-call');ico.textContent='📢';title.textContent="You're being called!";desc.textContent='Please proceed to the counter immediately!';
-    toast('📢 You are being called! Go to the counter NOW.','w',10000);
-    // Show end code modal
-    if(!endCodePrompted){endCodePrompted=true;setTimeout(function(){
-  if(document.getElementById('modal-ticket-label')) document.getElementById('modal-ticket-label').textContent=activeEntry.ticket_label||'—';
-  document.getElementById('modal-endcode').style.display='flex';
-},500);}
-  } else if(d.status==='serving'){
-    box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are currently at the counter.';
-  } else {
-    box.classList.add('sb-wait');
-    if(pos===1){ico.textContent='🔔';title.textContent="You're next!";desc.textContent='You will be called very soon.';}
-    else if(pos<=3){ico.textContent='⏰';title.textContent='Nearly your turn';desc.textContent='Only a few people ahead of you.';}
-    else{ico.textContent='⏳';title.textContent='Waiting in queue';desc.textContent='Position updates automatically. Stay nearby.';}
-  }
-
-  // Notification check
   if(notifEnabled&&!notifSent&&d.eta_minutes<=notifMins){
     notifSent=true;
-    showBrowserNotification('QCode — Your Turn Soon!','You have approximately '+d.eta_minutes+' minutes left. Get ready!');
-    toast('🔔 Your turn is coming up in ~'+d.eta_minutes+' min!','w',8000);
+    showBrowserNotif("QCode — Your Turn Soon!","You have approximately "+d.eta_minutes+" minutes left. Get ready!");
+    toast("&#128276; Your turn is coming up in ~"+d.eta_minutes+" min!","w",8000);
   }
 }
 
 function clearActiveEntry(){
   clearInterval(pollTimer);
-  if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-  localStorage.removeItem('qc_active_entry');
-  activeEntry=null;
-  document.getElementById('no-active').style.display='';
-  document.getElementById('active-view').style.display='none';
-  document.getElementById('active-dot').style.display='none';
-  if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
+  if(profile){localStorage.removeItem("activeEntry_"+profile.id);localStorage.removeItem("lockedETA_"+profile.id);}
+  localStorage.removeItem("qc_active_entry");
+  activeEntry=null;lockedETA=null;
+  document.getElementById("no-active").style.display="";
+  document.getElementById("active-view").style.display="none";
+  document.getElementById("active-dot").style.display="none";
+  var bd=document.getElementById("bn-dot");if(bd)bd.style.display="none";
 }
-
-function startPolling(){
-  clearInterval(pollTimer);
-  pollTimer=setInterval(refreshActive,12000);
-  // Also run auto-cancel sweep
-  setInterval(function(){api('/api/system/auto-cancel',{method:'POST'});},60000);
-}
+function startPolling(){clearInterval(pollTimer);pollTimer=setInterval(refreshActive,12000);setInterval(function(){api("/api/system/auto-cancel",{method:"POST"});},60000);}
 
 async function leaveQueue(){
-  if(!activeEntry||!confirm('Leave this queue?'))return;
-  document.getElementById('leave-btn').disabled=true;
-  var r=await api('/api/user/leave-queue/'+activeEntry.id,{method:'POST'});
-  if(!r.ok){toast(r.data.error||'Error.','e');document.getElementById('leave-btn').disabled=false;return;}
-  clearActiveEntry();
-  toast('You have left the queue.','i');
+  if(!activeEntry||!confirm("Leave this queue?"))return;
+  document.getElementById("leave-btn").disabled=true;
+  var r=await api("/api/user/leave-queue/"+activeEntry.id,{method:"POST"});
+  if(!r.ok){toast(r.data.error||"Error.","e");document.getElementById("leave-btn").disabled=false;return;}
+  clearActiveEntry();toast("You have left the queue.","i");
 }
 
-// ═══════════════════════════════════════════════════════
-// NOTIFICATION MODAL
-// ═══════════════════════════════════════════════════════
 function closeNotifModal(yes){
-  document.getElementById('modal-notif').style.display='none';
-  if(yes){
-    notifEnabled=true;
-    notifMins=parseInt(document.getElementById('notif-mins').value)||5;
-    toast('✓ You will be notified '+notifMins+' min before your turn.','s');
-    // Request browser notification permission
-    if('Notification' in window&&Notification.permission==='default'){Notification.requestPermission();}
-  }
+  document.getElementById("modal-notif").style.display="none";
+  if(yes){notifEnabled=true;notifMins=parseInt(document.getElementById("notif-mins").value)||5;toast("&#10003; You will be notified "+notifMins+" min before your turn.","s");if("Notification" in window&&Notification.permission==="default")Notification.requestPermission();}
 }
-function showBrowserNotification(title,body){
-  if('Notification' in window&&Notification.permission==='granted'){
-    new Notification(title,{body:body,icon:'/static/icon.png'});
-  }
-}
+function showBrowserNotif(title,body){if("Notification" in window&&Notification.permission==="granted")new Notification(title,{body:body});}
 
-// ═══════════════════════════════════════════════════════
-// END CODE
-// ═══════════════════════════════════════════════════════
 async function submitEndCode(){
-  var code=document.getElementById('end-code-inp').value.trim().toUpperCase();
-  var err=document.getElementById('end-code-err');
-  err.style.display='none';
-  if(!code||code.length<4){err.textContent='Please enter the 4-character end code.';err.style.display='block';return;}
-  if(!activeEntry){document.getElementById('modal-endcode').style.display='none';return;}
-  var r=await api('/api/user/verify-end-code',{method:'POST',body:{entry_id:activeEntry.id,end_code:code}});
-  if(!r.ok){err.textContent=r.data.error||'Invalid code. Ask the staff for the correct end code.';err.style.display='block';return;}
-  document.getElementById('modal-endcode').style.display='none';
-  toast('✓ Service confirmed! Thank you.','s');
-  fbEntryId=activeEntry.id;
-  clearActiveEntry();
-  setTimeout(openFeedbackModal,800);
+  var code=document.getElementById("end-code-inp").value.trim().toUpperCase();
+  var err=document.getElementById("end-code-err");err.style.display="none";
+  if(!code||code.length<4){err.textContent="Please enter the 4-character end code.";err.style.display="block";return;}
+  if(!activeEntry){document.getElementById("modal-endcode").style.display="none";return;}
+  var r=await api("/api/user/verify-end-code",{method:"POST",body:{entry_id:activeEntry.id,end_code:code}});
+  if(!r.ok){err.textContent=r.data.error||"Invalid code. Ask the staff for the correct end code.";err.style.display="block";return;}
+  document.getElementById("modal-endcode").style.display="none";
+  toast("&#10003; Service confirmed! Thank you.","s");
+  fbEntryId=activeEntry.id;clearActiveEntry();setTimeout(openFeedbackModal,800);
 }
 
-// ═══════════════════════════════════════════════════════
-// FEEDBACK
-// ═══════════════════════════════════════════════════════
-function openFeedbackModal(){document.getElementById('modal-feedback').style.display='flex';fbRating=0;document.querySelectorAll('.star').forEach(function(s){s.classList.remove('active');});}
-function closeFeedbackModal(){document.getElementById('modal-feedback').style.display='none';}
-function setStar(n){
-  fbRating=n;
-  document.querySelectorAll('.star').forEach(function(s){s.classList.toggle('active',parseInt(s.dataset.v)<=n);});
-}
+function openFeedbackModal(){document.getElementById("modal-feedback").style.display="flex";fbRating=0;document.querySelectorAll(".star").forEach(function(s){s.classList.remove("active");});}
+function closeFeedbackModal(){document.getElementById("modal-feedback").style.display="none";}
+function setStar(n){fbRating=n;document.querySelectorAll(".star").forEach(function(s){s.classList.toggle("active",parseInt(s.dataset.v)<=n);});}
 async function submitFeedback(){
-  if(!fbRating){toast('Please select a rating.','e');return;}
+  if(!fbRating){toast("Please select a rating.","e");return;}
   if(!fbEntryId){closeFeedbackModal();return;}
-  var comment=document.getElementById('fb-comment').value.trim();
-  var r=await api('/api/user/feedback',{method:'POST',body:{entry_id:fbEntryId,rating:fbRating,comment:comment}});
-  if(!r.ok){toast(r.data.error||'Failed to submit feedback.','e');return;}
-  closeFeedbackModal();
-  toast('Thank you for your feedback! ⭐','s');
+  var r=await api("/api/user/feedback",{method:"POST",body:{entry_id:fbEntryId,rating:fbRating,comment:document.getElementById("fb-comment").value.trim()}});
+  if(!r.ok){toast(r.data.error||"Failed to submit feedback.","e");return;}
+  closeFeedbackModal();toast("Thank you for your feedback! &#11088;","s");
 }
 
-// ═══════════════════════════════════════════════════════
-// HISTORY
-// ═══════════════════════════════════════════════════════
 async function loadHistory(){
-  var r=await api('/api/user/history');
-  var tb=document.getElementById('hist-tbody');
-  if(!r.ok||!r.data.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8">No queue history yet. Join a queue to get started!</td></tr>';return;}
+  var r=await api("/api/user/history");
+  var tb=document.getElementById("hist-tbody");
+  if(!r.ok||!r.data.length){tb.innerHTML="<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8">No queue history yet. Join a queue to get started!</td></tr>";return;}
   tb.innerHTML=r.data.map(function(e){
-    return '<tr><td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
-      '<td>'+(e.svc_name||'—')+'</td><td>'+(e.org_name||'—')+'</td>'+
-      '<td>'+(e.join_method==='sms'?'📱 SMS':'🌐 Web')+'</td>'+
-      '<td>'+badge(e.status)+'</td>'+
-      '<td style="font-size:.8rem">'+fmt(e.joined_at)+'</td></tr>';
-  }).join('');
+    return "<tr><td><span class="ticket-tag">"+(e.ticket_label||"&#8212;")+"</span></td>"+
+      "<td>"+(e.svc_name||"&#8212;")+"</td><td>"+(e.org_name||"&#8212;")+"</td>"+
+      "<td>"+(e.join_method==="sms"?"&#128241; SMS":"&#127760; Web")+"</td>"+
+      "<td>"+badge(e.status)+"</td>"+
+      "<td style="font-size:.8rem">"+fmt(e.joined_at)+"</td></tr>";
+  }).join("");
 }
 
-// ═══════════════════════════════════════════════════════
-// NEARBY
-// ═══════════════════════════════════════════════════════
 var _allNearbyServices=[];
 async function loadNearby(){
-  var r=await api('/api/user/open-services');
-  var grid=document.getElementById('nearby-grid');
-  if(!r.ok||!r.data.length){_allNearbyServices=[];grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">🔍</div><p>No open services right now.</p></div>';return;}
-  _allNearbyServices=r.data;
-  renderNearbyGrid(_allNearbyServices);
+  var r=await api("/api/user/open-services");
+  var grid=document.getElementById("nearby-grid");
+  if(!r.ok||!r.data.length){_allNearbyServices=[];grid.innerHTML="<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">&#128269;</div><p>No open services right now.</p></div>";return;}
+  _allNearbyServices=r.data;renderNearbyGrid(_allNearbyServices);
 }
 function renderNearbyGrid(svcs){
-  var grid=document.getElementById('nearby-grid');
-  if(!svcs.length){grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><p>No matching services found.</p></div>';return;}
+  var grid=document.getElementById("nearby-grid");
+  if(!svcs.length){grid.innerHTML="<div style="text-align:center;padding:3rem;color:#64748b"><p>No matching services found.</p></div>";return;}
   grid.innerHTML=svcs.map(function(s){
-    return '<div class="nb-card" onclick="nsLoadService(\''+s.service_code+'\')">'+
-      '<div class="nb-name">'+s.name+'</div>'+
-      '<div class="nb-meta">🏢 '+(s.org_name||'—')+'<br>👥 '+s.waiting_count+' waiting · ⏱ '+s.time_interval+' min/person'+(s.staff_name?'<br>👤 '+s.staff_name:'')+'</div>'+
-      '<div class="nb-code">'+s.service_code+'</div></div>';
-  }).join('');
+    return "<div class="nb-card" onclick="nsLoadService('"+s.service_code+"')">"+
+      "<div class="nb-name">"+s.name+"</div>"+
+      "<div class="nb-meta">&#127970; "+(s.org_name||"&#8212;")+"<br>&#128101; "+s.waiting_count+" waiting &#183; &#9201; "+s.time_interval+" min/person"+(s.staff_name?"<br>&#128100; "+s.staff_name:"")+"</div>"+
+      "<div class="nb-code">"+s.service_code+"</div></div>";
+  }).join("");
 }
 function filterNearby(q){
   if(!q.trim()){renderNearbyGrid(_allNearbyServices);return;}
   var low=q.toLowerCase();
-  renderNearbyGrid(_allNearbyServices.filter(function(s){
-    return (s.name||'').toLowerCase().includes(low)||(s.org_name||'').toLowerCase().includes(low)||(s.service_code||'').toLowerCase().includes(low);
-  }));
+  renderNearbyGrid(_allNearbyServices.filter(function(s){return(s.name||"").toLowerCase().includes(low)||(s.org_name||"").toLowerCase().includes(low)||(s.service_code||"").toLowerCase().includes(low);}));
 }
-function prefillCode(code){show('join');document.getElementById('code-in').value=code;findService();}
 
-// Nearby panel: search by code
 var _nsSvc=null;
 async function nearbyFindService(){
-  var code=document.getElementById('ns-code-in').value.trim().toUpperCase();
-  var errEl=document.getElementById('ns-code-err');
-  var btn=document.getElementById('ns-find-btn');
-  errEl.style.display='none';
-  if(!code){errEl.textContent='Please enter a service code.';errEl.style.display='block';return;}
-  btn.disabled=true;btn.textContent='…';
-  var r=await api('/api/user/find-service?code='+encodeURIComponent(code));
-  btn.disabled=false;btn.textContent='Find →';
-  if(!r.ok){errEl.textContent=(r.data&&r.data.error)||'Service not found.';errEl.style.display='block';return;}
+  var code=document.getElementById("ns-code-in").value.trim().toUpperCase();
+  var errEl=document.getElementById("ns-code-err");var btn=document.getElementById("ns-find-btn");
+  errEl.style.display="none";
+  if(!code){errEl.textContent="Please enter a service code.";errEl.style.display="block";return;}
+  btn.disabled=true;btn.textContent="&#8230;";
+  var r=await api("/api/user/find-service?code="+encodeURIComponent(code));
+  btn.disabled=false;btn.textContent="Find &#8594;";
+  if(!r.ok){errEl.textContent=(r.data&&r.data.error)||"Service not found.";errEl.style.display="block";return;}
   _nsSvc=r.data;
-  document.getElementById('ns-found-name').textContent=_nsSvc.name;
-  document.getElementById('ns-found-org').textContent=_nsSvc.org_name?'🏢 '+_nsSvc.org_name:'';
-  document.getElementById('ns-found-eta').textContent='⏱ ~'+(_nsSvc.eta_minutes||0)+' min wait';
-  document.getElementById('ns-found-waiting').textContent='👥 '+(_nsSvc.waiting_count||0)+' waiting';
-  // logo
-  var logoEl=document.getElementById('ns-found-logo');
-  if(_nsSvc.org_logo){logoEl.src=_nsSvc.org_logo;logoEl.style.display='block';}else{logoEl.style.display='none';}
-  // custom form
-  var formWrap=document.getElementById('ns-custom-form-wrap');
-  var formFields=document.getElementById('ns-custom-form-fields');
-  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
+  document.getElementById("ns-found-name").textContent=_nsSvc.name;
+  document.getElementById("ns-found-org").textContent=_nsSvc.org_name?"&#127970; "+_nsSvc.org_name:"";
+  document.getElementById("ns-found-eta").textContent="&#9201; ~"+(_nsSvc.eta_minutes||0)+" min wait";
+  document.getElementById("ns-found-waiting").textContent="&#128101; "+(_nsSvc.waiting_count||0)+" waiting";
+  var logoEl=document.getElementById("ns-found-logo");
+  if(_nsSvc.org_logo){logoEl.src=_nsSvc.org_logo;logoEl.style.display="block";}else{logoEl.style.display="none";}
+  var formWrap=document.getElementById("ns-custom-form-wrap");
+  var formFields=document.getElementById("ns-custom-form-fields");
+  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||"[]");}catch(e){}
   if(fields.length){
-    formWrap.style.display='block';
+    formWrap.style.display="block";
     formFields.innerHTML=fields.map(function(f,i){
-      return '<div class="fg"><label class="lbl">'+(f.label||f)+(f.required?'*':'')+'</label>'+
-        '<input class="inp" id="ns-cf-'+i+'" type="text" placeholder="'+(f.placeholder||'')+'" '+(f.required?'required':'')+'/></div>';
-    }).join('');
-  }else{formWrap.style.display='none';}
-  document.getElementById('ns-step-code').style.display='none';
-  document.getElementById('ns-step-found').style.display='block';
+      return "<div class="fg"><label class="lbl">"+(f.label||f)+(f.required?"*":"")+"</label>"+
+        "<input class="inp" id="ns-cf-"+i+"" type="text" placeholder=""+(f.placeholder||"")+"" "+(f.required?"required":"")+" /></div>";
+    }).join("");
+  }else{formWrap.style.display="none";}
+  document.getElementById("ns-step-code").style.display="none";
+  document.getElementById("ns-step-found").style.display="block";
 }
-async function nsLoadService(code){
-  document.getElementById('ns-code-in').value=code;
-  nearbyFindService();
-  document.getElementById('nearby-search-card').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function nsCancelFind(){
-  _nsSvc=null;
-  document.getElementById('ns-step-found').style.display='none';
-  document.getElementById('ns-step-code').style.display='block';
-  document.getElementById('ns-code-in').value='';
-  document.getElementById('ns-code-err').style.display='none';
-}
+async function nsLoadService(code){document.getElementById("ns-code-in").value=code;nearbyFindService();document.getElementById("nearby-search-card").scrollIntoView({behavior:"smooth",block:"start"});}
+function nsCancelFind(){_nsSvc=null;document.getElementById("ns-step-found").style.display="none";document.getElementById("ns-step-code").style.display="block";document.getElementById("ns-code-in").value="";document.getElementById("ns-code-err").style.display="none";}
 async function nsConfirmJoin(){
   if(!_nsSvc)return;
   var customData={};
-  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
+  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||"[]");}catch(e){}
   for(var i=0;i<fields.length;i++){
-    var el=document.getElementById('ns-cf-'+i);
-    if(fields[i].required&&(!el||!el.value.trim())){toast('Please fill in all required fields.','e');return;}
+    var el=document.getElementById("ns-cf-"+i);
+    if(fields[i].required&&(!el||!el.value.trim())){toast("Please fill in all required fields.","e");return;}
     if(el)customData[fields[i].label||fields[i]]=el.value.trim();
   }
-  var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:_nsSvc.id,custom_form_data:customData}});
-  if(r.status===409){toast('You are already in this queue.','i');show('active');loadActiveQueue();return;}
-  if(!r.ok){toast((r.data&&r.data.error)||'Failed to join queue.','e');return;}
-  var entry=r.data.entry;
-  sessionStorage.setItem('qc_active_entry',JSON.stringify(entry));
-  toast('Joined! Ticket: '+entry.ticket_label,'s');
-  nsCancelFind();
-  show('active');
-  loadActiveQueue();
-  showNotifyModalIfNeeded();
+  var r=await api("/api/user/join-queue",{method:"POST",body:{service_id:_nsSvc.id,custom_form_data:customData}});
+  if(r.status===409){toast("You are already in this queue.","i");show("active");return;}
+  if(!r.ok){toast((r.data&&r.data.error)||"Failed to join queue.","e");return;}
+  activeEntry=r.data.entry||r.data;
+  lockedETA=activeEntry.estimated_time||null;
+  if(profile){localStorage.setItem("activeEntry_"+profile.id,JSON.stringify(activeEntry));if(lockedETA)localStorage.setItem("lockedETA_"+profile.id,lockedETA);}
+  toast("Joined! Ticket: "+activeEntry.ticket_label,"s");
+  nsCancelFind();renderActiveStatic();show("active");
+  document.getElementById("active-dot").style.display="";var bd=document.getElementById("bn-dot");if(bd)bd.style.display="";
+  endCodePrompted=false;startPolling();
+  setTimeout(function(){document.getElementById("modal-notif").style.display="flex";},700);
 }
 
-// ═══════════════════════════════════════════════════════
-// ACCOUNT
-// ═══════════════════════════════════════════════════════
 async function saveAccount(){
-  var name=document.getElementById('acc-name').value.trim();
-  var phone=document.getElementById('acc-phone').value.trim();
-  var r=await api('/api/user/profile',{method:'POST',body:{full_name:name,phone:phone}});
-  if(!r.ok){toast(r.data.error||'Save failed.','e');return;}
-  document.getElementById('tb-name').textContent=name||profile.email||'—';
-  toast('Account saved! ✓','s');
+  var name=document.getElementById("acc-name").value.trim();
+  var phone=document.getElementById("acc-phone").value.trim();
+  var r=await api("/api/user/profile",{method:"POST",body:{full_name:name,phone:phone}});
+  if(!r.ok){toast(r.data.error||"Save failed.","e");return;}
+  document.getElementById("tb-name").textContent=name||profile.email||"&#8212;";
+  toast("Account saved! &#10003;","s");
 }
 
-// ═══════════════════════════════════════════════════════
-// FAQ AI
-// ═══════════════════════════════════════════════════════
-function toggleFAQ(){document.getElementById('faq-panel').classList.toggle('hidden');if(!document.getElementById('faq-panel').classList.contains('hidden'))setTimeout(function(){document.getElementById('faq-inp').focus();},100);}
-function quickQ(q){document.getElementById('faq-inp').value=q;sendFAQ();}
-function clearChat(){faqHistory=[];document.getElementById('faq-msgs').innerHTML='<div class="faq-msg ai"><div class="faq-bubble">Chat cleared! How can I help you?</div></div>';}
+function quickQ(q){document.getElementById("faq-inp").value=q;sendFAQ();}
+function clearChat(){faqHistory=[];document.getElementById("faq-msgs").innerHTML="<div class="faq-msg ai"><div class="faq-bubble">Chat cleared! How can I help you?</div></div>";}
 async function sendFAQ(){
-  var inp=document.getElementById('faq-inp');var msg=inp.value.trim();if(!msg)return;
-  inp.value='';appendMsg('user',msg);faqHistory.push({role:'user',content:msg});
+  var inp=document.getElementById("faq-inp");var msg=inp.value.trim();if(!msg)return;
+  inp.value="";appendMsg("user",msg);faqHistory.push({role:"user",content:msg});
   if(faqHistory.length>20)faqHistory=faqHistory.slice(-20);
-  var typingId='t'+Date.now();appendMsg('ai','Thinking…','',typingId);document.getElementById('faq-send').disabled=true;
+  var typingId="t"+Date.now();appendMsg("ai","Thinking&#8230;","",typingId);document.getElementById("faq-send").disabled=true;
   try{
-    var res=await api('/api/ai/faq',{method:'POST',body:{messages:faqHistory,system:FAQ_SYS}});
-    var reply=(res.data&&res.data.response)||'Sorry, I could not get a response. Please try again.';
-    faqHistory.push({role:'assistant',content:reply});
+    var res=await api("/api/ai/faq",{method:"POST",body:{messages:faqHistory,system:FAQ_SYS}});
+    var reply=(res.data&&res.data.response)||"Sorry, I could not get a response. Please try again.";
+    faqHistory.push({role:"assistant",content:reply});
     var el=document.getElementById(typingId);if(el)el.remove();
-    appendMsg('ai',reply);
-  }catch(e){var el2=document.getElementById(typingId);if(el2)el2.remove();appendMsg('ai','⚠️ AI temporarily unavailable.');}
-  finally{document.getElementById('faq-send').disabled=false;inp.focus();}
+    appendMsg("ai",reply);
+  }catch(e){var el2=document.getElementById(typingId);if(el2)el2.remove();appendMsg("ai","&#9888;&#65039; AI temporarily unavailable.");}
+  finally{document.getElementById("faq-send").disabled=false;inp.focus();}
 }
 function appendMsg(role,text,cls,id){
-  var wrap=document.getElementById('faq-msgs');var div=document.createElement('div');
-  div.className='faq-msg '+role;if(id)div.id=id;
-  div.innerHTML='<div class="faq-bubble'+(cls?' '+cls:'')+'">'+text.replace(/\n/g,'<br>')+'</div>';
+  var wrap=document.getElementById("faq-msgs");var div=document.createElement("div");
+  div.className="faq-msg "+role;if(id)div.id=id;
+  div.innerHTML="<div class="faq-bubble"+(cls?" "+cls:"")+"">"+text.replace(/\n/g,"<br>")+"</div>";
   wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
 }
 
-// ═══════════════════════════════════════════════════════
-// LOGOUT
-// ═══════════════════════════════════════════════════════
 async function doLogout(){
-  clearInterval(pollTimer);
-  await api('/api/auth/logout',{method:'POST'});
-  window.location.href='/';
+  clearInterval(pollTimer);await api("/api/auth/logout",{method:"POST"});window.location.href="/";
 }
 
-// ═══════════════════════════════════════════════════════
-// INPUT EVENTS
-// ═══════════════════════════════════════════════════════
-document.getElementById('code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
-document.getElementById('code-in').addEventListener('keydown',function(e){if(e.key==='Enter')findService();});
-document.getElementById('ns-code-in').addEventListener('keydown',function(e){if(e.key==='Enter')nearbyFindService();});
-document.getElementById('ns-code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+document.getElementById("code-in").addEventListener("input",function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,"");});
+document.getElementById("code-in").addEventListener("keydown",function(e){if(e.key==="Enter")findService();});
+document.getElementById("ns-code-in").addEventListener("keydown",function(e){if(e.key==="Enter")nearbyFindService();});
+document.getElementById("ns-code-in").addEventListener("input",function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,"");});
 
 init();
 </script>
 
-<!-- ═══ BOTTOM NAV (mobile) ═══ -->
 <nav class="bottom-nav">
   <div class="bn-items">
-    <button class="bn-item active" id="bn-join" onclick="show('join')">
-      <span class="bn-ico">🎫</span><span>Join</span>
-    </button>
-    <button class="bn-item" id="bn-active" onclick="show('active')">
-      <span class="bn-ico">📡</span>
-      <span class="bn-dot" id="bn-dot"></span>
-      <span>Active</span>
-    </button>
-    <button class="bn-item" id="bn-nearby" onclick="show('nearby')">
-      <span class="bn-ico">🗺</span><span>Services</span>
-    </button>
-    <button class="bn-item" id="bn-history" onclick="show('history')">
-      <span class="bn-ico">🕐</span><span>History</span>
-    </button>
-    <button class="bn-item" id="bn-account" onclick="show('account')">
-      <span class="bn-ico">👤</span><span>Account</span>
-    </button>
+    <button class="bn-item active" id="bn-join" onclick="show('join')"><span class="bn-ico">&#127915;</span><span>Join</span></button>
+    <button class="bn-item" id="bn-active" onclick="show('active')"><span class="bn-ico">&#128225;</span><span class="bn-dot" id="bn-dot"></span><span>Active</span></button>
+    <button class="bn-item" id="bn-nearby" onclick="show('nearby')"><span class="bn-ico">&#128506;</span><span>Services</span></button>
+    <button class="bn-item" id="bn-history" onclick="show('history')"><span class="bn-ico">&#128336;</span><span>History</span></button>
+    <button class="bn-item" id="bn-account" onclick="show('account')"><span class="bn-ico">&#128100;</span><span>Account</span></button>
   </div>
 </nav>
 </body>
