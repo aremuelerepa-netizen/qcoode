@@ -23,8 +23,14 @@ if not SUPABASE_URL or not SUPABASE_ANON_KEY or not SUPABASE_KEY:
     raise RuntimeError("Missing required env vars: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_KEY")
 
 def get_groq():
+    # Fix: pass a clean httpx.Client to avoid the 'proxies' kwarg error
+    # that occurs when groq tries to pass proxies to newer httpx versions (0.28+)
+    import httpx
     from groq import Groq
-    return Groq(api_key=os.getenv("GROQ_API_KEY", ""))
+    return Groq(
+        api_key=os.getenv("GROQ_API_KEY", ""),
+        http_client=httpx.Client()
+    )
 
 SMS_GATEWAY_NUMBER = os.getenv("SMS_GATEWAY_NUMBER", "+2349155189936")
 ANDROID_GW_URL      = os.getenv("ANDROID_GW_URL", "")
@@ -184,7 +190,12 @@ def ai_faq():
     if not messages: return jsonify({"error": "No messages"}), 400
     try:
         client   = get_groq()
-        response = client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "system", "content": system_prompt}, *messages], max_tokens=600, temperature=0.7)
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "system", "content": system_prompt}, *messages],
+            max_tokens=600,
+            temperature=0.7
+        )
         return jsonify({"response": response.choices[0].message.content})
     except Exception as e:
         print(f"Groq error: {e}")
@@ -484,8 +495,29 @@ def api_org_create_service():
         code = _rcode(6)
         if not db_select("services", {"service_code": f"eq.{code}"}): break
     end_code = _rcode(4)
-    res = db_insert("services", {"org_id": uid, "name": name, "staff_name": d.get("staff_name") or None, "description": d.get("description") or None, "service_code": code, "end_code": end_code, "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3], "ticket_counter": 0, "time_interval": int(d.get("time_interval") or 5), "max_users": int(d.get("max_users")) if d.get("max_users") else None, "status": "open", "user_info_form": json.dumps(d.get("user_info_form") or []), "queue_start": d.get("queue_start") or d.get("schedule_start") or None, "queue_end": d.get("queue_end") or d.get("schedule_end") or None, "break_times": json.dumps(d.get("break_times") or [])})
-    if not res["ok"]: return jsonify({"error": "Failed to create service"}), 500
+    # Send arrays as real arrays (not json.dumps strings) so Supabase JSONB columns accept them
+    payload = {
+        "org_id": uid,
+        "name": name,
+        "staff_name": d.get("staff_name") or None,
+        "description": d.get("description") or None,
+        "service_code": code,
+        "end_code": end_code,
+        "ticket_prefix": (d.get("ticket_prefix") or "A").upper()[:3],
+        "ticket_counter": 0,
+        "time_interval": int(d.get("time_interval") or 5),
+        "max_users": int(d.get("max_users")) if d.get("max_users") else None,
+        "status": "open",
+        "user_info_form": d.get("user_info_form") or [],
+        "queue_start": d.get("queue_start") or d.get("schedule_start") or None,
+        "queue_end": d.get("queue_end") or d.get("schedule_end") or None,
+        "break_times": d.get("break_times") or [],
+    }
+    res = db_insert("services", payload)
+    if not res["ok"]:
+        print(f"[Create Service Error] status={res['status']} data={res['data']}")
+        err_msg = res["data"].get("message") or res["data"].get("details") or "Failed to create service" if isinstance(res["data"], dict) else "Failed to create service"
+        return jsonify({"error": err_msg}), 500
     svc = res["data"][0] if isinstance(res["data"], list) else res["data"]
     return jsonify({"success": True, "service": svc, "service_code": code, "end_code": end_code}), 201
 
@@ -719,26 +751,49 @@ def receive_sms():
 # ─── GUEST APIs ────────────────────────────────────────────────
 @app.route("/api/guest/join", methods=["POST"])
 def api_guest_join():
-    d = request.get_json() or {}; svc_id = d.get("service_id"); guest_name = (d.get("guest_name") or "").strip()
+    d = request.get_json() or {}
+    svc_id     = d.get("service_id")
+    guest_name = (d.get("guest_name") or "").strip()
+    guest_phone = (d.get("guest_phone") or "").strip() or None
     if not svc_id: return jsonify({"error": "service_id required"}), 400
     if not guest_name: return jsonify({"error": "Guest name required"}), 400
-    svcs = db_select("services",{"id":f"eq.{svc_id}"})
+    svcs = db_select("services", {"id": f"eq.{svc_id}"})
     if not svcs: return jsonify({"error": "Service not found"}), 404
     svc = svcs[0]
     if svc["status"] != "open": return jsonify({"error": f"Queue is {svc['status']}."}), 400
-    max_u = svc.get("max_users") or 9999; current = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"in.(waiting,called,serving)"})
+    max_u   = svc.get("max_users") or 9999
+    current = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "in.(waiting,called,serving)"})
     if current >= max_u: return jsonify({"error": "Queue is full."}), 400
-    n = (svc.get("ticket_counter") or 0)+1; label = f"{svc.get('ticket_prefix','Q')}{str(n).zfill(3)}"
-    db_update("services",{"id":svc_id},{"ticket_counter":n})
-    pos = db_count("queue_entries",{"service_id":f"eq.{svc_id}","status":"eq.waiting"})+1
-    eta_t = (datetime.now(timezone.utc)+timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
+    n     = (svc.get("ticket_counter") or 0) + 1
+    label = f"{svc.get('ticket_prefix','Q')}{str(n).zfill(3)}"
+    db_update("services", {"id": svc_id}, {"ticket_counter": n})
+    pos   = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
+    eta_t = (datetime.now(timezone.utc) + timedelta(minutes=pos * (svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    res = db_insert("queue_entries",{"service_id":svc_id,"user_id":None,"guest_name":guest_name,"ticket_label":label,"ticket_number":n,"status":"waiting","estimated_time":eta_t,"join_method":"web","end_code":end_code,"joined_at":datetime.now(timezone.utc).isoformat()})
-    if not res["ok"]: return jsonify({"error": "Failed to join queue."}), 500
-    entry = res["data"][0] if isinstance(res["data"],list) else res["data"]
-    entry["position"] = pos; entry["svc_name"] = svc["name"]; entry["time_interval"] = svc.get("time_interval",5)
-    org = db_select("profiles",{"id":f"eq.{svc['org_id']}"},single=True) or {}; entry["org_name"] = org.get("org_name","")
-    return jsonify({"success":True,"entry":entry,"end_code":end_code}), 201
+    res = db_insert("queue_entries", {
+        "service_id":   svc_id,
+        "user_id":      None,
+        "guest_name":   guest_name,
+        "guest_phone":  guest_phone,
+        "ticket_label": label,
+        "ticket_number": n,
+        "status":       "waiting",
+        "estimated_time": eta_t,
+        "join_method":  "web",
+        "end_code":     end_code,
+        "joined_at":    datetime.now(timezone.utc).isoformat()
+    })
+    if not res["ok"]:
+        print(f"[Guest Join Error] status={res['status']} data={res['data']}")
+        err_msg = res["data"].get("message") or res["data"].get("details") or "Failed to join queue" if isinstance(res["data"], dict) else "Failed to join queue"
+        return jsonify({"error": err_msg}), 500
+    entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
+    entry["position"]     = pos
+    entry["svc_name"]     = svc["name"]
+    entry["time_interval"] = svc.get("time_interval", 5)
+    org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
+    entry["org_name"] = org.get("org_name", "")
+    return jsonify({"success": True, "entry": entry, "end_code": end_code}), 201
 
 @app.route("/api/guest/queue-status/<entry_id>")
 def api_guest_queue_status(entry_id):
