@@ -227,8 +227,61 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 #faq-send:hover{background:#3451d1}#faq-send:disabled{opacity:.5}
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){.shell{flex-direction:column}.sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:.75rem;border-right:none;border-bottom:2px solid rgba(13,17,23,.06);gap:.25rem}.sb-sect{display:none}.main{max-height:none}}
-@media(max-width:640px){.main{padding:1rem}.td-num{font-size:3.5rem}.stat-pair{grid-template-columns:1fr}}
+@media(max-width:900px){
+  .shell{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:.75rem;border-right:none;border-bottom:2px solid rgba(13,17,23,.06);gap:.25rem}
+  .sb-sect{display:none}
+  .main{max-height:none}
+}
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:640px){
+  .main{padding:1rem}
+  .td-num{font-size:3.5rem}
+  .stat-pair{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  /* Topbar */
+  .tb{padding:.625rem .875rem;gap:.5rem}
+  .tb-title{font-size:1rem}
+  .tb-org{display:none}
+  /* Sidebar nav becomes scrollable row */
+  .sidebar{padding:.5rem .625rem;gap:.2rem;overflow-x:auto;flex-wrap:nowrap}
+  .sb-item{font-size:.72rem;padding:.4rem .6rem;flex-shrink:0;white-space:nowrap}
+  .sb-item .ico{font-size:.85rem}
+  /* Main content */
+  .main{padding:.875rem .75rem}
+  .ph h1{font-size:1.25rem}
+  .ph p{font-size:.82rem}
+  /* Cards */
+  .card{padding:1.25rem 1rem}
+  .card-title{font-size:.875rem}
+  /* Ticket */
+  .ticket-display{padding:1.75rem 1rem}
+  .td-num{font-size:3rem}
+  .td-label{font-size:.65rem}
+  .stat-pair{grid-template-columns:1fr 1fr;gap:.625rem}
+  /* Join panel */
+  .inp-row{flex-direction:row}
+  .inp-row .inp{min-width:0}
+  .found-box{padding:.75rem}
+  /* Nearby grid */
+  .nearby-grid{grid-template-columns:1fr}
+  /* Table */
+  .tbl-wrap{font-size:.78rem}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem .625rem}
+  /* Profile hero */
+  .profile-hero{flex-direction:column;text-align:center;padding:1.5rem 1rem}
+  /* FAQ widget */
+  .faq-panel{width:calc(100vw - 2rem);right:auto;left:50%;transform:translateX(-50%)}
+  .faq-btn{bottom:1rem;right:1rem}
+  /* Modal */
+  .modal{padding:1.5rem 1.125rem;border-radius:1.25rem;max-width:calc(100vw - 1.5rem)}
+  .modal-footer{flex-direction:column}
+  .modal-footer .btn{width:100%}
+}
 </style>
 </head>
 <body>
@@ -357,7 +410,41 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 
     <!-- ═══ NEARBY ═══ -->
     <div class="panel" id="panel-nearby">
-      <div class="ph"><h1>Open Services</h1><p>All live queues you can join right now</p></div>
+      <div class="ph"><h1>Open Services</h1><p>Browse live queues or search by service code</p></div>
+      <!-- Search by code inside Open Services -->
+      <div class="card" style="margin-bottom:1.25rem" id="nearby-search-card">
+        <div class="card-title">🔍 Find by Service Code</div>
+        <div id="ns-step-code">
+          <div class="inp-row">
+            <input id="ns-code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8"/>
+            <button class="btn btn-primary" onclick="nearbyFindService()" id="ns-find-btn">Find →</button>
+          </div>
+          <div id="ns-code-err" class="ferr"></div>
+        </div>
+        <div id="ns-step-found" style="display:none;margin-top:1.25rem">
+          <div class="found-box">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <img id="ns-found-logo" class="found-logo" src="" alt="" style="display:none"/>
+              <div class="found-name" id="ns-found-name"></div>
+            </div>
+            <div class="found-meta">
+              <span id="ns-found-org"></span>
+              <span id="ns-found-eta">⏱ Calculating…</span>
+              <span id="ns-found-waiting">👥 — waiting</span>
+            </div>
+          </div>
+          <div id="ns-custom-form-wrap" style="display:none;margin-bottom:1rem">
+            <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">📋 Please fill in the required information</div>
+            <div id="ns-custom-form-fields"></div>
+          </div>
+          <button class="btn btn-success btn-full btn-lg" onclick="nsConfirmJoin()">✓ Join This Queue</button>
+          <button class="btn btn-ghost btn-full" onclick="nsCancelFind()" style="margin-top:.625rem">← Back to list</button>
+        </div>
+      </div>
+      <!-- Filter bar -->
+      <div style="margin-bottom:1rem;display:flex;gap:.5rem;align-items:center">
+        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or organization…" style="max-width:320px" oninput="filterNearby(this.value)"/>
+      </div>
       <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
 
@@ -787,18 +874,99 @@ async function loadHistory(){
 // ═══════════════════════════════════════════════════════
 // NEARBY
 // ═══════════════════════════════════════════════════════
+var _allNearbyServices=[];
 async function loadNearby(){
   var r=await api('/api/user/open-services');
   var grid=document.getElementById('nearby-grid');
-  if(!r.ok||!r.data.length){grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">🔍</div><p>No open services right now.</p></div>';return;}
-  grid.innerHTML=r.data.map(function(s){
-    return '<div class="nb-card" onclick="prefillCode(\''+s.service_code+'\')">'+
+  if(!r.ok||!r.data.length){_allNearbyServices=[];grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">🔍</div><p>No open services right now.</p></div>';return;}
+  _allNearbyServices=r.data;
+  renderNearbyGrid(_allNearbyServices);
+}
+function renderNearbyGrid(svcs){
+  var grid=document.getElementById('nearby-grid');
+  if(!svcs.length){grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><p>No matching services found.</p></div>';return;}
+  grid.innerHTML=svcs.map(function(s){
+    return '<div class="nb-card" onclick="nsLoadService(\''+s.service_code+'\')">'+
       '<div class="nb-name">'+s.name+'</div>'+
       '<div class="nb-meta">🏢 '+(s.org_name||'—')+'<br>👥 '+s.waiting_count+' waiting · ⏱ '+s.time_interval+' min/person'+(s.staff_name?'<br>👤 '+s.staff_name:'')+'</div>'+
       '<div class="nb-code">'+s.service_code+'</div></div>';
   }).join('');
 }
+function filterNearby(q){
+  if(!q.trim()){renderNearbyGrid(_allNearbyServices);return;}
+  var low=q.toLowerCase();
+  renderNearbyGrid(_allNearbyServices.filter(function(s){
+    return (s.name||'').toLowerCase().includes(low)||(s.org_name||'').toLowerCase().includes(low)||(s.service_code||'').toLowerCase().includes(low);
+  }));
+}
 function prefillCode(code){show('join');document.getElementById('code-in').value=code;findService();}
+
+// Nearby panel: search by code
+var _nsSvc=null;
+async function nearbyFindService(){
+  var code=document.getElementById('ns-code-in').value.trim().toUpperCase();
+  var errEl=document.getElementById('ns-code-err');
+  var btn=document.getElementById('ns-find-btn');
+  errEl.style.display='none';
+  if(!code){errEl.textContent='Please enter a service code.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='…';
+  var r=await api('/api/user/find-service?code='+encodeURIComponent(code));
+  btn.disabled=false;btn.textContent='Find →';
+  if(!r.ok){errEl.textContent=(r.data&&r.data.error)||'Service not found.';errEl.style.display='block';return;}
+  _nsSvc=r.data;
+  document.getElementById('ns-found-name').textContent=_nsSvc.name;
+  document.getElementById('ns-found-org').textContent=_nsSvc.org_name?'🏢 '+_nsSvc.org_name:'';
+  document.getElementById('ns-found-eta').textContent='⏱ ~'+(_nsSvc.eta_minutes||0)+' min wait';
+  document.getElementById('ns-found-waiting').textContent='👥 '+(_nsSvc.waiting_count||0)+' waiting';
+  // logo
+  var logoEl=document.getElementById('ns-found-logo');
+  if(_nsSvc.org_logo){logoEl.src=_nsSvc.org_logo;logoEl.style.display='block';}else{logoEl.style.display='none';}
+  // custom form
+  var formWrap=document.getElementById('ns-custom-form-wrap');
+  var formFields=document.getElementById('ns-custom-form-fields');
+  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
+  if(fields.length){
+    formWrap.style.display='block';
+    formFields.innerHTML=fields.map(function(f,i){
+      return '<div class="fg"><label class="lbl">'+(f.label||f)+(f.required?'*':'')+'</label>'+
+        '<input class="inp" id="ns-cf-'+i+'" type="text" placeholder="'+(f.placeholder||'')+'" '+(f.required?'required':'')+'/></div>';
+    }).join('');
+  }else{formWrap.style.display='none';}
+  document.getElementById('ns-step-code').style.display='none';
+  document.getElementById('ns-step-found').style.display='block';
+}
+async function nsLoadService(code){
+  document.getElementById('ns-code-in').value=code;
+  nearbyFindService();
+  document.getElementById('nearby-search-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function nsCancelFind(){
+  _nsSvc=null;
+  document.getElementById('ns-step-found').style.display='none';
+  document.getElementById('ns-step-code').style.display='block';
+  document.getElementById('ns-code-in').value='';
+  document.getElementById('ns-code-err').style.display='none';
+}
+async function nsConfirmJoin(){
+  if(!_nsSvc)return;
+  var customData={};
+  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
+  for(var i=0;i<fields.length;i++){
+    var el=document.getElementById('ns-cf-'+i);
+    if(fields[i].required&&(!el||!el.value.trim())){toast('Please fill in all required fields.','e');return;}
+    if(el)customData[fields[i].label||fields[i]]=el.value.trim();
+  }
+  var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:_nsSvc.id,custom_form_data:customData}});
+  if(r.status===409){toast('You are already in this queue.','i');show('active');loadActiveQueue();return;}
+  if(!r.ok){toast((r.data&&r.data.error)||'Failed to join queue.','e');return;}
+  var entry=r.data.entry;
+  sessionStorage.setItem('qc_active_entry',JSON.stringify(entry));
+  toast('Joined! Ticket: '+entry.ticket_label,'s');
+  nsCancelFind();
+  show('active');
+  loadActiveQueue();
+  showNotifyModalIfNeeded();
+}
 
 // ═══════════════════════════════════════════════════════
 // ACCOUNT
@@ -853,6 +1021,8 @@ async function doLogout(){
 // ═══════════════════════════════════════════════════════
 document.getElementById('code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
 document.getElementById('code-in').addEventListener('keydown',function(e){if(e.key==='Enter')findService();});
+document.getElementById('ns-code-in').addEventListener('keydown',function(e){if(e.key==='Enter')nearbyFindService();});
+document.getElementById('ns-code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
 
 init();
 </script>
