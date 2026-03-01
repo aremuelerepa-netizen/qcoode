@@ -35,6 +35,19 @@ a{color:var(--brand);text-decoration:none}
 .back:hover{color:rgba(255,255,255,.7)}
 .divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;color:var(--muted);font-size:.78rem}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── MOBILE ── */
+html{-webkit-text-size-adjust:100%;touch-action:manipulation}
+*{-webkit-tap-highlight-color:transparent}
+input,select,textarea,button{font-size:16px !important}
+@media(max-width:480px){
+  body{padding:1.5rem .75rem;align-items:flex-start;padding-top:2.5rem}
+  .wrap{max-width:100%}
+  .card{padding:1.75rem 1.25rem;border-radius:1.25rem}
+  .title{font-size:1.25rem}
+  .btn{padding:.875rem}
+  .sw{font-size:.82rem}
+}
 </style>
 </head>
 <body>
