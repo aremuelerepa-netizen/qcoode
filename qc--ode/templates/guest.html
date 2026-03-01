@@ -47,8 +47,9 @@ body{font-family:var(--fd);min-height:100vh;background:linear-gradient(135deg,va
 #toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.5rem;z-index:999}
 .toast{padding:.75rem 1rem;border-radius:var(--r);box-shadow:var(--sh);font-size:.825rem;font-weight:600;display:flex;align-items:center;gap:.5rem;border-left:4px solid;animation:tIn .25s ease}
 .t-w{background:#fffbeb;border-color:var(--amber);color:#92400e}
+.t-e{background:#fff1f2;border-color:var(--rose);color:#9f1239}
+.t-s{background:#f0fdf4;border-color:var(--teal);color:#065f46}
 @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
-/* Overlay + Modal */
 .overlay{position:fixed;inset:0;z-index:400;background:rgba(13,17,23,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem}
 .modal{background:var(--white);border-radius:var(--r3);padding:2rem;width:100%;max-width:420px;box-shadow:var(--shl)}
 .modal-title{font-size:1.15rem;font-weight:800;color:var(--ink);margin-bottom:1.25rem}
@@ -61,8 +62,6 @@ body{font-family:var(--fd);min-height:100vh;background:linear-gradient(135deg,va
 .stars{display:flex;gap:.375rem;justify-content:center;margin:1rem 0}
 .star{font-size:2rem;cursor:pointer;opacity:.3;transition:all .15s}
 .star.active{opacity:1}
-
-/* ── MOBILE ── */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
@@ -152,7 +151,7 @@ input,select,textarea,button{font-size:16px !important}
     <label class="lbl">Comment (optional)</label>
     <textarea id="fb-comment" class="inp" style="resize:vertical;min-height:70px" placeholder="Tell us more…"></textarea>
     <div class="modal-footer">
-      <button onclick="document.getElementById('modal-feedback').style.display='none'" style="background:var(--mist);border:2px solid var(--mist2);color:#475569;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Skip</button>
+      <button onclick="skipFeedback()" style="background:var(--mist);border:2px solid var(--mist2);color:#475569;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Skip</button>
       <button onclick="submitFeedback()" style="background:var(--accent);color:#fff;border:none;padding:.65rem 1.25rem;border-radius:10px;font-family:var(--fd);font-weight:700;cursor:pointer">Submit</button>
     </div>
   </div>
@@ -161,109 +160,221 @@ input,select,textarea,button{font-size:16px !important}
 <div id="toasts"></div>
 
 <script>
-var entry=null,svc=null,pollTimer=null;
-var fbRating=0,endCodePrompted=false;
+// ── State ──────────────────────────────────────────────────
+var entry = null;
+var endCode = null;
+var pollTimer = null;
+var fbRating = 0;
+var endCodePrompted = false;
+var refreshFails = 0;
+var MAX_FAILS = 5; // only redirect after 5 consecutive failures
 
-function toast(msg,type,ms){
-  type=type||'w';ms=ms||7000;
-  var el=document.createElement('div');el.className='toast t-'+type;el.innerHTML='<span>⚠</span><span>'+msg+'</span>';
-  document.getElementById('toasts').appendChild(el);setTimeout(function(){el.remove();},ms);
+// ── Helpers ───────────────────────────────────────────────
+function toast(msg, type, ms) {
+  type = type || 'w'; ms = ms || 5000;
+  var el = document.createElement('div');
+  el.className = 'toast t-' + type;
+  el.innerHTML = '<span>' + msg + '</span>';
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(function(){ el.remove(); }, ms);
 }
-function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});}
 
-async function api(url,opts){
-  try{var r=await fetch(url,{headers:{'Content-Type':'application/json'},...(opts||{})});var d=await r.json().catch(function(){return{};});return{ok:r.ok,data:d};}
-  catch(e){return{ok:false,data:{error:'Network error'}};}
+function fmtTime(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 
-async function init(){
-  var stored=sessionStorage.getItem('guestEntry');
-  if(!stored){window.location.href='/';return;}
-  try{var p=JSON.parse(stored);entry=p.entry||p;svc={name:entry.svc_name,id:entry.service_id};}
-  catch(e){window.location.href='/';return;}
-  document.getElementById('ticket-num').textContent=entry.ticket_label||'—';
-  document.getElementById('svc-name').textContent=entry.svc_name||'—';
-  document.getElementById('org-name').textContent=entry.org_name||'';
-  if(entry.end_code){
-    var eb=document.getElementById('endcode-box');
-    eb.textContent='🔑 End Code: '+entry.end_code+' (show to staff when done)';
-    eb.style.display='';
+function fmtDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'});
+}
+
+async function api(url, opts) {
+  try {
+    var r = await fetch(url, {headers:{'Content-Type':'application/json'}, ...(opts||{})});
+    var d = await r.json().catch(function(){ return {}; });
+    return {ok: r.ok, status: r.status, data: d};
+  } catch(e) {
+    return {ok: false, status: 0, data: {error: 'Network error'}};
   }
-  await refresh();
-  pollTimer=setInterval(refresh,12000);
 }
 
-async function refresh(){
-  if(!entry)return;
-  var r=await api('/api/guest/queue-status/'+entry.id);
-  if(!r.ok)return;
-  var d=r.data;
+// ── Init ──────────────────────────────────────────────────
+function init() {
+  // Try to load entry from sessionStorage
+  var stored = null;
+  try { stored = sessionStorage.getItem('guestEntry'); } catch(e) {}
 
-  // Handle terminal states
-  if(['completed','no_show','cancelled'].includes(d.status)){
-    clearInterval(pollTimer);sessionStorage.removeItem('guestEntry');
-    var emo=d.status==='completed'?'✅':'❌';
-    var msg=d.status==='completed'?'You were served!':d.status==='no_show'?'Marked as no-show':'You left the queue';
-    document.getElementById('main-card').innerHTML='<div style="text-align:center;padding:1.5rem"><div style="font-size:3.5rem;margin-bottom:1rem">'+emo+'</div><h2 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:1.5rem;font-weight:800;color:#0d1117;margin-bottom:.875rem">'+msg+'</h2><p style="color:#64748b;line-height:1.65;margin-bottom:2rem">Ticket '+entry.ticket_label+' is now closed.</p><a href="/register-user" style="display:block;padding:.875rem;background:#4361ee;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center;margin-bottom:.75rem">Create Free Account</a><a href="/" style="display:block;padding:.875rem;color:#64748b;border:2px solid #e8eeff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center">← Back to Home</a></div>';
-    if(d.status==='completed')setTimeout(function(){document.getElementById('modal-feedback').style.display='flex';},800);
+  if (!stored) {
+    // Nothing stored — user came here directly without joining
+    // Don't redirect immediately; show a helpful message instead
+    showNoEntry();
     return;
   }
 
-  var ahead=d.ahead||0;var pos=d.position||1;
-  document.getElementById('pos-num').textContent=pos;
-  document.getElementById('stat-ahead').textContent=Math.max(0,pos-1);
-  document.getElementById('stat-total').textContent=d.total||0;
-  document.getElementById('eta-str').textContent='~'+(d.eta_minutes||0)+' min';
-  document.getElementById('upd-time').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  try {
+    var parsed = JSON.parse(stored);
 
-  if(d.estimated_time){
-    var etaDate=new Date(d.estimated_time);
-    document.getElementById('et-val').textContent=etaDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('et-date').textContent=fmtDate(d.estimated_time);
-    document.getElementById('exact-box').style.display='';
+    // Handle all possible storage shapes:
+    // Shape 1: {success:true, entry:{...}, end_code:"XXXX"}  ← from api/guest/join response
+    // Shape 2: {entry:{...}, end_code:"XXXX"}
+    // Shape 3: {id:"...", ticket_label:"...", ...}            ← raw entry object
+    if (parsed.entry && parsed.entry.id) {
+      entry = parsed.entry;
+      endCode = parsed.end_code || parsed.entry.end_code || null;
+    } else if (parsed.id) {
+      entry = parsed;
+      endCode = parsed.end_code || null;
+    } else {
+      // Unrecognised shape — show error but don't redirect
+      showNoEntry();
+      return;
+    }
+  } catch(e) {
+    showNoEntry();
+    return;
   }
 
-  // Called
-  document.getElementById('called-box').style.display=d.status==='called'?'block':'none';
-  if(d.status==='called'&&!endCodePrompted){
-    endCodePrompted=true;
-    toast('📢 You are being called! Go to the counter now.','w',12000);
-    setTimeout(function(){document.getElementById('modal-endcode').style.display='flex';},600);
+  // Populate static fields immediately from stored data
+  document.getElementById('ticket-num').textContent = entry.ticket_label || '—';
+  document.getElementById('svc-name').textContent   = entry.svc_name    || entry.name || '—';
+  document.getElementById('org-name').textContent   = entry.org_name    || '';
+
+  // Show end code if present
+  if (endCode) {
+    var eb = document.getElementById('endcode-box');
+    eb.textContent = '🔑 End Code: ' + endCode + ' (show to staff when done)';
+    eb.style.display = '';
+  }
+
+  // Start polling — first refresh immediately, then every 12s
+  refresh();
+  pollTimer = setInterval(refresh, 12000);
+}
+
+function showNoEntry() {
+  document.getElementById('main-card').innerHTML =
+    '<div style="text-align:center;padding:1.5rem">' +
+    '<div style="font-size:3rem;margin-bottom:1rem">🎫</div>' +
+    '<h2 style="font-size:1.25rem;font-weight:800;color:#0d1117;margin-bottom:.75rem">No Active Ticket</h2>' +
+    '<p style="color:#64748b;line-height:1.65;margin-bottom:1.5rem">You don\'t have an active queue ticket. Find a service to join.</p>' +
+    '<a href="/" style="display:block;padding:.875rem;background:#4361ee;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center">← Find a Queue</a>' +
+    '</div>';
+}
+
+// ── Poll ──────────────────────────────────────────────────
+async function refresh() {
+  if (!entry || !entry.id) return;
+
+  var r = await api('/api/guest/queue-status/' + entry.id);
+
+  if (!r.ok) {
+    refreshFails++;
+    // Only redirect after MAX_FAILS consecutive network failures
+    if (refreshFails >= MAX_FAILS) {
+      clearInterval(pollTimer);
+      toast('Could not reach server after several attempts.', 'e', 6000);
+    }
+    return; // stay on page, retry next tick
+  }
+
+  // Reset fail counter on success
+  refreshFails = 0;
+
+  var d = r.data;
+
+  // Terminal states
+  if (['completed', 'no_show', 'cancelled'].includes(d.status)) {
+    clearInterval(pollTimer);
+    sessionStorage.removeItem('guestEntry');
+    var emo  = d.status === 'completed' ? '✅' : '❌';
+    var msg  = d.status === 'completed' ? 'You were served!'
+             : d.status === 'no_show'   ? 'Marked as no-show'
+             :                            'You left the queue';
+    document.getElementById('main-card').innerHTML =
+      '<div style="text-align:center;padding:1.5rem">' +
+      '<div style="font-size:3.5rem;margin-bottom:1rem">' + emo + '</div>' +
+      '<h2 style="font-family:\'Plus Jakarta Sans\',sans-serif;font-size:1.5rem;font-weight:800;color:#0d1117;margin-bottom:.875rem">' + msg + '</h2>' +
+      '<p style="color:#64748b;line-height:1.65;margin-bottom:2rem">Ticket ' + (entry.ticket_label||'') + ' is now closed.</p>' +
+      '<a href="/register-user" style="display:block;padding:.875rem;background:#4361ee;color:#fff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center;margin-bottom:.75rem">Create Free Account</a>' +
+      '<a href="/" style="display:block;padding:.875rem;color:#64748b;border:2px solid #e8eeff;border-radius:10px;font-weight:700;text-decoration:none;text-align:center">← Back to Home</a>' +
+      '</div>';
+    if (d.status === 'completed') {
+      setTimeout(function(){ document.getElementById('modal-feedback').style.display = 'flex'; }, 800);
+    }
+    return;
+  }
+
+  // Update live stats
+  var pos = d.position || 1;
+  document.getElementById('pos-num').textContent    = pos;
+  document.getElementById('stat-ahead').textContent = Math.max(0, pos - 1);
+  document.getElementById('stat-total').textContent = d.total || 0;
+  document.getElementById('eta-str').textContent    = '~' + (d.eta_minutes || 0) + ' min';
+  document.getElementById('upd-time').textContent   = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+  if (d.estimated_time) {
+    var etaDate = new Date(d.estimated_time);
+    document.getElementById('et-val').textContent  = fmtTime(d.estimated_time);
+    document.getElementById('et-date').textContent = fmtDate(d.estimated_time);
+    document.getElementById('exact-box').style.display = '';
+  }
+
+  // Called state
+  var calledBox = document.getElementById('called-box');
+  calledBox.style.display = d.status === 'called' ? 'block' : 'none';
+  if (d.status === 'called' && !endCodePrompted) {
+    endCodePrompted = true;
+    toast('📢 You are being called! Go to the counter now.', 'w', 12000);
+    setTimeout(function(){ document.getElementById('modal-endcode').style.display = 'flex'; }, 600);
   }
 }
 
-async function leaveQueue(){
-  if(!confirm('Leave this queue?'))return;
-  await api('/api/guest/leave/'+entry.id,{method:'POST'});
-  sessionStorage.removeItem('guestEntry');window.location.href='/';
+// ── Actions ───────────────────────────────────────────────
+async function leaveQueue() {
+  if (!confirm('Are you sure you want to leave this queue?')) return;
+  clearInterval(pollTimer);
+  await api('/api/guest/leave/' + entry.id, {method: 'POST'});
+  sessionStorage.removeItem('guestEntry');
+  window.location.href = '/';
 }
 
-async function submitEndCode(){
-  var code=document.getElementById('end-code-inp').value.trim().toUpperCase();
-  var err=document.getElementById('end-code-err');err.style.display='none';
-  if(!code||code.length<4){err.textContent='Enter the 4-character end code.';err.style.display='block';return;}
-  // Guest can't call verify-end-code (no session), so just show completion state
-  // The org will mark as complete via their dashboard
-  document.getElementById('modal-endcode').style.display='none';
-  clearInterval(pollTimer);sessionStorage.removeItem('guestEntry');
-  toast('Thank you! Staff will confirm your service.','w',5000);
-  setTimeout(function(){document.getElementById('modal-feedback').style.display='flex';},800);
+async function submitEndCode() {
+  var code = document.getElementById('end-code-inp').value.trim().toUpperCase();
+  var err  = document.getElementById('end-code-err');
+  err.style.display = 'none';
+  if (!code || code.length < 4) {
+    err.textContent    = 'Enter the 4-character end code.';
+    err.style.display  = 'block';
+    return;
+  }
+  document.getElementById('modal-endcode').style.display = 'none';
+  clearInterval(pollTimer);
+  sessionStorage.removeItem('guestEntry');
+  toast('Thank you! Staff will confirm your service. ✅', 's', 5000);
+  setTimeout(function(){ document.getElementById('modal-feedback').style.display = 'flex'; }, 800);
 }
 
-function setStar(n){
-  fbRating=n;
-  document.querySelectorAll('.star').forEach(function(s,i){s.classList.toggle('active',i<n);});
-}
-async function submitFeedback(){
-  if(!fbRating){toast('Please select a rating.','w',3000);return;}
-  var comment=document.getElementById('fb-comment').value.trim();
-  await api('/api/guest/feedback',{method:'POST',body:JSON.stringify({entry_id:entry.id,rating:fbRating,comment:comment})});
-  document.getElementById('modal-feedback').style.display='none';
-  toast('Thank you for your feedback! ⭐','w',4000);
-  setTimeout(function(){window.location.href='/';},2000);
+function setStar(n) {
+  fbRating = n;
+  document.querySelectorAll('.star').forEach(function(s, i){ s.classList.toggle('active', i < n); });
 }
 
+async function submitFeedback() {
+  if (!fbRating) { toast('Please select a rating first.', 'w', 3000); return; }
+  var comment = document.getElementById('fb-comment').value.trim();
+  await api('/api/guest/feedback', {method:'POST', body: JSON.stringify({entry_id: entry.id, rating: fbRating, comment: comment})});
+  document.getElementById('modal-feedback').style.display = 'none';
+  toast('Thank you for your feedback! ⭐', 's', 4000);
+  setTimeout(function(){ window.location.href = '/'; }, 2000);
+}
+
+function skipFeedback() {
+  document.getElementById('modal-feedback').style.display = 'none';
+  window.location.href = '/';
+}
+
+// ── Boot ──────────────────────────────────────────────────
 init();
 </script>
 </body>
