@@ -227,60 +227,75 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 #faq-send:hover{background:#3451d1}#faq-send:disabled{opacity:.5}
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .shell{flex-direction:column}
-  .sidebar{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:.75rem;border-right:none;border-bottom:2px solid rgba(13,17,23,.06);gap:.25rem}
-  .sb-sect{display:none}
-  .main{max-height:none}
-}
-/* ── MOBILE ── */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
-@media(max-width:640px){
-  .main{padding:1rem}
-  .td-num{font-size:3.5rem}
-  .stat-pair{grid-template-columns:1fr}
-}
-@media(max-width:480px){
-  /* Topbar */
-  .tb{padding:.625rem .875rem;gap:.5rem}
-  .tb-title{font-size:1rem}
-  .tb-org{display:none}
-  /* Sidebar nav becomes scrollable row */
-  .sidebar{padding:.5rem .625rem;gap:.2rem;overflow-x:auto;flex-wrap:nowrap}
-  .sb-item{font-size:.72rem;padding:.4rem .6rem;flex-shrink:0;white-space:nowrap}
-  .sb-item .ico{font-size:.85rem}
-  /* Main content */
-  .main{padding:.875rem .75rem}
-  .ph h1{font-size:1.25rem}
-  .ph p{font-size:.82rem}
+
+@media(max-width:768px){
+  /* Full screen layout */
+  html,body{height:100%;overflow-x:hidden}
+  .shell{flex-direction:column;flex:1;min-height:calc(100vh - 62px)}
+  /* Hide desktop sidebar - replaced by bottom nav */
+  .sidebar{display:none!important}
+  /* Main scrollable area fills screen above bottom nav */
+  .main{
+    flex:1;
+    max-height:none;
+    height:auto;
+    min-height:calc(100vh - 62px - 60px);
+    overflow-y:auto;
+    padding:1rem 1rem 5.5rem 1rem;
+    -webkit-overflow-scrolling:touch;
+  }
   /* Cards */
   .card{padding:1.25rem 1rem}
-  .card-title{font-size:.875rem}
-  /* Ticket */
-  .ticket-display{padding:1.75rem 1rem}
+  .ph h1{font-size:1.25rem}
+  .ph p{font-size:.82rem}
   .td-num{font-size:3rem}
-  .td-label{font-size:.65rem}
   .stat-pair{grid-template-columns:1fr 1fr;gap:.625rem}
-  /* Join panel */
-  .inp-row{flex-direction:row}
   .inp-row .inp{min-width:0}
   .found-box{padding:.75rem}
-  /* Nearby grid */
   .nearby-grid{grid-template-columns:1fr}
-  /* Table */
-  .tbl-wrap{font-size:.78rem}
-  .tbl-wrap th,.tbl-wrap td{padding:.5rem .625rem}
-  /* Profile hero */
+  .tbl-wrap{font-size:.78rem;overflow-x:auto}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem;white-space:nowrap}
   .profile-hero{flex-direction:column;text-align:center;padding:1.5rem 1rem}
-  /* FAQ widget */
-  .faq-panel{width:calc(100vw - 2rem);right:auto;left:50%;transform:translateX(-50%)}
-  .faq-btn{bottom:1rem;right:1rem}
-  /* Modal */
-  .modal{padding:1.5rem 1.125rem;border-radius:1.25rem;max-width:calc(100vw - 1.5rem)}
+  .faq-panel{width:calc(100vw - 2rem);right:auto;left:50%;transform:translateX(-50%);bottom:5rem}
+  .faq-btn{bottom:5rem;right:1rem}
+  .modal{padding:1.5rem 1.125rem;max-width:calc(100vw - 1.5rem)}
   .modal-footer{flex-direction:column}
   .modal-footer .btn{width:100%}
+  .ticket-display{padding:1.75rem 1rem}
+}
+
+/* ── BOTTOM NAV (mobile only) ── */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:var(--white);
+  border-top:2px solid rgba(13,17,23,.08);
+  padding:.25rem 0 env(safe-area-inset-bottom,.25rem);
+  box-shadow:0 -4px 20px rgba(13,17,23,.12);
+}
+.bn-items{display:flex;align-items:stretch}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.15rem;padding:.5rem .25rem;
+  font-size:.6rem;font-weight:600;color:#94a3b8;
+  cursor:pointer;border:none;background:none;
+  transition:all .15s;position:relative;
+  font-family:var(--fd);
+}
+.bn-item.active{color:var(--accent)}
+.bn-item .bn-ico{font-size:1.25rem;line-height:1}
+.bn-dot{
+  position:absolute;top:.4rem;right:calc(50% - .8rem);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--teal);border:2px solid var(--white);
+  display:none;
+  animation:pulse-dot 2s ease infinite;
+}
+@media(max-width:768px){
+  .bottom-nav{display:block}
 }
 </style>
 </head>
@@ -485,16 +500,21 @@ input,select,textarea,button{font-size:16px !important}
 <!-- End code modal -->
 <div id="modal-endcode" class="overlay" style="display:none">
   <div class="modal">
-    <h2 class="modal-title">✅ It's Your Turn!</h2>
-    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1.5rem">Please enter the <strong>End Code</strong> provided by the service staff to confirm your service.</p>
+    <h2 class="modal-title">📢 You're Being Called!</h2>
+    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1rem">Go to the counter now. <strong>Ask the staff for your End Code</strong> — you have 5 minutes before your slot is removed.</p>
+    <div style="background:rgba(67,97,238,.07);border:2px solid rgba(67,97,238,.2);border-radius:var(--r);padding:.875rem;text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:1.75rem;margin-bottom:.2rem">🎫</div>
+      <div style="font-weight:800;font-size:1.1rem;color:var(--ink)">Your Ticket: <span id="modal-ticket-label">—</span></div>
+      <div style="font-size:.78rem;color:#64748b;margin-top:.2rem">Show this to the staff and request your End Code</div>
+    </div>
     <div class="fg">
-      <label class="lbl">End Code</label>
+      <label class="lbl">End Code (from staff)</label>
       <input id="end-code-inp" class="inp code-inp" type="text" placeholder="XXXX" maxlength="4"/>
       <span id="end-code-err" class="ferr"></span>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="document.getElementById('modal-endcode').style.display='none'">Later</button>
-      <button class="btn btn-success" onclick="submitEndCode()">Confirm →</button>
+      <button class="btn btn-success" onclick="submitEndCode()">Submit End Code →</button>
     </div>
   </div>
 </div>
@@ -613,15 +633,25 @@ async function init(){
     '<div class="pf-sub">'+(profile.email||'')+'</div>'+
     (profile.phone?'<div class="pf-sub">📞 '+profile.phone+'</div>':'')+'</div>'+
     '<div class="pf-stats"><div class="pf-n">'+(profile.total_queues||0)+'</div><div class="pf-l">Total Queues</div></div>';
-  // Restore active entry from storage
-  var stored=sessionStorage.getItem('activeEntry_'+profile.id);
-  if(stored){try{activeEntry=JSON.parse(stored);}catch(e){}}
-  if(activeEntry){
+  // Restore active entry — use localStorage so it survives page navigation
+  var stored=localStorage.getItem('activeEntry_'+profile.id);
+  // Also check legacy key
+  if(!stored) stored=localStorage.getItem('qc_active_entry');
+  if(stored){
+    try{
+      var parsed=JSON.parse(stored);
+      activeEntry=parsed.entry||parsed;
+    }catch(e){activeEntry=null;}
+  }
+  if(activeEntry&&activeEntry.id){
+    // Show IMMEDIATELY from stored data — never lose queue on page reload
     document.getElementById('active-dot').style.display='';
+    if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
     renderActive();
     startPolling();
+    // Verify in background — refreshActive() handles clearing if truly done
   }
-  await loadHistory();
+    await loadHistory();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -630,8 +660,10 @@ async function init(){
 function show(name){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('active');});
   document.getElementById('panel-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
+  if(document.getElementById('nav-'+name)) document.getElementById('nav-'+name).classList.add('active');
+  if(document.getElementById('bn-'+name)) document.getElementById('bn-'+name).classList.add('active');
   if(name==='history')loadHistory();
   if(name==='nearby')loadNearby();
 }
@@ -679,12 +711,16 @@ async function confirmJoin(){
   try{var fields=JSON.parse(foundSvc.user_info_form||'[]');for(var i=0;i<fields.length;i++){var f=fields[i];var el=document.getElementById('cf-'+f.id);if(!el)continue;if(f.required&&!el.value){toast('"'+f.label+'" is required.','e');return;}formData[f.id]={label:f.label,value:el.value};}}catch(e){}
   var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:foundSvc.id,custom_form_data:formData}});
   if(!r.ok){toast(r.data.error||'Failed to join queue.','e');return;}
-  activeEntry=r.data.entry;
-  if(profile)sessionStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+  activeEntry=r.data.entry||r.data;
+  if(profile){
+    localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+    // Also save to legacy key for compatibility
+    localStorage.removeItem('qc_active_entry');
+  }
   cancelFind();
   renderActive();
   show('active');
-  document.getElementById('active-dot').style.display='';
+  document.getElementById('active-dot').style.display='';if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
   toast("You've joined the queue!",'s');
   startPolling();
   // Show notification modal
@@ -702,7 +738,7 @@ function renderActive(){
   document.getElementById('a-org-name').textContent=activeEntry.org_name||'';
   document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
   document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
-  if(activeEntry.end_code){document.getElementById('td-endcode').textContent='🔑 End Code: '+activeEntry.end_code+' (keep safe)';}
+  // End code hidden from user — they must get it from org staff when called
   refreshActive();
 }
 
@@ -718,11 +754,11 @@ async function refreshActive(){
   // If done
   if(['completed','cancelled','no_show'].includes(d.status)){
     clearInterval(pollTimer);
-    if(profile)sessionStorage.removeItem('activeEntry_'+profile.id);
+    if(profile)localStorage.removeItem('activeEntry_'+profile.id);
     activeEntry=null;
     document.getElementById('no-active').style.display='';
     document.getElementById('active-view').style.display='none';
-    document.getElementById('active-dot').style.display='none';
+    document.getElementById('active-dot').style.display='none';if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
     toast('Your queue session has ended.','i');
     if(d.status==='completed'&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
     return;
@@ -756,7 +792,10 @@ async function refreshActive(){
     box.classList.add('sb-call');ico.textContent='📢';title.textContent="You're being called!";desc.textContent='Please proceed to the counter immediately!';
     toast('📢 You are being called! Go to the counter NOW.','w',10000);
     // Show end code modal
-    if(!endCodePrompted){endCodePrompted=true;setTimeout(function(){document.getElementById('modal-endcode').style.display='flex';},500);}
+    if(!endCodePrompted){endCodePrompted=true;setTimeout(function(){
+  if(document.getElementById('modal-ticket-label')) document.getElementById('modal-ticket-label').textContent=activeEntry.ticket_label||'—';
+  document.getElementById('modal-endcode').style.display='flex';
+},500);}
   } else if(d.status==='serving'){
     box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are currently at the counter.';
   } else {
@@ -776,11 +815,13 @@ async function refreshActive(){
 
 function clearActiveEntry(){
   clearInterval(pollTimer);
-  if(profile)sessionStorage.removeItem('activeEntry_'+profile.id);
+  if(profile)localStorage.removeItem('activeEntry_'+profile.id);
+  localStorage.removeItem('qc_active_entry');
   activeEntry=null;
   document.getElementById('no-active').style.display='';
   document.getElementById('active-view').style.display='none';
   document.getElementById('active-dot').style.display='none';
+  if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
 }
 
 function startPolling(){
@@ -1026,5 +1067,28 @@ document.getElementById('ns-code-in').addEventListener('input',function(){this.v
 
 init();
 </script>
+
+<!-- ═══ BOTTOM NAV (mobile) ═══ -->
+<nav class="bottom-nav">
+  <div class="bn-items">
+    <button class="bn-item active" id="bn-join" onclick="show('join')">
+      <span class="bn-ico">🎫</span><span>Join</span>
+    </button>
+    <button class="bn-item" id="bn-active" onclick="show('active')">
+      <span class="bn-ico">📡</span>
+      <span class="bn-dot" id="bn-dot"></span>
+      <span>Active</span>
+    </button>
+    <button class="bn-item" id="bn-nearby" onclick="show('nearby')">
+      <span class="bn-ico">🗺</span><span>Services</span>
+    </button>
+    <button class="bn-item" id="bn-history" onclick="show('history')">
+      <span class="bn-ico">🕐</span><span>History</span>
+    </button>
+    <button class="bn-item" id="bn-account" onclick="show('account')">
+      <span class="bn-ico">👤</span><span>Account</span>
+    </button>
+  </div>
+</nav>
 </body>
 </html>
