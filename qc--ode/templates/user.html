@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<link rel="manifest" href="/static/manifest.json"/>
+<meta name="theme-color" content="#4361ee"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>My Dashboard — QCode</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
 <style>
@@ -152,6 +156,83 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .toggle input:checked + .toggle-slider{background:var(--accent)}
 .toggle input:checked + .toggle-slider::before{transform:translateX(22px)}
 
+/* ── OFFLINE BANNER ── */
+.offline-banner{display:none;position:fixed;top:62px;left:0;right:0;z-index:190;background:var(--amber);color:var(--ink);padding:.5rem 1.5rem;font-size:.825rem;font-weight:700;text-align:center}
+
+/* ── ORG LOGO ── */
+.org-logo-img{width:44px;height:44px;border-radius:var(--r);object-fit:cover;border:2px solid rgba(255,255,255,.2);flex-shrink:0}
+.org-logo-placeholder{width:44px;height:44px;border-radius:var(--r);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.2)}
+
+/* ── STAGE PROGRESS ── */
+.stage-progress{background:var(--white);border:1px solid rgba(13,17,23,.06);border-radius:var(--r2);padding:1.125rem 1.5rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
+.stage-progress-title{font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.875rem}
+.stage-steps{display:flex;align-items:center;overflow-x:auto;padding-bottom:.25rem}
+.stage-step{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1;min-width:60px;position:relative}
+.stage-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:calc(50% + 14px);right:calc(-50% + 14px);height:2px;background:#e2e8f0;z-index:0}
+.stage-step.done:not(:last-child)::after{background:var(--teal)}
+.stage-step.active:not(:last-child)::after{background:linear-gradient(90deg,var(--accent),#e2e8f0)}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;border:2px solid #e2e8f0;background:var(--white);color:#94a3b8;position:relative;z-index:1;flex-shrink:0;transition:all .3s}
+.stage-step.done .step-dot{background:var(--teal);border-color:var(--teal);color:#fff}
+.stage-step.active .step-dot{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px rgba(67,97,238,.15);animation:pulse-step 2s ease infinite}
+@keyframes pulse-step{0%,100%{box-shadow:0 0 0 4px rgba(67,97,238,.15)}50%{box-shadow:0 0 0 8px rgba(67,97,238,.05)}}
+.step-label{font-size:.62rem;font-weight:600;color:#94a3b8;text-align:center;white-space:nowrap}
+.stage-step.done .step-label{color:var(--teal)}
+.stage-step.active .step-label{color:var(--accent);font-weight:700}
+
+/* ── COUNTDOWN ── */
+.countdown-box{background:var(--mist2);border:2px solid var(--mist3);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;text-align:center}
+.countdown-label{font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+.countdown-timer{display:flex;justify-content:center;align-items:center;gap:.5rem}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:.1rem;min-width:48px}
+.cd-n{font-family:var(--fi);font-size:2rem;font-weight:800;color:var(--accent);line-height:1;font-style:italic}
+.cd-l{font-size:.6rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}
+.cd-sep{font-family:var(--fi);font-size:1.75rem;font-weight:800;color:var(--mist3);line-height:1;font-style:italic;margin-top:-.25rem}
+.progress-bar-wrap{height:4px;background:var(--mist3);border-radius:999px;margin-top:.875rem;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--accent);border-radius:999px;transition:width 1s linear}
+
+/* ── BATCH TAG ── */
+.td-batch{display:inline-flex;align-items:center;gap:.375rem;border-radius:999px;padding:.3rem .875rem;font-size:.75rem;font-weight:600;margin:.25rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+
+/* ── COUNTER ASSIGNMENT ── */
+.td-counter{background:rgba(255,190,11,.2);border:1px solid rgba(255,190,11,.35);color:var(--amber);border-radius:999px;padding:.4rem 1rem;font-size:.825rem;font-weight:700;margin:.4rem auto;display:inline-flex;align-items:center;gap:.375rem}
+.counter-box{background:linear-gradient(135deg,rgba(255,190,11,.1),rgba(255,190,11,.04));border:2px solid rgba(255,190,11,.3);border-radius:var(--r2);padding:1.25rem;margin-bottom:1.25rem;text-align:center}
+.counter-box-label{font-size:.7rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.375rem}
+.counter-box-name{font-family:var(--fi);font-size:2rem;font-weight:800;color:var(--ink);font-style:italic;line-height:1.2}
+.counter-box-sub{font-size:.8rem;color:#64748b;margin-top:.25rem}
+
+/* ── CHECKOUT BUTTON ── */
+.checkout-card{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(217,119,6,.04));border:2px solid rgba(245,158,11,.25);border-radius:var(--r2);padding:1.5rem;margin-bottom:1.25rem;text-align:center}
+.checkout-card-title{font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:.375rem}
+.checkout-card-sub{font-size:.825rem;color:#64748b;margin-bottom:1.25rem;line-height:1.5}
+.btn-checkout{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:1rem;padding:.875rem 2rem;width:100%;border-radius:var(--r2);box-shadow:0 4px 20px rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center;border:none;font-family:var(--fd);font-weight:700;cursor:pointer;transition:all var(--t)}
+.btn-checkout:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
+.btn-checkout:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── CROWD INDICATOR ── */
+.nb-crowd{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;margin-top:.5rem}
+.nb-crowd-low{background:rgba(6,214,160,.1);color:#065f46}
+.nb-crowd-med{background:rgba(255,190,11,.15);color:#92400e}
+.nb-crowd-high{background:rgba(239,35,60,.08);color:var(--rose)}
+
+/* ── STATUS BOX EXTRA STATES ── */
+.sb-shop{background:rgba(6,214,160,.05);border-color:rgba(6,214,160,.2)}
+.sb-pack{background:rgba(114,9,183,.05);border-color:rgba(114,9,183,.2)}
+.b-shopping{background:rgba(6,214,160,.1);color:#065f46}
+.b-checkout{background:rgba(255,190,11,.15);color:#92400e}
+.b-packing{background:rgba(114,9,183,.08);color:#7209b7}
+
+/* ── QUEUE CLOSED BOX ── */
+.queue-closed-box{background:var(--mist2);border:2px solid var(--mist3);border-radius:var(--r2);padding:1.25rem;text-align:center}
+.qc-time{font-family:var(--fi);font-size:1.25rem;font-weight:800;color:var(--accent);font-style:italic}
+
+/* ── PWA BANNER ── */
+.pwa-banner{background:linear-gradient(135deg,var(--accent2),var(--vivid));color:#fff;border-radius:var(--r2);padding:1rem 1.25rem;display:flex;align-items:center;gap:.875rem;margin-bottom:1.25rem}
+.pwa-banner-text{flex:1;font-size:.825rem;line-height:1.5}
+.pwa-banner-text strong{display:block;font-size:.9rem;margin-bottom:.2rem}
+.pwa-install-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fd);font-size:.8rem;font-weight:700;cursor:pointer;transition:all var(--t)}
+.pwa-install-btn:hover{background:rgba(255,255,255,.3)}
+.pwa-dismiss{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:1.1rem;padding:.25rem;line-height:1}
+
 /* ══ DRAGGABLE ASK AI BUTTON ══ */
 #faq-widget{
   position:fixed;bottom:5rem;right:1.5rem;z-index:500;
@@ -238,6 +319,8 @@ input,select,textarea,button{font-size:16px !important}
 </style>
 </head>
 <body>
+<div class="offline-banner" id="offline-banner">⚠️ You are offline — showing last known queue state</div>
+
 <div class="topbar">
   <a href="/" class="tb-logo">
     <svg width="28" height="28" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8" fill="#4361ee"/><rect x="7" y="9" width="16" height="3" rx="1.5" fill="white"/><rect x="7" y="14" width="11" height="3" rx="1.5" fill="rgba(255,255,255,.6)"/><rect x="7" y="19" width="7" height="3" rx="1.5" fill="rgba(255,255,255,.35)"/></svg>
@@ -266,6 +349,14 @@ input,select,textarea,button{font-size:16px !important}
     <!-- JOIN -->
     <div class="panel active" id="panel-join">
       <div class="ph"><h1>Join a Queue</h1><p>Enter the 6-character service code given to you</p></div>
+      <div class="pwa-banner" id="pwa-banner" style="display:none">
+        <div style="font-size:1.5rem">📱</div>
+        <div class="pwa-banner-text"><strong>Add QCode to your home screen</strong>Get notified when it's your turn — even with the screen off.</div>
+        <div style="display:flex;gap:.5rem;flex-shrink:0">
+          <button class="pwa-install-btn" onclick="triggerPWAInstall()">Install</button>
+          <button class="pwa-dismiss" onclick="dismissPWA()">✕</button>
+        </div>
+      </div>
       <div class="card">
         <div class="card-title">🎫 Service Code</div>
         <div id="step-code">
@@ -286,6 +377,7 @@ input,select,textarea,button{font-size:16px !important}
               <span id="found-eta"><strong>⏱</strong> Calculating…</span>
               <span id="found-waiting">👥 — waiting</span>
             </div>
+            <div id="found-crowd" style="margin-top:.5rem"></div>
           </div>
           <div id="custom-form-wrap" style="display:none;margin-bottom:1rem">
             <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">📋 Please fill in the required information</div>
@@ -303,7 +395,7 @@ input,select,textarea,button{font-size:16px !important}
 
     <!-- ACTIVE -->
     <div class="panel" id="panel-active">
-      <div class="ph"><h1>Active Queue</h1><p>Real-time position — your turn time is fixed when you join</p></div>
+      <div class="ph"><h1>Active Queue</h1><p>Your turn time is fixed when you join — it will not change</p></div>
       <div id="no-active" class="card">
         <div style="text-align:center;padding:2rem">
           <div style="font-size:3.5rem;margin-bottom:1rem">⏰</div>
@@ -313,17 +405,26 @@ input,select,textarea,button{font-size:16px !important}
         </div>
       </div>
       <div id="active-view" style="display:none">
-        <div style="background:var(--ink2);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
-          <div>
+        <!-- Org header with logo -->
+        <div style="background:var(--ink2);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap">
+          <div id="a-org-logo-wrap"><div class="org-logo-placeholder" id="a-org-logo-ph">Q</div></div>
+          <div style="flex:1">
             <div style="font-weight:800;font-size:1.05rem;color:#fff" id="a-svc-name">—</div>
             <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.125rem" id="a-org-name">—</div>
           </div>
           <span class="badge" id="a-svc-badge"></span>
         </div>
+        <!-- Stage progress -->
+        <div class="stage-progress" id="stage-progress-card" style="display:none">
+          <div class="stage-progress-title">📊 Your Journey</div>
+          <div class="stage-steps" id="stage-steps-row"></div>
+        </div>
+        <!-- Status box -->
         <div class="status-box sb-wait" id="status-box">
           <div class="sbi-ico" id="sb-ico">⏳</div>
           <div><div class="sbi-title" id="sb-title">Waiting in queue</div><div class="sbi-desc" id="sb-desc">Position updates automatically. Stay nearby.</div></div>
         </div>
+        <!-- Ticket display -->
         <div class="ticket-display">
           <div class="td-bg"></div>
           <div class="td-inner">
@@ -331,19 +432,46 @@ input,select,textarea,button{font-size:16px !important}
             <div class="td-lbl">Your Ticket</div>
             <div class="td-num" id="td-num">—</div>
             <div><span class="td-pos">Position <strong id="td-pos" style="margin-left:.25rem">—</strong></span></div>
+            <div id="td-batch-wrap" style="display:none"><span class="td-batch" id="td-batch">Batch 1</span></div>
             <div><span class="td-eta" id="td-eta">Your turn at: —</span></div>
+            <div id="td-counter-wrap" style="display:none"><span class="td-counter" id="td-counter">🏷 Counter —</span></div>
           </div>
         </div>
-        <!-- LOCKED ETA — set once when joining, NEVER changes -->
+        <!-- Locked ETA box -->
         <div class="exact-time" id="exact-time-box" style="display:none">
           <div class="et-label">⏰ Your scheduled turn time</div>
           <div class="et-time" id="et-time">—</div>
           <div class="et-date" id="et-date">—</div>
           <div class="et-locked">🔒 Fixed when you joined — won't change</div>
         </div>
+        <!-- Countdown timer -->
+        <div class="countdown-box" id="countdown-box" style="display:none">
+          <div class="countdown-label">⏳ Time until your turn</div>
+          <div class="countdown-timer">
+            <div class="cd-unit"><div class="cd-n" id="cd-h">00</div><div class="cd-l">hrs</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-unit"><div class="cd-n" id="cd-m">00</div><div class="cd-l">min</div></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-unit"><div class="cd-n" id="cd-s">00</div><div class="cd-l">sec</div></div>
+          </div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+        </div>
+        <!-- Stats -->
         <div class="stat-pair">
           <div class="sp"><div class="sp-n" id="sp-ahead">—</div><div class="sp-l">Ahead of You</div></div>
-          <div class="sp"><div class="sp-n" id="sp-total">—</div><div class="sp-l">Total Waiting</div></div>
+          <div class="sp"><div class="sp-n" id="sp-wait-mins">—</div><div class="sp-l">Est. Wait (mins)</div></div>
+        </div>
+        <!-- Counter assignment card -->
+        <div class="counter-box" id="counter-assign-box" style="display:none">
+          <div class="counter-box-label">Your assigned counter</div>
+          <div class="counter-box-name" id="counter-assign-name">—</div>
+          <div class="counter-box-sub">Please proceed to this counter when called</div>
+        </div>
+        <!-- Ready to Checkout (shopping stage only) -->
+        <div class="checkout-card" id="checkout-card" style="display:none">
+          <div class="checkout-card-title">🛒 Done shopping?</div>
+          <div class="checkout-card-sub">Press the button below when you are ready to checkout. You will be automatically assigned to the next available counter.</div>
+          <button class="btn-checkout" onclick="readyToCheckout()" id="checkout-btn">✅ Ready for Checkout →</button>
         </div>
         <button class="btn btn-danger btn-full btn-lg" id="leave-btn" onclick="leaveQueue()">✕ Leave Queue</button>
       </div>
@@ -532,16 +660,35 @@ function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString(u
 function badge(s){var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return '<span class="badge '+(m[s]||'')+'">'+(( s||'').replace('_',' '))+'</span>';}
 
 // ═══ STATE ═══
-var profile=null,activeEntry=null,foundSvc=null,pollTimer=null;
+var profile=null,activeEntry=null,foundSvc=null,pollTimer=null,cdTimer=null;
 var fbEntryId=null,fbRating=0;
-var notifEnabled=false,notifMins=5,notifSent=false;
+var notifEnabled=false,notifMins=10,notifSent=false;
 var endCodePrompted=false,faqHistory=[];
 // LOCKED ETA: set ONCE at join time, NEVER recalculated
 var lockedEtaISO=null;
+var _404count=0;
+var _pwaDeferredPrompt=null;
+var _joinedAt=null;
 
 const FAQ_SYS=`You are QCode Assistant — the helpful AI for QCode, a digital queue management platform.
-QCode lets users join queues with a 6-character service code. Features: real-time position tracking, SMS joining, end codes to confirm service, automated slot cancellation if user doesn't respond within 25% of allotted time, guest mode, organization dashboards.
+QCode lets users join queues with a 6-character service code. Features: real-time position tracking, SMS joining, multi-stage queues (Entry → Shopping → Checkout → Packing), end codes to confirm service, smart counter assignment, batch queue system, push notifications, automated pushback if user doesn't respond within 5 minutes (3 strikes = no-show), guest mode, organization dashboards.
 Answer questions helpfully, concisely and accurately. If user writes in another language, respond in that language.`;
+
+// ═══ PWA ═══
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();_pwaDeferredPrompt=e;
+  var b=document.getElementById('pwa-banner');
+  if(b&&!localStorage.getItem('pwa-dismissed'))b.style.display='flex';
+});
+function triggerPWAInstall(){if(_pwaDeferredPrompt){_pwaDeferredPrompt.prompt();_pwaDeferredPrompt=null;}dismissPWA();}
+function dismissPWA(){localStorage.setItem('pwa-dismissed','1');var b=document.getElementById('pwa-banner');if(b)b.style.display='none';}
+
+// ═══ OFFLINE ═══
+window.addEventListener('online',function(){document.getElementById('offline-banner').style.display='none';});
+window.addEventListener('offline',function(){document.getElementById('offline-banner').style.display='block';});
+
+// ═══ SERVICE WORKER ═══
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/service-worker.js').catch(function(){});}
 
 // ═══ INIT ═══
 async function init(){
@@ -575,6 +722,7 @@ async function init(){
       lockedEtaISO=activeEntry.estimated_time;
       localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
     }
+    _joinedAt=localStorage.getItem('joinedAt_'+activeEntry.id)||null;
   }
 
   // Show active queue immediately from storage without waiting for server
@@ -585,6 +733,8 @@ async function init(){
     startPolling();
   }
   await loadHistory();
+  // Register push if already allowed
+  if('Notification' in window&&Notification.permission==='granted'){notifEnabled=true;registerPushSubscription();}
 }
 
 // ═══ PANELS ═══
@@ -603,6 +753,7 @@ function show(name){
     document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
     document.getElementById('a-svc-name').textContent=activeEntry.svc_name||'—';
     document.getElementById('a-org-name').textContent=activeEntry.org_name||'';
+    _renderOrgLogo(activeEntry.org_logo,activeEntry.org_name);
     _applyLockedEta();
   }
   if(name==='history')loadHistory();
@@ -626,6 +777,14 @@ async function findService(){
   document.getElementById('found-eta').innerHTML='<strong>⏱</strong> ~'+r.data.eta_minutes+' min wait';
   document.getElementById('found-waiting').textContent='👥 '+(r.data.waiting_count||0)+' waiting';
   if(r.data.org_logo){var li=document.getElementById('found-logo');li.src=r.data.org_logo;li.style.display='';}
+  // Crowd level indicator
+  var cl=r.data.crowd_level||'';
+  var crowdEl=document.getElementById('found-crowd');
+  if(crowdEl){
+    var crowdMap={low:'🟢 Low crowd',medium:'🟡 Moderate',high:'🔴 Very Busy'};
+    var crowdCls={low:'nb-crowd-low',medium:'nb-crowd-med',high:'nb-crowd-high'};
+    crowdEl.innerHTML=cl?'<span class="nb-crowd '+( crowdCls[cl]||'')+'">'+( crowdMap[cl]||cl)+'</span>':'';
+  }
   document.getElementById('step-code').style.display='none';
   document.getElementById('step-found').style.display='block';
   var fields=[];try{fields=JSON.parse(r.data.user_info_form||'[]');}catch(e){}
@@ -667,8 +826,10 @@ async function confirmJoin(){
 
   // ── LOCK ETA at join time — this value NEVER changes ──
   lockedEtaISO=activeEntry.estimated_time||null;
-  if(lockedEtaISO&&activeEntry.id){
-    localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+  _joinedAt=new Date().toISOString();
+  if(activeEntry.id){
+    if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+    localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);
   }
 
   if(profile){
@@ -682,12 +843,76 @@ async function confirmJoin(){
   if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
   renderActive();
   show('active');
-  toast('🎉 You joined the queue!','s');
+  toast('🎉 You joined the queue! Ticket: '+(activeEntry.ticket_label||''),'s');
   startPolling();
   setTimeout(function(){document.getElementById('modal-notif').style.display='flex';},700);
 }
 
 // ═══ ACTIVE QUEUE ═══
+// ── Org logo ──
+function _renderOrgLogo(logoUrl,orgName){
+  var wrap=document.getElementById('a-org-logo-wrap');if(!wrap)return;
+  if(logoUrl){
+    wrap.innerHTML='<img class="org-logo-img" src="'+logoUrl+'" alt="'+(orgName||'')+'"/>';
+  }else{
+    var ini=((orgName||'Q').trim().split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2));
+    wrap.innerHTML='<div class="org-logo-placeholder">'+ini+'</div>';
+  }
+}
+
+// ── Stage progress ──
+function _renderStageProgress(stages,currentIdx){
+  var card=document.getElementById('stage-progress-card');
+  var row=document.getElementById('stage-steps-row');
+  if(!stages||!stages.length){card.style.display='none';return;}
+  card.style.display='';
+  var icons={'entry':'🚪','shopping':'🛒','checkout':'💳','packing':'📦'};
+  row.innerHTML=stages.map(function(s,i){
+    var n=(s.name||s).toLowerCase();var ico=icons[n]||'📍';
+    var cls='stage-step'+(i<currentIdx?' done':i===currentIdx?' active':'');
+    var dot=i<currentIdx?'✓':(i===currentIdx?ico:(i+1).toString());
+    return '<div class="'+cls+'"><div class="step-dot">'+dot+'</div><div class="step-label">'+(s.label||s.name||s)+'</div></div>';
+  }).join('');
+}
+
+// ── Stage-specific UI ──
+function _renderStageUI(stageName){
+  var cc=document.getElementById('checkout-card');
+  var cb=document.getElementById('counter-assign-box');
+  var tcw=document.getElementById('td-counter-wrap');
+  cc.style.display='none';cb.style.display='none';tcw.style.display='none';
+  var s=(stageName||'').toLowerCase();
+  if(s==='shopping'||s==='entry_completed'){
+    cc.style.display='block';
+  }else if((s==='checkout'||s==='packing')&&activeEntry&&activeEntry.assigned_counter){
+    document.getElementById('counter-assign-name').textContent=activeEntry.assigned_counter;
+    document.getElementById('td-counter').textContent='🏷 '+activeEntry.assigned_counter;
+    cb.style.display='block';tcw.style.display='';
+  }
+}
+
+// ── Countdown ──
+function startCountdown(){
+  clearInterval(cdTimer);
+  var eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
+  if(!eta){document.getElementById('countdown-box').style.display='none';return;}
+  var etaMs=new Date(eta).getTime();
+  var joinMs=_joinedAt?new Date(_joinedAt).getTime():Date.now();
+  var totalMs=Math.max(1,etaMs-joinMs);
+  document.getElementById('countdown-box').style.display='';
+  function tick(){
+    var now=Date.now();var left=Math.max(0,etaMs-now);
+    var h=Math.floor(left/3600000);var m=Math.floor((left%3600000)/60000);var s=Math.floor((left%60000)/1000);
+    document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
+    document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
+    document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
+    var pct=Math.min(100,Math.max(0,((totalMs-left)/totalMs)*100));
+    document.getElementById('progress-fill').style.width=pct+'%';
+    if(left<=0){clearInterval(cdTimer);document.getElementById('countdown-box').style.display='none';}
+  }
+  tick();cdTimer=setInterval(tick,1000);
+}
+
 function renderActive(){
   if(!activeEntry)return;
   document.getElementById('no-active').style.display='none';
@@ -696,13 +921,25 @@ function renderActive(){
   document.getElementById('a-org-name').textContent=activeEntry.org_name||'';
   document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
   document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
+  _renderOrgLogo(activeEntry.org_logo,activeEntry.org_name);
+  // Batch
+  if(activeEntry.batch_number){
+    document.getElementById('td-batch').textContent='Batch '+activeEntry.batch_number;
+    document.getElementById('td-batch-wrap').style.display='';
+  }
+  // Stages
+  if(activeEntry.stages&&activeEntry.stages.length){
+    _renderStageProgress(activeEntry.stages,activeEntry.current_stage_index||0);
+  }
+  _renderStageUI(activeEntry.stage_name||'');
   // Apply locked ETA immediately
   _applyLockedEta();
+  startCountdown();
   // Trigger a background refresh for position/status
   refreshActive();
 }
 
-// Apply locked ETA to UI — called on every render but VALUE never changes
+// Apply locked ETA to UI — VALUE never changes
 function _applyLockedEta(){
   var eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
   if(!eta)return;
@@ -722,19 +959,18 @@ async function refreshActive(){
   if(!r.ok){
     if(r.status===404){
       _404count++;
-      // Only clear after 3 consecutive 404s - prevents clearing on network blip or slow DB
       if(_404count>=3){clearActiveEntry();return;}
     }
-    return; // Network error or session issue — keep showing stored data
+    return; // Network error — keep showing stored data
   }
-  _404count=0; // reset on success
+  _404count=0;
   var d=r.data;
 
   if(['completed','cancelled','no_show'].includes(d.status)){
-    clearInterval(pollTimer);
+    clearInterval(pollTimer);clearInterval(cdTimer);
     if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-    if(activeEntry)localStorage.removeItem('lockedEta_'+activeEntry.id);
-    activeEntry=null;lockedEtaISO=null;
+    if(activeEntry){localStorage.removeItem('lockedEta_'+activeEntry.id);localStorage.removeItem('joinedAt_'+activeEntry.id);}
+    activeEntry=null;lockedEtaISO=null;_joinedAt=null;
     document.getElementById('no-active').style.display='';
     document.getElementById('active-view').style.display='none';
     document.getElementById('active-dot').style.display='none';
@@ -747,10 +983,41 @@ async function refreshActive(){
   var pos=d.position||1;
   document.getElementById('td-pos').textContent=pos;
   document.getElementById('sp-ahead').textContent=Math.max(0,pos-1);
-  document.getElementById('sp-total').textContent=d.total||0;
+  // Estimated wait in minutes
+  var waitMins=d.estimated_wait_minutes||Math.max(0,(pos-1)*(activeEntry.time_interval||5));
+  document.getElementById('sp-wait-mins').textContent=waitMins>0?waitMins+'m':'Soon';
 
-  // ── ETA is LOCKED — NEVER update from server response ──
+  // ETA is LOCKED — NEVER update from server response
   _applyLockedEta();
+
+  // Stage change detection
+  if(d.stage_name&&d.stage_name!==(activeEntry.stage_name||'')){
+    activeEntry.stage_name=d.stage_name;
+    activeEntry.current_stage_index=d.current_stage_index||0;
+    activeEntry.assigned_counter=d.assigned_counter||null;
+    if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+    _renderStageUI(d.stage_name);
+    if(d.stages)_renderStageProgress(d.stages,d.current_stage_index||0);
+    // Lock new ETA when entering checkout or packing
+    if((d.stage_name==='checkout'||d.stage_name==='packing')&&d.estimated_time){
+      lockedEtaISO=d.estimated_time;
+      localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+      activeEntry.estimated_time=d.estimated_time;
+      _applyLockedEta();startCountdown();
+    }
+  }
+
+  // Counter assignment update
+  if(d.assigned_counter&&d.assigned_counter!==activeEntry.assigned_counter){
+    activeEntry.assigned_counter=d.assigned_counter;
+    document.getElementById('counter-assign-name').textContent=d.assigned_counter;
+    document.getElementById('td-counter').textContent='🏷 '+d.assigned_counter;
+    document.getElementById('counter-assign-box').style.display='block';
+    document.getElementById('td-counter-wrap').style.display='';
+  }
+
+  // Org logo late load
+  if(d.org_logo&&!activeEntry.org_logo){activeEntry.org_logo=d.org_logo;_renderOrgLogo(d.org_logo,d.org_name||activeEntry.org_name);}
 
   var box=document.getElementById('status-box');
   var ico=document.getElementById('sb-ico');
@@ -758,22 +1025,28 @@ async function refreshActive(){
   var desc=document.getElementById('sb-desc');
   box.className='status-box';
   var badgeEl=document.getElementById('a-svc-badge');
-  badgeEl.textContent=d.svc_status||'';
-  badgeEl.className='badge b-'+(d.svc_status||'');
+  badgeEl.textContent=d.svc_status||d.status||'';
+  badgeEl.className='badge b-'+(d.svc_status||d.status||'');
 
   if(d.status==='called'){
-    box.classList.add('sb-call');ico.textContent='📢';title.textContent="You're being called!";desc.textContent='Please proceed to the counter immediately!';
+    box.classList.add('sb-call');ico.textContent='📢';title.textContent="You're being called!";
+    desc.textContent='Please proceed to the counter immediately! You have 5 minutes.';
     toast('📢 You are being called! Go to the counter NOW.','w',10000);
+    showBrowserNotification('QCode — It\'s Your Turn!','Head to the counter now. You have 5 minutes!');
     if(!endCodePrompted){endCodePrompted=true;setTimeout(function(){
       if(document.getElementById('modal-ticket-label'))document.getElementById('modal-ticket-label').textContent=activeEntry.ticket_label||'—';
       document.getElementById('modal-endcode').style.display='flex';
     },500);}
   } else if(d.status==='serving'){
     box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are currently at the counter.';
+  } else if((d.stage_name||'').toLowerCase()==='shopping'){
+    box.classList.add('sb-shop');ico.textContent='🛒';title.textContent='Happy Shopping!';desc.textContent='Take your time. Press Ready to Checkout when done.';
+  } else if((d.stage_name||'').toLowerCase()==='packing'){
+    box.classList.add('sb-pack');ico.textContent='📦';title.textContent='Packing & Verification';desc.textContent='Head to the packing desk for item verification.';
   } else {
     box.classList.add('sb-wait');
-    if(pos===1){ico.textContent='🔔';title.textContent="You're next!";desc.textContent='You will be called very soon.';}
-    else if(pos<=3){ico.textContent='⏰';title.textContent='Nearly your turn';desc.textContent='Only a few people ahead of you.';}
+    if(pos===1){ico.textContent='🔔';title.textContent="You're next!";desc.textContent='You will be called very soon. Get ready!';}
+    else if(pos<=3){ico.textContent='⏰';title.textContent='Almost your turn';desc.textContent='Only a few people ahead of you.';}
     else{ico.textContent='⏳';title.textContent='Waiting in queue';desc.textContent='Position updates automatically. Stay nearby.';}
   }
 
@@ -787,12 +1060,42 @@ async function refreshActive(){
   }
 }
 
+// ── Ready to Checkout ──
+async function readyToCheckout(){
+  if(!activeEntry)return;
+  var btn=document.getElementById('checkout-btn');
+  btn.disabled=true;btn.textContent='Assigning counter…';
+  var r=await api('/api/user/ready-checkout',{method:'POST',body:{entry_id:activeEntry.id}});
+  if(!r.ok){toast(r.data.error||'Failed. Please try again.','e');btn.disabled=false;btn.textContent='✅ Ready for Checkout →';return;}
+  activeEntry.stage_name='checkout';
+  activeEntry.assigned_counter=r.data.assigned_counter||null;
+  if(r.data.ticket_label)activeEntry.ticket_label=r.data.ticket_label;
+  if(r.data.estimated_time){
+    lockedEtaISO=r.data.estimated_time;
+    localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+    activeEntry.estimated_time=r.data.estimated_time;
+  }
+  if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+  document.getElementById('checkout-card').style.display='none';
+  if(r.data.assigned_counter){
+    document.getElementById('counter-assign-name').textContent=r.data.assigned_counter;
+    document.getElementById('td-counter').textContent='🏷 '+r.data.assigned_counter;
+    document.getElementById('counter-assign-box').style.display='block';
+    document.getElementById('td-counter-wrap').style.display='';
+  }
+  if(r.data.ticket_label)document.getElementById('td-num').textContent=r.data.ticket_label;
+  _applyLockedEta();startCountdown();
+  toast('✅ Assigned to '+(r.data.assigned_counter||'checkout')+' — head there now!','s',7000);
+  showBrowserNotification('QCode — Checkout Ready!','Assigned to '+(r.data.assigned_counter||'checkout')+'. Head over now!');
+  await refreshActive();
+}
+
 function clearActiveEntry(){
-  clearInterval(pollTimer);
+  clearInterval(pollTimer);clearInterval(cdTimer);
   if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-  if(activeEntry)localStorage.removeItem('lockedEta_'+activeEntry.id);
+  if(activeEntry){localStorage.removeItem('lockedEta_'+activeEntry.id);localStorage.removeItem('joinedAt_'+activeEntry.id);}
   localStorage.removeItem('qc_active_entry');
-  activeEntry=null;lockedEtaISO=null;
+  activeEntry=null;lockedEtaISO=null;_joinedAt=null;
   document.getElementById('no-active').style.display='';
   document.getElementById('active-view').style.display='none';
   document.getElementById('active-dot').style.display='none';
@@ -813,17 +1116,30 @@ async function leaveQueue(){
   clearActiveEntry();toast('You have left the queue.','i');
 }
 
-// ═══ NOTIFICATION ═══
 function closeNotifModal(yes){
   document.getElementById('modal-notif').style.display='none';
   if(yes){
-    notifEnabled=true;notifMins=parseInt(document.getElementById('notif-mins').value)||5;
+    notifEnabled=true;notifMins=parseInt(document.getElementById('notif-mins').value)||10;
     toast('✓ You will be notified ~'+notifMins+' min before your turn.','s');
-    if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();
+    if('Notification' in window&&Notification.permission==='default'){
+      Notification.requestPermission().then(function(p){if(p==='granted')registerPushSubscription();});
+    }
   }
 }
 function showBrowserNotification(title,body){
-  if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body:body,icon:'/static/icon.png'});
+  if('Notification' in window&&Notification.permission==='granted'){
+    new Notification(title,{body:body,icon:'/static/icon-192.png'});
+  }
+}
+async function registerPushSubscription(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  try{
+    var reg=await navigator.serviceWorker.ready;
+    var keyMeta=document.querySelector('meta[name="vapid-public-key"]');
+    if(!keyMeta)return;
+    var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyMeta.content});
+    await api('/api/user/push-subscribe',{method:'POST',body:{subscription:JSON.parse(JSON.stringify(sub))}});
+  }catch(e){}
 }
 
 // ═══ END CODE ═══
@@ -949,9 +1265,13 @@ async function nsConfirmJoin(){
   if(!r.ok){toast((r.data&&r.data.error)||'Failed to join queue.','e');return;}
   activeEntry=r.data.entry||r.data;
   lockedEtaISO=activeEntry.estimated_time||null;
-  if(lockedEtaISO&&activeEntry.id)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+  _joinedAt=new Date().toISOString();
+  if(activeEntry.id){
+    if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+    localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);
+  }
   if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
-  toast('Joined! Ticket: '+activeEntry.ticket_label,'s');
+  toast('🎉 Joined! Ticket: '+activeEntry.ticket_label,'s');
   nsCancelFind();
   document.getElementById('active-dot').style.display='';
   if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
@@ -1045,7 +1365,7 @@ function appendMsg(role,text,cls,id){
 
 // ═══ LOGOUT ═══
 async function doLogout(){
-  clearInterval(pollTimer);
+  clearInterval(pollTimer);clearInterval(cdTimer);
   await api('/api/auth/logout',{method:'POST'});
   window.location.href='/';
 }
