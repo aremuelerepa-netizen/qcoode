@@ -1117,7 +1117,51 @@ function removeStage(i) {
   stageList.splice(i, 1);
   renderStages();
 }
+function renderFormFields() {
+  const el = document.getElementById('fb-fields');
+  if (!formFields.length) {
+    el.innerHTML = '<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>';
+    return;
+  }
+  el.innerHTML = formFields.map((f, i) => `
+    <div class="fb-field-row">
+      <div class="fb-field-info">
+        <div class="fb-field-label">${f.label}</div>
+        <div class="fb-field-type">${f.type}</div>
+      </div>
+      <button class="btn bd bsm" onclick="formFields.splice(${i},1);renderFormFields()">✕</button>
+    </div>`).join('');
+}
 
+function addFormField() {
+  const type  = document.getElementById('fb-type').value;
+  const label = document.getElementById('fb-label').value.trim();
+  if (!label) { toast('Enter a field label first.','e'); return; }
+  formFields.push({ type, label });
+  document.getElementById('fb-label').value = '';
+  renderFormFields();
+}
+
+function renderBreaks() {
+  const el = document.getElementById('break-list');
+  if (!breaks.length) { el.innerHTML = ''; return; }
+  el.innerHTML = breaks.map((b, i) => `
+    <div class="break-item">
+      <span>🕐 ${b.start} – ${b.end}</span>
+      <button class="btn bd bsm" onclick="breaks.splice(${i},1);renderBreaks()">✕</button>
+    </div>`).join('');
+}
+
+function addBreak() {
+  const start = document.getElementById('brk-start').value;
+  const end   = document.getElementById('brk-end').value;
+  if (!start || !end) { toast('Enter both start and end times.','e'); return; }
+  if (start >= end)   { toast('Break end must be after start.','e'); return; }
+  breaks.push({ start, end });
+  document.getElementById('brk-start').value = '';
+  document.getElementById('brk-end').value   = '';
+  renderBreaks();
+}
 function addStaffTag(i, inputEl) {
   const val = inputEl.value.trim();
   if (!val) return;
@@ -1351,61 +1395,6 @@ function updateCallTimer() {
     callBtn.disabled = true;
     callBtn.title = `Cannot call yet — wait ${timeStr}`;
   }
-}
-
-// ─── CREATE SERVICE — update to include stages & batch ───
-const _origCreateService = createService;
-async function createService() {
-  const errEl     = document.getElementById('m-err');
-  const createBtn = document.getElementById('create-btn');
-  errEl.style.display='none';
-  const name     = (document.getElementById('m-name').value||'').trim();
-  const staff    = (document.getElementById('m-staff').value||'').trim();
-  const desc     = (document.getElementById('m-desc').value||'').trim();
-  const prefix   = (document.getElementById('m-prefix').value||'').trim().toUpperCase();
-  const interval = parseInt(document.getElementById('m-interval').value)||5;
-  const maxVal   = document.getElementById('m-max').value;
-  const startVal = document.getElementById('m-start').value;
-  const endVal   = document.getElementById('m-end').value;
-  if (!name)   { errEl.textContent='Service name is required.';   errEl.style.display='block'; return; }
-  if (!prefix) { errEl.textContent='Ticket prefix is required.';  errEl.style.display='block'; return; }
-  if (startVal && endVal && startVal>=endVal) { errEl.textContent='End time must be after start time.'; errEl.style.display='block'; return; }
-  // Validate stages
-  if (stagesEnabled) {
-    for (let i=0; i<stageList.length; i++) {
-      if (!stageList[i].name.trim()) { errEl.textContent=`Stage ${i+1} needs a name.`; errEl.style.display='block'; return; }
-      if (stageList[i].pin && !/^\d{4}$/.test(stageList[i].pin)) { errEl.textContent=`Stage ${i+1} PIN must be exactly 4 digits.`; errEl.style.display='block'; return; }
-    }
-  }
-  createBtn.disabled=true; createBtn.textContent='Creating…';
-  const body = {
-    name, staff_name: staff||null, description: desc||null,
-    ticket_prefix: prefix, time_interval: interval,
-    max_users: maxVal ? parseInt(maxVal) : null,
-    user_info_form: formFields,
-    schedule_start: startVal ? new Date(startVal).toISOString() : null,
-    schedule_end:   endVal   ? new Date(endVal).toISOString()   : null,
-    break_times: breaks,
-  };
-  if (stagesEnabled && stageList.length) {
-    body.stages = stageList.map((s, i) => ({
-      name: s.name.trim(), order: i+1, time_interval: s.interval||5,
-      staff_names: s.staff, staff_pin: s.pin||null,
-      counter_count: s.staff.length || 1,
-    }));
-  }
-  if (batchEnabled) {
-    body.batch_enabled   = true;
-    body.batch_size      = parseInt(document.getElementById('m-batch-size').value)||50;
-    body.batch_buffer_min= parseInt(document.getElementById('m-batch-buffer').value)||30;
-  }
-  const r = await api('/api/org/services', {method:'POST', body});
-  createBtn.disabled=false; createBtn.textContent='Create Service';
-  if (!r.ok) { errEl.textContent=r.data.error||'Failed to create service.'; errEl.style.display='block'; return; }
-  const code = r.data.service?.service_code || '—';
-  toast(`✓ Service created! Code: ${code}`, 's', 8000);
-  closeModal('modal-create');
-  await loadServices();
 }
 
 function openCreateModal() {
