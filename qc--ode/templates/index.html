@@ -188,7 +188,7 @@ input,select,textarea,button{font-size:16px !important}
     <h1 id="hero-h1">Queue Smarter,<br><span>Not Harder</span></h1>
     <p class="hero-sub" id="hero-sub">Join any queue with your QCode account — real-time position tracking, push notifications, multi-stage progress, and full history.</p>
 
-    <!-- JOIN CARD — login-only -->
+    <!-- JOIN CARD -->
     <div class="join-card">
       <div class="jc-label" id="jc-title">Find & Join a Queue</div>
       <div class="jc-note" id="jc-note">Sign in to join a queue, track your position, and receive notifications before your turn.</div>
@@ -201,7 +201,7 @@ input,select,textarea,button{font-size:16px !important}
         <div id="code-err" class="ferr"></div>
       </div>
 
-      <!-- Service preview — login to join -->
+      <!-- Service preview — shown after code lookup -->
       <div id="step-found" style="display:none;margin-top:1rem">
         <div class="found-box">
           <div class="found-name" id="found-name"></div>
@@ -211,6 +211,11 @@ input,select,textarea,button{font-size:16px !important}
             <span id="found-waiting"></span>
           </div>
         </div>
+        <!-- 
+          FIX: join-signin-btn href is set dynamically in previewService().
+          If logged in → goes to /user?join=CODE
+          If logged out → goes to /login-user?join=CODE
+        -->
         <a id="join-signin-btn" href="/login-user" class="btn bp btn-full" style="margin-bottom:.5rem">Sign in to Join this Queue →</a>
         <button class="btn bg-btn btn-full" onclick="cancelFind()">← Try another code</button>
       </div>
@@ -305,6 +310,9 @@ const TRANSLATIONS = {
   pt:{h1:'Fique na Fila\nde Forma Inteligente',sub:'Junte-se a qualquer fila com sua conta QCode.',jcTitle:'Encontrar uma fila',jcNote:'Entre com sua conta para receber notificações.',howTitle:'Como Funciona',howSub:'Três passos simples'}
 };
 
+// ── Track session state globally ──
+let currentUser = null;
+
 function setLang(l) {
   document.documentElement.lang = l;
   document.documentElement.dir  = l==='ar' ? 'rtl' : 'ltr';
@@ -328,7 +336,13 @@ function toast(msg, type='i', ms=4500) {
   setTimeout(() => el.remove(), ms);
 }
 
-// Preview service info without joining — directs to login
+// ── FIX: Use /api/guest/queue-status via service lookup trick,
+//    OR use the public find-service route correctly.
+//    /api/user/find-service works WITHOUT login — it only reads
+//    from services table. The session check inside returns 401
+//    only if we add uid checks. Looking at app.py: find-service
+//    does NOT check session — it's public! ✅ No fix needed there.
+//    BUT we pass the code to login page so user.html auto-joins.
 async function previewService() {
   const code  = document.getElementById('code-inp').value.trim().toUpperCase();
   const errEl = document.getElementById('code-err');
@@ -336,24 +350,47 @@ async function previewService() {
   errEl.style.display = 'none';
   if (!code) { errEl.textContent = 'Please enter a service code.'; errEl.style.display='block'; return; }
   btn.disabled = true; btn.textContent = '…';
-  const r = await fetch('/api/user/find-service?code=' + encodeURIComponent(code));
-  btn.disabled = false; btn.textContent = 'Preview';
-  if (!r.ok) {
-    const d = await r.json().catch(()=>({}));
-    errEl.textContent = d.error || 'Service not found.';
+
+  try {
+    const r = await fetch('/api/user/find-service?code=' + encodeURIComponent(code));
+    btn.disabled = false; btn.textContent = 'Preview';
+
+    if (!r.ok) {
+      const d = await r.json().catch(()=>({}));
+      errEl.textContent = d.error || 'Service not found.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const svc = await r.json();
+    document.getElementById('found-name').textContent    = svc.name;
+    document.getElementById('found-org').textContent     = svc.org_name ? '🏢 '+svc.org_name : '';
+    document.getElementById('found-eta').textContent     = '⏱ ~'+(svc.eta_minutes||0)+' min wait';
+    document.getElementById('found-waiting').textContent = '👥 '+(svc.waiting_count||0)+' waiting';
+
+    // FIX: If already logged in, send to dashboard with join code
+    //       If not logged in, send to login page with join code
+    const joinBtn = document.getElementById('join-signin-btn');
+    if (currentUser && currentUser.logged_in) {
+      const dash = currentUser.role === 'organization' ? '/org'
+                 : currentUser.role === 'super_admin'  ? '/super-admin'
+                 : '/user';
+      joinBtn.textContent = 'Go to Dashboard to Join →';
+      joinBtn.href = dash + '?join=' + encodeURIComponent(code);
+    } else {
+      joinBtn.textContent = 'Sign in to Join this Queue →';
+      joinBtn.href = '/login-user?join=' + encodeURIComponent(code);
+    }
+
+    document.getElementById('step-code').style.display  = 'none';
+    document.getElementById('step-found').style.display = 'block';
+    document.getElementById('auth-strip').style.display = 'none';
+
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Preview';
+    errEl.textContent = 'Network error. Please try again.';
     errEl.style.display = 'block';
-    return;
   }
-  const svc = await r.json();
-  document.getElementById('found-name').textContent    = svc.name;
-  document.getElementById('found-org').textContent     = svc.org_name ? '🏢 '+svc.org_name : '';
-  document.getElementById('found-eta').textContent     = '⏱ ~'+(svc.eta_minutes||0)+' min wait';
-  document.getElementById('found-waiting').textContent = '👥 '+(svc.waiting_count||0)+' waiting';
-  // Pass code to login page so user.html can auto-join after login
-  document.getElementById('join-signin-btn').href = '/login-user?join=' + encodeURIComponent(code);
-  document.getElementById('step-code').style.display  = 'none';
-  document.getElementById('step-found').style.display = 'block';
-  document.getElementById('auth-strip').style.display = 'none';
 }
 
 function cancelFind() {
@@ -369,9 +406,9 @@ async function loadStats() {
     const r = await fetch('/api/public/stats');
     if (!r.ok) return;
     const d = await r.json();
-    document.getElementById('stat-orgs').textContent   = d.approved_orgs    || 0;
-    document.getElementById('stat-served').textContent = d.total_served      || 0;
-    document.getElementById('stat-active').textContent = d.active_services   || 0;
+    document.getElementById('stat-orgs').textContent   = d.approved_orgs  || 0;
+    document.getElementById('stat-served').textContent = d.total_served    || 0;
+    document.getElementById('stat-active').textContent = d.active_services || 0;
   } catch(e) {}
 }
 
@@ -380,23 +417,24 @@ async function checkSession() {
     const r = await fetch('/api/auth/me', {credentials:'include'});
     if (!r.ok) return;
     const d = await r.json();
+    currentUser = d; // store globally so previewService can use it
+
     if (d.logged_in) {
-      const dash = d.role==='organization' ? '/org' : d.role==='super_admin' ? '/super-admin' : '/user';
-      // Replace Sign In link with Dashboard link
+      const dash = d.role==='organization' ? '/org'
+                 : d.role==='super_admin'  ? '/super-admin'
+                 : '/user';
+
+      // Update nav: replace Sign In with Dashboard
       const signinEl = document.getElementById('nav-signin');
-      if (signinEl) { signinEl.textContent='My Dashboard'; signinEl.href=dash; }
-      // Replace auth strip with dashboard button
+      if (signinEl) { signinEl.textContent = 'My Dashboard'; signinEl.href = dash; }
+
+      // Replace auth strip with single dashboard button
       const strip = document.getElementById('auth-strip');
       if (strip) strip.innerHTML = `<a href="${dash}" class="auth-signin" style="flex:1;text-align:center">Go to My Dashboard →</a>`;
-      // Update join card note
+
+      // Update join card note with user's name
       const note = document.getElementById('jc-note');
-      if (note) note.textContent = `Welcome back, ${d.full_name||''}! Enter a service code to find and join a queue.`;
-      // Update join button to go straight to user dashboard join
-      const joinBtn = document.getElementById('join-signin-btn');
-      if (joinBtn) {
-        joinBtn.textContent = 'Go to Dashboard to Join →';
-        joinBtn.href = dash;
-      }
+      if (note) note.textContent = `Welcome back, ${d.full_name||'there'}! Enter a service code to preview and join a queue.`;
     }
   } catch(e) {}
 }
@@ -416,6 +454,7 @@ document.getElementById('code-inp').addEventListener('keydown', e => { if (e.key
 const sl = localStorage.getItem('qcode_lang');
 if (sl && TRANSLATIONS[sl]) setLang(sl);
 
+// Run on load
 checkSession();
 loadStats();
 </script>
