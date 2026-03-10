@@ -1051,6 +1051,53 @@ function printReport() {
 
 // ─── CREATE SERVICE ───
 // ─── ACCOUNT ───
+function renderFormFields() {
+  const el = document.getElementById('fb-fields');
+  if (!formFields.length) {
+    el.innerHTML = '<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>';
+    return;
+  }
+  el.innerHTML = formFields.map((f, i) => `
+    <div class="fb-field-row">
+      <div class="fb-field-info">
+        <div class="fb-field-label">${f.label}</div>
+        <div class="fb-field-type">${f.type}</div>
+      </div>
+      <button class="btn bd bsm" onclick="formFields.splice(${i},1);renderFormFields()">✕</button>
+    </div>`).join('');
+}
+
+function addFormField() {
+  const type  = document.getElementById('fb-type').value;
+  const label = document.getElementById('fb-label').value.trim();
+  if (!label) { toast('Enter a field label first.','e'); return; }
+  formFields.push({ type, label });
+  document.getElementById('fb-label').value = '';
+  renderFormFields();
+}
+
+function renderBreaks() {
+  const el = document.getElementById('break-list');
+  if (!breaks.length) { el.innerHTML = ''; return; }
+  el.innerHTML = breaks.map((b, i) => `
+    <div class="break-item">
+      <span>🕐 ${b.start} – ${b.end}</span>
+      <button class="btn bd bsm" onclick="breaks.splice(${i},1);renderBreaks()">✕</button>
+    </div>`).join('');
+}
+
+function addBreak() {
+  const start = document.getElementById('brk-start').value;
+  const end   = document.getElementById('brk-end').value;
+  if (!start || !end) { toast('Enter both start and end times.','e'); return; }
+  if (start >= end)   { toast('Break end must be after start.','e'); return; }
+  breaks.push({ start, end });
+  document.getElementById('brk-start').value = '';
+  document.getElementById('brk-end').value   = '';
+  renderBreaks();
+}
+
+// ─── ACCOUNT ───
 async function handleLogoFile(input) {
   const file = input.files[0];
   if (!file) return;
