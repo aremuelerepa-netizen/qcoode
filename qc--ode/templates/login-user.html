@@ -60,10 +60,14 @@ input,select,textarea,button{font-size:16px !important}
     <p class="sub">Sign in to your QCode account to track your queues.</p>
     <div id="err" class="err"></div>
     <div id="warn" class="warn"></div>
-    <div class="fg"><label class="lbl">Email Address</label><input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+    <div class="fg">
+      <label class="lbl">Email Address</label>
+      <input id="email" class="inp" type="email" placeholder="you@example.com" autocomplete="email"/>
+    </div>
     <div class="fg">
       <div class="lbl-row">
         <label class="lbl">Password</label>
+        <!-- FIX: href now matches the route added in app_password_routes.py -->
         <a href="/forgot-password-user" class="forgot-link">Forgot password?</a>
       </div>
       <input id="password" class="inp" type="password" placeholder="Your password" autocomplete="current-password"/>
@@ -71,7 +75,9 @@ input,select,textarea,button{font-size:16px !important}
     <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
     <div class="divider">or</div>
     <div class="sw">Don't have an account? <a href="/register-user">Create one →</a></div>
-    <div class="sw" style="margin-top:.375rem"><a href="/login-org" style="color:var(--muted);font-size:.82rem">Signing in as an organization? →</a></div>
+    <div class="sw" style="margin-top:.375rem">
+      <a href="/login-org" style="color:var(--muted);font-size:.82rem">Signing in as an organization? →</a>
+    </div>
   </div>
   <a href="/" class="back">← Back to home</a>
 </div>
@@ -82,39 +88,79 @@ async function doLogin() {
   const err      = document.getElementById('err');
   const warn     = document.getElementById('warn');
   const btn      = document.getElementById('btn');
-  err.style.display = 'none'; warn.style.display = 'none';
-  if (!email || !password) { err.textContent = 'Email and password are required.'; err.style.display = 'block'; return; }
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  const r = await fetch('/api/auth/login', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({email, password}), credentials:'include'
-  });
-  const d = await r.json().catch(() => ({}));
-  btn.disabled = false; btn.textContent = 'Sign In';
-  if (!r.ok) {
-    if (d.error && d.error.toLowerCase().includes('pending')) {
-      warn.textContent = '⚠ Your organization account is pending admin approval.'; warn.style.display = 'block';
-    } else {
-      err.textContent = d.error || 'Login failed.'; err.style.display = 'block';
-    }
+  err.style.display = 'none';
+  warn.style.display = 'none';
+
+  if (!email || !password) {
+    err.textContent = 'Email and password are required.';
+    err.style.display = 'block';
     return;
   }
-  window.location.href = d.redirect || '/user';
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    // ✅ Correct endpoint for user login
+    const r = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
+    });
+    const d = await r.json().catch(() => ({}));
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+
+    if (!r.ok) {
+      const msg = d.error || 'Login failed.';
+      if (msg.toLowerCase().includes('pending')) {
+        warn.textContent = '⚠ Your organization account is pending admin approval.';
+        warn.style.display = 'block';
+      } else if (msg.toLowerCase().includes('suspended')) {
+        err.textContent = '⛔ This account has been suspended. Contact support.';
+        err.style.display = 'block';
+      } else {
+        err.textContent = msg;
+        err.style.display = 'block';
+      }
+      return;
+    }
+
+    // ✅ app.py returns { redirect: "/user" | "/org" | "/super-admin" }
+    // After login, check if there's a ?join=CODE param to auto-join a queue
+    const params   = new URLSearchParams(window.location.search);
+    const joinCode = params.get('join');
+    if (joinCode && d.role === 'user') {
+      window.location.href = '/user?join=' + encodeURIComponent(joinCode);
+    } else {
+      window.location.href = d.redirect || '/user';
+    }
+
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+    err.textContent = 'Network error. Please try again.';
+    err.style.display = 'block';
+  }
 }
+
 async function checkSession() {
+  // Skip redirect if ?force=1 in URL (allows re-login)
   const params = new URLSearchParams(window.location.search);
   if (params.get('force') === '1') return;
   try {
-    const r = await fetch('/api/auth/me', {credentials:'include'});
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
     if (!r.ok) return;
     const d = await r.json();
     if (d.logged_in) {
-      if (d.role === 'organization') window.location.href = '/org';
+      if (d.role === 'organization')  window.location.href = '/org';
       else if (d.role === 'super_admin') window.location.href = '/super-admin';
-      else if (d.role === 'user') window.location.href = '/user';
+      else window.location.href = '/user';
     }
-  } catch(e) {}
+  } catch (e) {}
 }
+
 document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 checkSession();
 </script>
