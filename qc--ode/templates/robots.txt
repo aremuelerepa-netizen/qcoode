@@ -1,0 +1,44 @@
+# QCode — robots.txt
+# Controls which pages search engines (Google, Bing, etc.) are allowed to crawl
+
+User-agent: *
+
+# ── ALLOW: Public pages ──────────────────────────────────────
+Allow: /
+Allow: /register-user
+Allow: /register-org
+Allow: /login-user
+Allow: /login-org
+Allow: /forgot-password-user
+Allow: /forgot-password-org
+
+# ── DISALLOW: Private dashboards ─────────────────────────────
+Disallow: /user
+Disallow: /org
+Disallow: /super-admin
+Disallow: /admin
+Disallow: /staff/
+
+# ── DISALLOW: API endpoints ───────────────────────────────────
+Disallow: /api/
+Disallow: /auth/
+
+# ── DISALLOW: Password reset pages (contain tokens) ──────────
+Disallow: /reset-password-user
+Disallow: /reset-password-org
+
+# ── Sitemap location ─────────────────────────────────────────
+Sitemap: https://qcode.onrender.com/sitemap.xml
+
+# ── Block common bad bots ─────────────────────────────────────
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
