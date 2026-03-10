@@ -124,7 +124,6 @@ textarea.inp{resize:vertical;min-height:70px}
 .b-pending{background:var(--amber-l);color:#92400e}
 .b-approved{background:var(--green-l);color:#047857}
 .b-suspended{background:var(--red-l);color:var(--red)}
-.b-notyet{background:rgba(136,146,164,.12);color:var(--muted)}
 
 /* ─── QUEUE VIEW ─── */
 .q-header{background:var(--ink2);border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.875rem}
@@ -137,35 +136,6 @@ textarea.inp{resize:vertical;min-height:70px}
 .cb-ticket{font-family:var(--fh);font-size:2rem;font-weight:700}
 .cb-name{font-size:.875rem;opacity:.85;margin-top:.1rem}
 .cb-endcode{font-size:.8rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:.4rem;padding:.3rem .625rem;margin-top:.4rem;letter-spacing:.1em;font-family:var(--fh);display:inline-block}
-
-/* ─── CALL TIMER BOX ─── */
-.call-timer-box{
-  background:linear-gradient(135deg,rgba(67,97,238,.07),rgba(76,201,240,.05));
-  border:2px solid rgba(67,97,238,.2);
-  border-radius:var(--rl);
-  padding:1.125rem 1.5rem;
-  margin-bottom:1.25rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-wrap:wrap;
-  gap:.75rem;
-}
-.call-timer-box.ready{
-  background:linear-gradient(135deg,rgba(6,214,160,.08),rgba(6,214,160,.04));
-  border-color:var(--green);
-}
-.call-timer-box.soon{
-  background:linear-gradient(135deg,rgba(255,209,102,.1),rgba(255,209,102,.05));
-  border-color:var(--amber);
-}
-.ctb-left{display:flex;align-items:center;gap:.875rem}
-.ctb-ico{font-size:1.75rem}
-.ctb-title{font-family:var(--fh);font-weight:700;font-size:.95rem;color:var(--ink)}
-.ctb-sub{font-size:.78rem;color:var(--muted);margin-top:.125rem}
-.ctb-countdown{font-family:var(--fh);font-size:1.5rem;font-weight:700;color:var(--brand);white-space:nowrap}
-.ctb-countdown.green{color:#047857}
-.ctb-countdown.amber{color:#92400e}
 
 /* ─── TABS ─── */
 .tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
@@ -231,30 +201,128 @@ tr:hover td{background:var(--bg)}
 .t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
 @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
 
-@media(max-width:900px){.sidebar{width:210px}}
-@media(max-width:700px){
-  .shell{flex-direction:column}
-  .sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap;padding:.75rem}
-}
+/* ── USER INFO BUTTON ── */
+.info-btn{background:rgba(67,97,238,.1);border:none;color:var(--brand);cursor:pointer;width:26px;height:26px;border-radius:50%;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;transition:all var(--t);flex-shrink:0}
+.info-btn:hover{background:var(--brand);color:#fff;transform:scale(1.1)}
+.ui-basic-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
+.ui-basic-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.2rem}
+.ui-basic-value{font-size:.85rem;color:var(--ink);font-weight:600}
+.ui-field{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
+.ui-field-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem}
+.ui-field-value{font-size:.875rem;color:var(--ink);font-weight:500;word-break:break-word}
+
+/* ── LOGO UPLOAD ── */
+.logo-upload-area{border:2px dashed var(--border);border-radius:var(--rl);padding:1.5rem;text-align:center;cursor:pointer;transition:all var(--t);background:var(--bg);position:relative;overflow:hidden}
+.logo-upload-area:hover,.logo-upload-area.dragover{border-color:var(--brand);background:rgba(67,97,238,.04)}
+.logo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.logo-upload-ico{font-size:2rem;margin-bottom:.5rem}
+.logo-upload-lbl{font-size:.82rem;color:var(--muted)}
+.logo-upload-lbl strong{color:var(--brand)}
+.logo-preview-img{width:72px;height:72px;border-radius:var(--r);object-fit:cover;border:2px solid var(--border);margin:0 auto .75rem;display:block}
+
+/* ── STAGE BUILDER ── */
+.stage-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:.875rem;cursor:pointer;transition:all var(--t)}
+.stage-toggle-row:hover,.stage-toggle-row.enabled{border-color:rgba(67,97,238,.4)}
+.stage-toggle-row.enabled{background:rgba(67,97,238,.04)}
+.toggle-pill{width:44px;height:24px;border-radius:999px;background:var(--border);position:relative;transition:.25s;flex-shrink:0}
+.toggle-pill.on{background:var(--brand)}
+.toggle-pill::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-pill.on::after{left:23px}
+.stage-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:.875rem}
+.stage-item{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem;position:relative}
+.stage-item-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.stage-num{width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stage-name-inp{flex:1;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white)}
+.stage-interval-inp{width:80px;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white);text-align:center}
+.stage-remove-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.25rem;border-radius:var(--r);transition:all var(--t);flex-shrink:0}
+.stage-remove-btn:hover{background:var(--red-l);color:var(--red)}
+.staff-tags-wrap{display:flex;flex-wrap:wrap;gap:.375rem;align-items:center;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r);padding:.375rem .625rem;min-height:38px;cursor:text;transition:border-color var(--t)}
+.staff-tags-wrap:focus-within{border-color:var(--brand)}
+.staff-tag{display:inline-flex;align-items:center;gap:.3rem;background:rgba(67,97,238,.1);color:var(--brand);border-radius:999px;padding:.2rem .625rem;font-size:.78rem;font-weight:600}
+.staff-tag button{background:none;border:none;cursor:pointer;color:var(--brand);font-size:.9rem;line-height:1;padding:0;opacity:.6}
+.staff-tag button:hover{opacity:1}
+.staff-tags-input{border:none;outline:none;font-family:var(--fb);font-size:.82rem;min-width:100px;flex:1;background:transparent;padding:.2rem .25rem;color:var(--ink)}
+.stage-counter-count{font-size:.72rem;color:var(--muted);margin-top:.375rem}
+.pin-row{display:flex;align-items:center;gap:.625rem;margin-top:.625rem;padding:.5rem .625rem;background:var(--white);border:1.5px solid var(--border);border-radius:var(--r)}
+.pin-label{font-size:.78rem;color:var(--muted);flex:1}
+.pin-inp{width:90px;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fh);font-size:.9rem;letter-spacing:.2em;text-align:center;font-weight:700}
+.pin-inp:focus{outline:none;border-color:var(--brand)}
+
+/* ── BATCH ── */
+.batch-section{background:rgba(67,97,238,.03);border:1.5px solid rgba(67,97,238,.15);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:1rem}
+
+/* ── WALK-IN ── */
+.walkin-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:var(--r);padding:.5rem 1rem;font-family:var(--fb);font-size:.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all var(--t)}
+.walkin-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+
+/* ── EMERGENCY CONTROLS ── */
+.emergency-bar{background:rgba(239,69,101,.05);border:1.5px solid rgba(239,69,101,.2);border-radius:var(--rl);padding:.875rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap}
+.emergency-bar-title{font-size:.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0}
+.emergency-controls{display:flex;gap:.5rem;flex-wrap:wrap}
+.ecb{background:rgba(239,69,101,.08);border:1.5px solid rgba(239,69,101,.2);color:var(--red);border-radius:var(--r);padding:.3rem .75rem;font-family:var(--fb);font-size:.75rem;font-weight:700;cursor:pointer;transition:all var(--t)}
+.ecb:hover{background:var(--red);color:#fff}
+
+/* ── ANALYTICS ── */
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-bottom:1.5rem}
+.analytic-card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;border-top:3px solid var(--brand)}
+.analytic-card.g{border-top-color:var(--green)}.analytic-card.a{border-top-color:var(--amber)}.analytic-card.r{border-top-color:var(--red)}
+.ac-n{font-family:var(--fh);font-size:2rem;font-weight:700;color:var(--brand);line-height:1}
+.analytic-card.g .ac-n{color:#047857}.analytic-card.a .ac-n{color:#92400e}.analytic-card.r .ac-n{color:var(--red)}
+.ac-l{font-size:.72rem;color:var(--muted);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+.peak-bar-row{display:flex;align-items:center;gap:.625rem;margin-bottom:.5rem;font-size:.78rem}
+.peak-bar-label{width:40px;flex-shrink:0;color:var(--muted)}
+.peak-bar-track{flex:1;height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
+.peak-bar-fill{height:100%;background:var(--brand);border-radius:999px;transition:width .5s ease}
+.peak-bar-val{width:28px;text-align:right;flex-shrink:0;font-weight:700;font-size:.75rem;color:var(--brand)}
+.rating-stars{display:flex;gap:.25rem;align-items:center}
+.rating-star{color:var(--amber);font-size:1rem}
+
+/* ── RESPONSIVE ── */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
-@media(max-width:480px){
-  .topbar{padding:.625rem .875rem;gap:.5rem}
-  .tb-org{max-width:120px;font-size:.75rem}
-  .sidebar{padding:.5rem .625rem;overflow-x:auto;flex-wrap:nowrap;gap:.2rem}
-  .sb-item{font-size:.72rem;padding:.4rem .625rem;flex-shrink:0;white-space:nowrap;border-radius:.5rem}
-  .main{padding:.875rem .75rem}
-  .ph h1{font-size:1.25rem}
+
+@media(max-width:768px){
+  html,body{height:100%;overflow-x:hidden}
+  .shell{flex-direction:column;flex:1;min-height:calc(100vh - 62px)}
+  .sidebar{display:none!important}
+  .main{
+    flex:1;max-height:none;height:auto;
+    min-height:calc(100vh - 62px - 60px);
+    overflow-y:auto;
+    padding:1rem 1rem 5.5rem 1rem;
+    -webkit-overflow-scrolling:touch;
+  }
   .svc-grid{grid-template-columns:1fr}
   .svc-card{padding:1.125rem}
-  .stats-row{gap:.625rem}
-  .tbl-wrap{font-size:.78rem}
-  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem}
-  .modal{padding:1.5rem 1rem;border-radius:1.25rem;max-width:calc(100vw - 1.25rem)}
+  .stats-row{gap:.5rem;flex-wrap:wrap}
+  .stat-box{padding:.625rem .75rem;flex:1;min-width:80px}
+  .tbl-wrap{overflow-x:auto;font-size:.78rem}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem;white-space:nowrap}
+  .modal{padding:1.5rem 1rem;max-width:calc(100vw - 1.25rem)}
   .modal-footer{flex-direction:column;gap:.5rem}
   .modal-footer .btn{width:100%}
+  .ph h1{font-size:1.25rem}
 }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:300;
+  background:var(--white);border-top:2px solid var(--border);
+  padding:.25rem 0 env(safe-area-inset-bottom,.25rem);
+  box-shadow:0 -4px 20px rgba(13,15,20,.1);
+}
+.bn-items{display:flex}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;
+  color:var(--muted);cursor:pointer;border:none;background:none;
+  transition:color .15s;font-family:var(--fb);
+}
+.bn-item.active{color:var(--brand)}
+.bn-ico{font-size:1.2rem;line-height:1}
+@media(max-width:768px){.bottom-nav{display:block}}
 </style>
 </head>
 <body>
@@ -281,6 +349,7 @@ input,select,textarea,button{font-size:16px !important}
     <div class="sb-divider"></div>
     <div class="sb-section">Data</div>
     <button class="sb-item" onclick="showPanel('reports')" id="nav-reports"><span>📊</span> Reports</button>
+    <button class="sb-item" onclick="showPanel('analytics')" id="nav-analytics"><span>📈</span> Analytics</button>
     <button class="sb-item" onclick="showPanel('restore')" id="nav-restore"><span>🗑</span> Restore Deleted</button>
     <div class="sb-divider"></div>
     <button class="sb-item" onclick="showPanel('account')" id="nav-account"><span>⚙️</span> Account</button>
@@ -322,6 +391,7 @@ input,select,textarea,button{font-size:16px !important}
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
             <button class="btn bs" id="call-btn" onclick="callNext()">📢 Call Next</button>
+            <button class="walkin-btn" onclick="openWalkIn()">🚶 Walk-In</button>
             <select class="inp" style="padding:.5rem .875rem;width:auto;font-size:.82rem" id="status-sel" onchange="changeStatus()">
               <option value="open">Open</option>
               <option value="paused">Paused</option>
@@ -331,16 +401,15 @@ input,select,textarea,button{font-size:16px !important}
           </div>
         </div>
 
-        <!-- NEXT PERSON TIMER — shows countdown to when the next user's turn comes -->
-        <div id="call-timer-box" class="call-timer-box" style="display:none">
-          <div class="ctb-left">
-            <div class="ctb-ico" id="ctb-ico">⏰</div>
-            <div>
-              <div class="ctb-title" id="ctb-title">Next person's slot</div>
-              <div class="ctb-sub" id="ctb-sub">You can only call when their scheduled time arrives</div>
-            </div>
+        <!-- EMERGENCY CONTROLS (manager only) -->
+        <div class="emergency-bar" id="emergency-bar">
+          <span class="emergency-bar-title">⚡ Emergency</span>
+          <div class="emergency-controls">
+            <button class="ecb" onclick="emergencySkip()">⏭ Skip Current</button>
+            <button class="ecb" onclick="emergencyPause()">⏸ Pause Queue</button>
+            <button class="ecb" onclick="emergencyAdjustInterval()">⏱ Adjust Interval</button>
+            <button class="ecb" onclick="emergencyMoveTicket()">🔀 Move Ticket</button>
           </div>
-          <div class="ctb-countdown" id="ctb-countdown">—</div>
         </div>
 
         <!-- CALLED BANNER -->
@@ -398,6 +467,38 @@ input,select,textarea,button{font-size:16px !important}
       </div>
     </div>
 
+    <!-- ═══ ANALYTICS ═══ -->
+    <div class="panel" id="panel-analytics">
+      <div class="ph">
+        <div><h1>Analytics</h1><p>Performance insights for your queues today</p></div>
+        <div style="display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap">
+          <div class="fg" style="margin:0">
+            <label class="lbl">Service</label>
+            <select id="analytics-svc" class="inp" style="min-width:180px" onchange="loadAnalytics()"><option value="">All services</option></select>
+          </div>
+          <button class="btn bp" onclick="loadAnalytics()">↺ Refresh</button>
+        </div>
+      </div>
+      <div class="analytics-grid">
+        <div class="analytic-card g"><div class="ac-n" id="an-served">—</div><div class="ac-l">Served Today</div></div>
+        <div class="analytic-card"><div class="ac-n" id="an-waiting">—</div><div class="ac-l">Still Waiting</div></div>
+        <div class="analytic-card a"><div class="ac-n" id="an-avgwait">—<span style="font-size:1rem">m</span></div><div class="ac-l">Avg Wait Time</div></div>
+        <div class="analytic-card r"><div class="ac-n" id="an-noshow">—</div><div class="ac-l">No-Shows</div></div>
+        <div class="analytic-card g"><div class="ac-n" id="an-rating" style="display:flex;align-items:center;gap:.25rem">—<span style="font-size:1rem">⭐</span></div><div class="ac-l">Avg Rating</div></div>
+        <div class="analytic-card"><div class="ac-n" id="an-throughput">—<span style="font-size:1rem">/hr</span></div><div class="ac-l">Staff Throughput</div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-title">🕐 Busiest Hours</div>
+        <div id="peak-hours-chart" style="padding:.5rem 0">
+          <div class="loading"><div class="spin"></div> Loading…</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ Recent Feedback</div>
+        <div id="feedback-list"><div class="loading"><div class="spin"></div> Loading…</div></div>
+      </div>
+    </div>
+
     <!-- ═══ RESTORE ═══ -->
     <div class="panel" id="panel-restore">
       <div class="ph"><div><h1>Restore Deleted Services</h1><p>Recover services deleted within the last 30 days</p></div></div>
@@ -412,10 +513,19 @@ input,select,textarea,button{font-size:16px !important}
         <div id="acc-info" style="font-size:.875rem;color:var(--ink3);line-height:2;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)"></div>
         <div class="fg"><label class="lbl">Phone Number</label><input id="acc-phone" class="inp" type="tel" placeholder="+1 234 567 8900"/></div>
         <div class="fg">
-          <label class="lbl">Logo URL <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-          <input id="acc-logo" class="inp" type="url" placeholder="https://yoursite.com/logo.png" oninput="previewLogo(this.value)"/>
-          <span class="hint">Link to your organization logo image</span>
-          <div id="logo-preview" style="margin-top:.5rem;width:56px;height:56px;border-radius:var(--r);border:1.5px dashed var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🏢</div>
+          <label class="lbl">Organization Logo <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+          <div class="logo-upload-area" id="logo-upload-area">
+            <input type="file" id="logo-file-input" accept="image/*" onchange="handleLogoFile(this)"/>
+            <div id="logo-upload-inner">
+              <div class="logo-upload-ico">📸</div>
+              <div class="logo-upload-lbl"><strong>Click to upload</strong> or drag & drop<br><span style="font-size:.75rem">PNG, JPG, WebP — max 2MB</span></div>
+            </div>
+          </div>
+          <div id="logo-upload-status" style="font-size:.78rem;margin-top:.375rem;color:var(--muted)"></div>
+          <div style="margin-top:.5rem;display:none" id="logo-current-wrap">
+            <div style="font-size:.75rem;color:var(--muted);margin-bottom:.375rem">Current logo:</div>
+            <img id="logo-current-img" src="" alt="logo" style="width:64px;height:64px;object-fit:cover;border-radius:var(--r);border:2px solid var(--border)"/>
+          </div>
         </div>
         <button class="btn bp" onclick="updateAccount()">Save Changes</button>
       </div>
@@ -466,6 +576,34 @@ input,select,textarea,button{font-size:16px !important}
       <button class="btn bp bsm" style="align-self:flex-end;margin-bottom:1.125rem" onclick="addBreak()">+ Add Break</button>
     </div>
 
+    <div class="section-hdr">Multi-Stage Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional — e.g. Entry → Shopping → Checkout → Packing)</span></div>
+    <div class="stage-toggle-row" id="stage-toggle-row" onclick="toggleStages()">
+      <div>
+        <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Stage Queue</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customer automatically progresses through multiple stages</div>
+      </div>
+      <div class="toggle-pill" id="stage-toggle-pill"></div>
+    </div>
+    <div id="stages-wrap" style="display:none">
+      <div class="stage-list" id="stage-list"></div>
+      <button class="btn bp bsm" onclick="addStage()" style="margin-bottom:1rem">+ Add Stage</button>
+    </div>
+
+    <div class="section-hdr">Batch Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional — group customers into time batches)</span></div>
+    <div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
+      <div>
+        <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Batch Queue</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customers join in fixed-time batches (e.g. 50 people per 30-min window)</div>
+      </div>
+      <div class="toggle-pill" id="batch-toggle-pill"></div>
+    </div>
+    <div id="batch-wrap" style="display:none" class="batch-section">
+      <div class="inp-row">
+        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Batch Size</label><input id="m-batch-size" class="inp" type="number" min="1" value="50" placeholder="e.g. 50"/><span class="hint">Max customers per batch</span></div>
+        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Buffer Between Batches (min)</label><input id="m-batch-buffer" class="inp" type="number" min="0" value="30" placeholder="e.g. 30"/><span class="hint">Gap time between batches</span></div>
+      </div>
+    </div>
+
     <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
     <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Fields users must fill before joining. Leave empty for no custom form.</p>
     <div class="form-builder">
@@ -482,6 +620,27 @@ input,select,textarea,button{font-size:16px !important}
     <div class="modal-footer">
       <button class="btn bg" onclick="closeModal('modal-create')">Cancel</button>
       <button class="btn bp" onclick="createService()" id="create-btn">Create Service</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ USER INFO MODAL ═══ -->
+<div id="modal-userinfo" class="overlay" style="display:none" onclick="if(event.target===this)closeUserInfo()">
+  <div class="modal" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:2px solid var(--border)">
+      <div>
+        <div style="font-weight:800;font-size:1.05rem;color:var(--ink)" id="ui-title">User Information</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem" id="ui-subtitle"></div>
+      </div>
+      <button onclick="closeUserInfo()" style="background:var(--bg);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--muted)">✕</button>
+    </div>
+    <div id="ui-basic" style="margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.625rem"></div>
+    <div id="ui-form-wrap" style="display:none">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem">📋 Form Responses</div>
+      <div id="ui-form-fields" style="display:flex;flex-direction:column;gap:.625rem"></div>
+    </div>
+    <div style="margin-top:1.25rem;padding-top:1rem;border-top:2px solid var(--border);text-align:right">
+      <button class="btn bs" onclick="closeUserInfo()">Close</button>
     </div>
   </div>
 </div>
@@ -524,8 +683,12 @@ function openModal(id)  { document.getElementById(id).style.display='flex'; }
 // ─── STATE ───
 let profile=null, services=[], activeSvc=null, calledEntry=null;
 let formFields=[], breaks=[], reportData=[];
-let pollTimer=null, timerInterval=null;
-let _liveEntries=[]; // last loaded live queue
+let pollTimer=null, _callTimerInterval=null;
+let _liveEntries=[];
+// Stage builder state
+let stagesEnabled=false, stageList=[], batchEnabled=false;
+// Logo upload state
+let _uploadedLogoUrl=null;
 
 // ─── INIT ───
 async function init() {
@@ -544,9 +707,12 @@ async function init() {
 
   if (profile.approval_status === 'pending') document.getElementById('pending-bar').style.display='block';
 
-  document.getElementById('acc-phone').value = profile.phone   || '';
-  document.getElementById('acc-logo').value  = profile.logo_url|| '';
-  if (profile.logo_url) previewLogo(profile.logo_url);
+  document.getElementById('acc-phone').value = profile.phone || '';
+  // Logo upload — show current logo if exists
+  if (profile.logo_url) {
+    const wrap = document.getElementById('logo-current-wrap');
+    if (wrap) { wrap.style.display='block'; document.getElementById('logo-current-img').src = profile.logo_url; }
+  }
 
   document.getElementById('acc-info').innerHTML = `
     <div><strong>Organization:</strong> ${profile.org_name||'—'}</div>
@@ -562,10 +728,15 @@ async function init() {
 function showPanel(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
-  document.getElementById('nav-'+name).classList.add('active');
-  if (name==='restore') loadRestore();
-  if (name==='reports') populateReportSelect();
+  if(document.getElementById('nav-'+name)) document.getElementById('nav-'+name).classList.add('active');
+  var bnMap={'services':'services','queue':'queue','reports':'reports','restore':'account','account':'account'};
+  var bnKey=bnMap[name]||name;
+  if(document.getElementById('bn-'+bnKey)) document.getElementById('bn-'+bnKey).classList.add('active');
+  if (name==='restore')   loadRestore();
+  if (name==='reports')   populateReportSelect();
+  if (name==='analytics') { populateAnalyticsSelect(); loadAnalytics(); }
 }
 
 // ─── SERVICES ───
@@ -640,75 +811,6 @@ function openQueueView(svc) {
   switchTab('live');
   clearInterval(pollTimer);
   pollTimer = setInterval(loadQueue, 10000);
-  startCallTimer();
-}
-
-// ─── CALL TIMER — enforces time-based calling ───
-// Only the first waiting person in the queue whose estimated_time has arrived (or is within 30s)
-// is eligible to be called. Org sees a countdown until they can call.
-let _callTimerInterval = null;
-
-function startCallTimer() {
-  clearInterval(_callTimerInterval);
-  _callTimerInterval = setInterval(updateCallTimer, 1000);
-}
-
-function updateCallTimer() {
-  if (!activeSvc || !_liveEntries) return;
-  // Find the first waiting entry
-  const nextWaiting = _liveEntries.find(e => e.status === 'waiting');
-  const box = document.getElementById('call-timer-box');
-  const callBtn = document.getElementById('call-btn');
-
-  if (!nextWaiting) {
-    box.style.display = 'none';
-    callBtn.disabled = false;
-    callBtn.title = '';
-    return;
-  }
-
-  const etaStr = nextWaiting.estimated_time;
-  if (!etaStr) {
-    // No ETA stored — allow calling freely
-    box.style.display = 'none';
-    callBtn.disabled = false;
-    callBtn.title = '';
-    return;
-  }
-
-  const etaMs = new Date(etaStr).getTime();
-  const nowMs = Date.now();
-  const diffMs = etaMs - nowMs;
-  const diffSec = Math.ceil(diffMs / 1000);
-
-  box.style.display = 'flex';
-
-  if (diffSec <= 0) {
-    // It's time — allow calling
-    box.className = 'call-timer-box ready';
-    document.getElementById('ctb-ico').textContent = '✅';
-    document.getElementById('ctb-title').textContent = "It's time — you can call " + (nextWaiting.user_name || nextWaiting.guest_name || 'next person');
-    document.getElementById('ctb-sub').textContent = 'Their scheduled slot has arrived';
-    document.getElementById('ctb-countdown').textContent = 'Ready';
-    document.getElementById('ctb-countdown').className = 'ctb-countdown green';
-    callBtn.disabled = false;
-    callBtn.title = '';
-  } else {
-    // Not yet — block the call button
-    const mins = Math.floor(diffSec / 60);
-    const secs = diffSec % 60;
-    const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-    const isClose = diffSec <= 60;
-
-    box.className = 'call-timer-box' + (isClose ? ' soon' : '');
-    document.getElementById('ctb-ico').textContent = isClose ? '⏰' : '🕐';
-    document.getElementById('ctb-title').textContent = 'Next: ' + (nextWaiting.ticket_label||'—') + ' — ' + (nextWaiting.user_name || nextWaiting.guest_name || 'Guest');
-    document.getElementById('ctb-sub').textContent = 'Wait until their scheduled time before calling';
-    document.getElementById('ctb-countdown').textContent = timeStr;
-    document.getElementById('ctb-countdown').className = 'ctb-countdown' + (isClose ? ' amber' : '');
-    callBtn.disabled = true;
-    callBtn.title = 'Cannot call yet — wait ' + timeStr + ' for this person\'s scheduled slot';
-  }
 }
 
 async function loadQueue() {
@@ -716,11 +818,9 @@ async function loadQueue() {
   const r = await api('/api/org/queue/'+activeSvc.id);
   if (!r.ok) return;
   const entries = r.data || [];
-  _liveEntries = entries;
   calledEntry = entries.find(e => e.status==='called') || null;
   renderLiveTable(entries);
   renderCalledBanner();
-  updateCallTimer(); // immediately update call timer with new data
 }
 
 function renderLiveTable(entries) {
@@ -735,18 +835,17 @@ function renderLiveTable(entries) {
     const online = e.user_id ? (e.user_online ? '<span class="dot-on"></span>' : '<span class="dot-off"></span>') : '—';
     const ec = `<span style="font-family:var(--fh);font-size:.82rem;font-weight:700;color:var(--brand);letter-spacing:.05em">${e.end_code||'—'}</span>`;
 
-    // ETA display
-    let etaDisplay = '—';
-    let readyDisplay = '';
-    if (e.estimated_time && e.status === 'waiting') {
-      const etaMs = new Date(e.estimated_time).getTime();
+    // ETA + Ready columns (matching sent file)
+    let etaDisplay='—', readyDisplay='';
+    if (e.estimated_time && e.status==='waiting') {
+      const etaMs  = new Date(e.estimated_time).getTime();
       const diffMs = etaMs - now;
       if (diffMs <= 0) {
-        etaDisplay = '<span style="color:#047857;font-weight:700">Now</span>';
+        etaDisplay   = '<span style="color:#047857;font-weight:700">Now</span>';
         readyDisplay = '<span class="badge b-serving" style="font-size:.68rem">✓ Ready</span>';
       } else {
-        const mins = Math.ceil(diffMs / 60000);
-        etaDisplay = fmtTime(e.estimated_time);
+        const mins   = Math.ceil(diffMs / 60000);
+        etaDisplay   = fmtTime(e.estimated_time);
         readyDisplay = `<span style="font-size:.72rem;color:var(--muted)">in ${mins}m</span>`;
       }
     } else {
@@ -754,9 +853,13 @@ function renderLiveTable(entries) {
     }
 
     let acts = '';
-    if (e.status==='called') acts = `<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('${e.id}','completed')">✓ Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button></div>`;
-    else if (e.status==='waiting') acts = `<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`;
-    else acts = badge(e.status);
+    if (e.status==='called') {
+      acts = `<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('${e.id}','completed')">✓ Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button></div>`;
+    } else if (e.status==='waiting') {
+      acts = `<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`;
+    } else {
+      acts = badge(e.status);
+    }
 
     return `<tr>
       <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
@@ -782,47 +885,25 @@ function renderCalledBanner() {
   b.style.display = 'flex';
 }
 
-// FIX: org cannot call next until first waiting person's estimated_time is reached
-var _callCdTimer = null;
-
 async function callNext() {
-  if (!activeSvc) return;
-  var btn = document.getElementById('call-btn');
-  var nextWaiting = _liveEntries.find(function(e){ return e.status === 'waiting'; });
-  if (nextWaiting && nextWaiting.estimated_time) {
-    var diffMs = new Date(nextWaiting.estimated_time).getTime() - Date.now();
-    if (diffMs > 0) {
-      var diffMins = Math.ceil(diffMs / 60000);
-      toast('⏰ Cannot call yet — ' + (nextWaiting.ticket_label||'next person') + ' is due in ~' + diffMins + ' min.', 'w', 7000);
-      startCallCountdown(new Date(nextWaiting.estimated_time));
+  const btn = document.getElementById('call-btn'); btn.disabled=true; btn.textContent='Calling…';
+
+  // Check: cannot call if someone is already being called or serving
+  const r0 = await api('/api/org/queue/'+activeSvc.id);
+  if (r0.ok) {
+    const active = (r0.data||[]).filter(e => e.status==='called'||e.status==='serving');
+    if (active.length > 0) {
+      btn.disabled=false; btn.textContent='📢 Call Next';
+      toast('⚠️ Finish serving '+active[0].ticket_label+' before calling the next person.','w',7000);
       return;
     }
   }
-  // ETA reached — call now
-  btn.disabled = true; btn.textContent = 'Calling…';
-  var r = await api('/api/org/queue/call-next/' + activeSvc.id, {method:'POST'});
-  btn.disabled = false; btn.textContent = '📢 Call Next';
-  if (!r.ok) { toast(r.data.error || 'No one waiting.', 'i'); return; }
-  toast('📢 Calling ' + r.data.entry.ticket_label + ' — End code: ' + (r.data.entry.end_code || '—'), 's', 8000);
-  await loadQueue();
-}
 
-function startCallCountdown(eta) {
-  if (_callCdTimer) clearInterval(_callCdTimer);
-  var btn = document.getElementById('call-btn');
-  btn.disabled = true;
-  _callCdTimer = setInterval(function(){
-    var diff = eta - new Date();
-    if (diff <= 0) {
-      clearInterval(_callCdTimer); _callCdTimer = null;
-      btn.disabled = false; btn.textContent = '📢 Call Next';
-      toast('✅ Time reached — you can now call the next person!', 's', 5000);
-      return;
-    }
-    var m = Math.floor(diff / 60000);
-    var s = Math.floor((diff % 60000) / 1000);
-    btn.textContent = '⏰ Wait ' + m + ':' + String(s).padStart(2, '0');
-  }, 1000);
+  const r = await api('/api/org/queue/call-next/'+activeSvc.id, {method:'POST'});
+  btn.disabled=false; btn.textContent='📢 Call Next';
+  if (!r.ok) { toast(r.data.error||'No one waiting.','i'); return; }
+  toast(`📢 Calling ${r.data.entry.ticket_label} — End code: ${r.data.entry.end_code||'—'}`, 's', 8000);
+  await loadQueue();
 }
 
 async function markEntry(status) { if (calledEntry) await markById(calledEntry.id, status); }
@@ -833,7 +914,7 @@ async function markById(id, status) {
   if (['completed','no_show','cancelled'].includes(status)) calledEntry=null;
   toast('Marked as ' + status.replace('_',' '), 's');
   await loadQueue();
-  if (status==='completed') await loadServices();
+  if (status==='completed') await loadServices(); // update counts
 }
 
 function copyCode() {
@@ -885,7 +966,7 @@ async function deleteSvc(id, name) {
   if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
   toast(`"${name}" deleted.`,'w');
   if (activeSvc && activeSvc.id===id) {
-    clearInterval(pollTimer); clearInterval(_callTimerInterval);
+    clearInterval(pollTimer);
     activeSvc=null;
     document.getElementById('no-svc-sel').style.display  = 'block';
     document.getElementById('queue-view').style.display  = 'none';
@@ -964,110 +1045,320 @@ function printReport() {
   if (!reportData.length) { toast('Load a report first.','e'); return; }
   const win  = window.open('','_blank');
   const rows = reportData.map(e => `<tr><td>${e.ticket_label}</td><td>${e.guest_name||'User'}</td><td>${e.join_method}</td><td>${e.status}</td><td>${fmt(e.joined_at)}</td><td>${fmt(e.completed_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
-  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}
-/* ── USER INFO BUTTON & MODAL ── */
-.info-btn{background:rgba(67,97,238,.1);border:none;color:var(--brand);cursor:pointer;width:26px;height:26px;border-radius:50%;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.info-btn:hover{background:var(--brand);color:#fff;transform:scale(1.1)}
-.ui-field{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
-.ui-field-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem}
-.ui-field-value{font-size:.875rem;color:var(--ink);font-weight:500;word-break:break-word}
-.ui-basic-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
-.ui-basic-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.2rem}
-.ui-basic-value{font-size:.85rem;color:var(--ink);font-weight:600}
-</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table>
-<!-- ═══ USER INFO MODAL ═══ -->
-<div id="modal-userinfo" class="overlay" style="display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeUserInfo()">
-  <div class="modal" style="max-width:480px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:2px solid var(--border)">
-      <div>
-        <div style="font-weight:800;font-size:1.05rem;color:var(--ink)" id="ui-title">User Information</div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:.2rem" id="ui-subtitle"></div>
-      </div>
-      <button onclick="closeUserInfo()" style="background:var(--surface);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--muted)">✕</button>
-    </div>
-
-    <!-- Basic info -->
-    <div id="ui-basic" style="margin-bottom:1.25rem;background:var(--surface2);border-radius:var(--r);padding:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.625rem"></div>
-
-    <!-- Custom form answers -->
-    <div id="ui-form-wrap" style="display:none">
-      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem">📋 Form Responses</div>
-      <div id="ui-form-fields" style="display:flex;flex-direction:column;gap:.625rem"></div>
-    </div>
-
-    <div style="margin-top:1.25rem;padding-top:1rem;border-top:2px solid var(--border);text-align:right">
-      <button class="btn bs" onclick="closeUserInfo()">Close</button>
-    </div>
-  </div>
-</div>
-
-</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
   win.document.close(); win.print();
 }
 
 // ─── CREATE SERVICE ───
-function openCreateModal() {
-  formFields=[]; breaks=[];
-  renderFormFields(); renderBreaks();
-  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('m-prefix').value   = 'A';
-  document.getElementById('m-interval').value = '5';
-  document.getElementById('m-max').value      = '';
-  document.getElementById('m-err').style.display='none';
-  openModal('modal-create');
+// ─── ACCOUNT ───
+async function handleLogoFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { toast('Logo must be under 2MB.','e'); return; }
+  const status = document.getElementById('logo-upload-status');
+  status.textContent = '⏳ Uploading…';
+  const fd = new FormData();
+  fd.append('logo', file);
+  try {
+    const r = await fetch('/api/org/upload-logo', { method:'POST', credentials:'include', body: fd });
+    const d = await r.json().catch(()=>({}));
+    if (!r.ok) { status.textContent = '✕ Upload failed: ' + (d.error||'Error'); return; }
+    _uploadedLogoUrl = d.logo_url;
+    status.textContent = '✓ Logo uploaded';
+    // Show preview
+    const inner = document.getElementById('logo-upload-inner');
+    inner.innerHTML = `<img src="${d.logo_url}" class="logo-preview-img" alt="logo"/><div class="logo-upload-lbl"><strong>Tap to change</strong></div>`;
+    const wrap = document.getElementById('logo-current-wrap');
+    if (wrap) { wrap.style.display='none'; }
+    toast('Logo uploaded!','s');
+  } catch(e) { status.textContent = '✕ Upload error'; }
 }
 
-function addBreak() {
-  const s = document.getElementById('brk-start').value;
-  const e = document.getElementById('brk-end').value;
-  if (!s || !e) { toast('Enter both start and end for the break.','e'); return; }
-  if (s >= e)   { toast('Break end must be after start.','e'); return; }
-  const today = new Date().toISOString().split('T')[0];
-  breaks.push({ start:`${today}T${s}:00`, end:`${today}T${e}:00` });
-  document.getElementById('brk-start').value='';
-  document.getElementById('brk-end').value='';
-  renderBreaks();
+async function updateAccount() {
+  const phone = document.getElementById('acc-phone').value.trim();
+  const body  = { phone };
+  if (_uploadedLogoUrl) body.logo_url = _uploadedLogoUrl;
+  const r = await api('/api/org/profile', {method:'POST', body});
+  if (!r.ok) { toast(r.data.error||'Error saving.','e'); return; }
+  toast('Account updated!','s');
 }
 
-function renderBreaks() {
-  const el = document.getElementById('break-list');
-  if (!breaks.length) { el.innerHTML='<p style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">No breaks added.</p>'; return; }
-  el.innerHTML = breaks.map((b,i) => `
-    <div class="break-item">
-      <span>☕ ${b.start.slice(11,16)} – ${b.end.slice(11,16)}</span>
-      <button class="btn bg bsm" onclick="removeBreak(${i})">Remove</button>
+// ─── STAGE BUILDER ───
+function toggleStages() {
+  stagesEnabled = !stagesEnabled;
+  document.getElementById('stage-toggle-row').classList.toggle('enabled', stagesEnabled);
+  document.getElementById('stage-toggle-pill').classList.toggle('on', stagesEnabled);
+  document.getElementById('stages-wrap').style.display = stagesEnabled ? 'block' : 'none';
+  if (stagesEnabled && stageList.length === 0) {
+    // Pre-populate with default Pinnacle stages
+    stageList = [
+      { name:'Entry Queue',     interval:5,  staff:[], pin:'' },
+      { name:'Shopping',        interval:30, staff:[], pin:'' },
+      { name:'Checkout Queue',  interval:5,  staff:[], pin:'' },
+      { name:'Packing Queue',   interval:10, staff:[], pin:'' },
+    ];
+    renderStages();
+  }
+}
+
+function toggleBatch() {
+  batchEnabled = !batchEnabled;
+  document.getElementById('batch-toggle-row').classList.toggle('enabled', batchEnabled);
+  document.getElementById('batch-toggle-pill').classList.toggle('on', batchEnabled);
+  document.getElementById('batch-wrap').style.display = batchEnabled ? 'block' : 'none';
+}
+
+function addStage() {
+  stageList.push({ name:'', interval:5, staff:[], pin:'' });
+  renderStages();
+}
+
+function removeStage(i) {
+  stageList.splice(i, 1);
+  renderStages();
+}
+
+function addStaffTag(i, inputEl) {
+  const val = inputEl.value.trim();
+  if (!val) return;
+  if (inputEl.key !== undefined && inputEl.key !== 'Enter') return;
+  stageList[i].staff.push(val);
+  inputEl.value = '';
+  renderStages();
+}
+
+function removeStaffTag(stageIdx, staffIdx) {
+  stageList[stageIdx].staff.splice(staffIdx, 1);
+  renderStages();
+}
+
+function renderStages() {
+  const list = document.getElementById('stage-list');
+  if (!stageList.length) { list.innerHTML = '<p style="font-size:.78rem;color:var(--muted)">No stages added yet.</p>'; return; }
+  list.innerHTML = stageList.map((s, i) => `
+    <div class="stage-item">
+      <div class="stage-item-header">
+        <div class="stage-num">${i+1}</div>
+        <input class="stage-name-inp" placeholder="Stage name (e.g. Checkout)" value="${esc(s.name)}"
+          oninput="stageList[${i}].name=this.value"/>
+        <input class="stage-interval-inp" type="number" min="1" placeholder="min" value="${s.interval||5}"
+          oninput="stageList[${i}].interval=parseInt(this.value)||5" title="Minutes per person"/>
+        ${stageList.length > 1 ? `<button class="stage-remove-btn" onclick="removeStage(${i})" title="Remove stage">✕</button>` : ''}
+      </div>
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:.375rem">Staff Members <span style="font-size:.7rem">(type name + Enter)</span></div>
+      <div class="staff-tags-wrap" onclick="this.querySelector('.staff-tags-input').focus()">
+        ${s.staff.map((st, si) => `<span class="staff-tag">${st}<button onclick="removeStaffTag(${i},${si})">×</button></span>`).join('')}
+        <input class="staff-tags-input" placeholder="Add staff name…"
+          onkeydown="if(event.key==='Enter'){event.preventDefault();stageList[${i}].staff.push(this.value.trim());this.value='';renderStages();}"/>
+      </div>
+      <div class="stage-counter-count" id="sc-count-${i}">Counters: ${s.staff.length || '—'}</div>
+      <div class="pin-row">
+        <span class="pin-label">🔑 Staff PIN for this stage</span>
+        <input class="pin-inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="0000"
+          value="${esc(s.pin)}" oninput="stageList[${i}].pin=this.value" title="4-digit PIN for staff access"/>
+      </div>
     </div>`).join('');
 }
-function removeBreak(i) { breaks.splice(i,1); renderBreaks(); }
 
-function addFormField() {
-  const type  = document.getElementById('fb-type').value;
-  const label = (document.getElementById('fb-label').value||'').trim();
-  if (!label) { toast('Enter a field label.','e'); return; }
-  formFields.push({ id:'f'+Date.now(), label, type, required:false });
-  document.getElementById('fb-label').value='';
-  renderFormFields();
+// ─── WALK-IN ───
+function openWalkIn() {
+  const name  = prompt('Customer name (optional):') || '';
+  const phone = prompt('Phone number (optional, for SMS notifications):') || '';
+  if (name === null && phone === null) return; // cancelled both
+  addWalkIn(name.trim(), phone.trim());
 }
 
-function removeField(id) { formFields=formFields.filter(f=>f.id!==id); renderFormFields(); }
-
-function renderFormFields() {
-  const el = document.getElementById('fb-fields');
-  const icons = {text:'📝',textarea:'📄',select:'📋',file:'📁'};
-  if (!formFields.length) { el.innerHTML='<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>'; return; }
-  el.innerHTML = formFields.map(f => `
-    <div class="fb-field-row">
-      <span style="font-size:1.15rem">${icons[f.type]||'📝'}</span>
-      <div class="fb-field-info"><div class="fb-field-label">${f.label}</div><div class="fb-field-type">${f.type}</div></div>
-      <button class="btn bd bsm" onclick="removeField('${f.id}')">Remove</button>
-    </div>`).join('');
+async function addWalkIn(name, phone) {
+  if (!activeSvc) return;
+  const r = await api('/api/org/queue/walk-in/'+activeSvc.id, {
+    method: 'POST',
+    body: { name: name||'Walk-in Customer', phone: phone||null }
+  });
+  if (!r.ok) { toast(r.data.error||'Failed to add walk-in.','e'); return; }
+  toast('🚶 Walk-in added: '+(r.data.entry?.ticket_label||'—'),'s');
+  await loadQueue();
 }
 
+// ─── EMERGENCY CONTROLS ───
+async function emergencySkip() {
+  if (!activeSvc || !calledEntry) { toast('No one is currently called.','w'); return; }
+  if (!confirm('Skip current ticket and mark as no-show?')) return;
+  await markById(calledEntry.id, 'no_show');
+  toast('Ticket skipped.','w');
+}
+
+async function emergencyPause() {
+  if (!activeSvc) return;
+  const current = document.getElementById('status-sel').value;
+  const newStatus = current === 'paused' ? 'open' : 'paused';
+  document.getElementById('status-sel').value = newStatus;
+  await changeStatus();
+  toast(newStatus === 'paused' ? '⏸ Queue paused.' : '▶ Queue resumed.', 'i');
+}
+
+async function emergencyAdjustInterval() {
+  if (!activeSvc) return;
+  const current = activeSvc.time_interval || 5;
+  const val = prompt(`Current interval: ${current} min/person.\nEnter new interval (minutes):`, current);
+  if (!val || isNaN(parseInt(val))) return;
+  const newInterval = Math.max(1, parseInt(val));
+  const r = await api('/api/org/services/'+activeSvc.id+'/interval', {method:'POST', body:{time_interval: newInterval}});
+  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
+  activeSvc.time_interval = newInterval;
+  toast(`⏱ Interval updated to ${newInterval} min/person.`,'s');
+}
+
+async function emergencyMoveTicket() {
+  if (!activeSvc) return;
+  const ticket = prompt('Enter ticket label to move (e.g. A005):');
+  if (!ticket) return;
+  const newPos = prompt('Move to position # (1 = next):');
+  if (!newPos || isNaN(parseInt(newPos))) return;
+  const r = await api('/api/org/queue/move-ticket/'+activeSvc.id, {
+    method:'POST', body:{ticket_label: ticket.trim().toUpperCase(), position: parseInt(newPos)}
+  });
+  if (!r.ok) { toast(r.data.error||'Ticket not found.','e'); return; }
+  toast(`🔀 ${ticket.toUpperCase()} moved to position ${newPos}.`,'s');
+  await loadQueue();
+}
+
+// ─── ANALYTICS ───
+function populateAnalyticsSelect() {
+  const sel = document.getElementById('analytics-svc');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">All services</option>' + services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+}
+
+async function loadAnalytics() {
+  const svcId = document.getElementById('analytics-svc')?.value || '';
+  const url = svcId ? `/api/org/analytics?service_id=${svcId}` : '/api/org/analytics';
+  const r = await api(url);
+  if (!r.ok) { toast('Could not load analytics.','e'); return; }
+  const d = r.data || {};
+
+  document.getElementById('an-served').textContent     = d.served_today    ?? '—';
+  document.getElementById('an-waiting').textContent    = d.waiting_now      ?? '—';
+  document.getElementById('an-noshow').textContent     = d.no_shows_today   ?? '—';
+  document.getElementById('an-throughput').textContent = d.throughput_per_hr ?? '—';
+
+  const avgWait = document.getElementById('an-avgwait');
+  avgWait.innerHTML = (d.avg_wait_min != null) ? `${d.avg_wait_min}<span style="font-size:1rem">m</span>` : '—';
+
+  const ratingEl = document.getElementById('an-rating');
+  ratingEl.innerHTML = (d.avg_rating != null) ? `${Number(d.avg_rating).toFixed(1)}<span style="font-size:1rem">⭐</span>` : `—<span style="font-size:1rem">⭐</span>`;
+
+  // Peak hours bar chart
+  const chartEl = document.getElementById('peak-hours-chart');
+  if (d.peak_hours && d.peak_hours.length) {
+    const max = Math.max(...d.peak_hours.map(h=>h.count), 1);
+    chartEl.innerHTML = d.peak_hours.map(h => `
+      <div class="peak-bar-row">
+        <div class="peak-bar-label">${String(h.hour).padStart(2,'0')}:00</div>
+        <div class="peak-bar-track"><div class="peak-bar-fill" style="width:${Math.round(h.count/max*100)}%"></div></div>
+        <div class="peak-bar-val">${h.count}</div>
+      </div>`).join('');
+  } else {
+    chartEl.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:.5rem">No data yet for today.</p>';
+  }
+
+  // Recent feedback
+  const fbList = document.getElementById('feedback-list');
+  if (d.feedback && d.feedback.length) {
+    fbList.innerHTML = d.feedback.slice(0,10).map(f => `
+      <div style="padding:.75rem;border-bottom:1px solid var(--border);display:flex;gap:.75rem;align-items:flex-start">
+        <div class="rating-stars">${'⭐'.repeat(f.rating||0)}</div>
+        <div style="flex:1">
+          <div style="font-size:.82rem;color:var(--ink3)">${f.comment||'<em style="color:var(--muted)">No comment</em>'}</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">${f.service_name||''} · ${fmtTime(f.created_at)}</div>
+        </div>
+      </div>`).join('');
+  } else {
+    fbList.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:1rem">No feedback yet.</p>';
+  }
+}
+
+// ─── USER INFO MODAL ───
+function showUserInfo(entryId) {
+  const entry = _liveEntries.find(e => e.id === entryId);
+  if (!entry) return;
+  document.getElementById('ui-title').textContent = (entry.user_name || 'Guest') + ' — ' + (entry.ticket_label || '');
+  document.getElementById('ui-subtitle').textContent = (entry.join_method==='sms' ? '📱 Joined via SMS' : '🌐 Joined via Web') + (entry.user_id ? '' : ' · Guest');
+  const basics = [
+    {label:'Ticket',   value: entry.ticket_label||'—'},
+    {label:'Name',     value: entry.user_name||'Guest'},
+    {label:'Phone',    value: entry.guest_phone||entry.user_phone||'—'},
+    {label:'Status',   value: (entry.status||'—').replace('_',' ')},
+    {label:'Position', value: entry.position != null ? '#'+entry.position : '—'},
+    {label:'Joined',   value: entry.joined_at ? new Date(entry.joined_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'},
+  ];
+  document.getElementById('ui-basic').innerHTML = basics.map(b =>
+    `<div class="ui-basic-item"><div class="ui-basic-label">${b.label}</div><div class="ui-basic-value">${b.value}</div></div>`
+  ).join('');
+  const formWrap = document.getElementById('ui-form-wrap');
+  const formFieldsEl = document.getElementById('ui-form-fields');
+  let formData = null;
+  try { formData = typeof entry.custom_form_data==='string' ? JSON.parse(entry.custom_form_data) : entry.custom_form_data; } catch(e) {}
+  if (formData && typeof formData==='object' && Object.keys(formData).length) {
+    formWrap.style.display = 'block';
+    formFieldsEl.innerHTML = Object.entries(formData).map(([key, val]) => {
+      const label = (val && val.label) ? val.label : key;
+      const value = (val && val.value !== undefined) ? val.value : (typeof val==='string' ? val : JSON.stringify(val));
+      return `<div class="ui-field"><div class="ui-field-label">${label}</div><div class="ui-field-value">${value||'<em style="color:var(--muted)">Not provided</em>'}</div></div>`;
+    }).join('');
+  } else {
+    formWrap.style.display = 'none';
+  }
+  document.getElementById('modal-userinfo').style.display = 'flex';
+}
+
+function closeUserInfo() { document.getElementById('modal-userinfo').style.display='none'; }
+
+// ─── CALL TIMER ───
+function startCallTimer() {
+  clearInterval(_callTimerInterval);
+  _callTimerInterval = setInterval(updateCallTimer, 1000);
+}
+
+function updateCallTimer() {
+  if (!activeSvc || !_liveEntries) return;
+  const nextWaiting = _liveEntries.find(e => e.status === 'waiting');
+  const box     = document.getElementById('call-timer-box');
+  const callBtn = document.getElementById('call-btn');
+  if (!nextWaiting || !nextWaiting.estimated_time) {
+    box.style.display = 'none'; callBtn.disabled = false; callBtn.title = ''; return;
+  }
+  const diffMs  = new Date(nextWaiting.estimated_time).getTime() - Date.now();
+  const diffSec = Math.ceil(diffMs / 1000);
+  box.style.display = 'flex';
+  if (diffSec <= 0) {
+    box.className = 'call-timer-box ready';
+    document.getElementById('ctb-ico').textContent        = '✅';
+    document.getElementById('ctb-title').textContent      = "It's time — you can call " + (nextWaiting.user_name||nextWaiting.guest_name||'next person');
+    document.getElementById('ctb-sub').textContent        = 'Their scheduled slot has arrived';
+    document.getElementById('ctb-countdown').textContent  = 'Ready';
+    document.getElementById('ctb-countdown').className    = 'ctb-countdown green';
+    callBtn.disabled = false; callBtn.title = '';
+  } else {
+    const mins = Math.floor(diffSec/60), secs = diffSec%60;
+    const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    const isClose = diffSec <= 60;
+    box.className = 'call-timer-box' + (isClose ? ' soon' : '');
+    document.getElementById('ctb-ico').textContent        = isClose ? '⏰' : '🕐';
+    document.getElementById('ctb-title').textContent      = 'Next: '+(nextWaiting.ticket_label||'—')+' — '+(nextWaiting.user_name||nextWaiting.guest_name||'Guest');
+    document.getElementById('ctb-sub').textContent        = 'Wait until their scheduled time before calling';
+    document.getElementById('ctb-countdown').textContent  = timeStr;
+    document.getElementById('ctb-countdown').className    = 'ctb-countdown' + (isClose ? ' amber' : '');
+    callBtn.disabled = true;
+    callBtn.title = `Cannot call yet — wait ${timeStr}`;
+  }
+}
+
+// ─── CREATE SERVICE — update to include stages & batch ───
+const _origCreateService = createService;
 async function createService() {
-  const errEl    = document.getElementById('m-err');
-  const createBtn= document.getElementById('create-btn');
+  const errEl     = document.getElementById('m-err');
+  const createBtn = document.getElementById('create-btn');
   errEl.style.display='none';
-
   const name     = (document.getElementById('m-name').value||'').trim();
   const staff    = (document.getElementById('m-staff').value||'').trim();
   const desc     = (document.getElementById('m-desc').value||'').trim();
@@ -1076,14 +1367,18 @@ async function createService() {
   const maxVal   = document.getElementById('m-max').value;
   const startVal = document.getElementById('m-start').value;
   const endVal   = document.getElementById('m-end').value;
-
-  if (!name)   { errEl.textContent='Service name is required.';    errEl.style.display='block'; return; }
-  if (!prefix) { errEl.textContent='Ticket prefix is required.';   errEl.style.display='block'; return; }
+  if (!name)   { errEl.textContent='Service name is required.';   errEl.style.display='block'; return; }
+  if (!prefix) { errEl.textContent='Ticket prefix is required.';  errEl.style.display='block'; return; }
   if (startVal && endVal && startVal>=endVal) { errEl.textContent='End time must be after start time.'; errEl.style.display='block'; return; }
-
+  // Validate stages
+  if (stagesEnabled) {
+    for (let i=0; i<stageList.length; i++) {
+      if (!stageList[i].name.trim()) { errEl.textContent=`Stage ${i+1} needs a name.`; errEl.style.display='block'; return; }
+      if (stageList[i].pin && !/^\d{4}$/.test(stageList[i].pin)) { errEl.textContent=`Stage ${i+1} PIN must be exactly 4 digits.`; errEl.style.display='block'; return; }
+    }
+  }
   createBtn.disabled=true; createBtn.textContent='Creating…';
-
-  const r = await api('/api/org/services', { method:'POST', body:{
+  const body = {
     name, staff_name: staff||null, description: desc||null,
     ticket_prefix: prefix, time_interval: interval,
     max_users: maxVal ? parseInt(maxVal) : null,
@@ -1091,35 +1386,43 @@ async function createService() {
     schedule_start: startVal ? new Date(startVal).toISOString() : null,
     schedule_end:   endVal   ? new Date(endVal).toISOString()   : null,
     break_times: breaks,
-  }});
-
+  };
+  if (stagesEnabled && stageList.length) {
+    body.stages = stageList.map((s, i) => ({
+      name: s.name.trim(), order: i+1, time_interval: s.interval||5,
+      staff_names: s.staff, staff_pin: s.pin||null,
+      counter_count: s.staff.length || 1,
+    }));
+  }
+  if (batchEnabled) {
+    body.batch_enabled   = true;
+    body.batch_size      = parseInt(document.getElementById('m-batch-size').value)||50;
+    body.batch_buffer_min= parseInt(document.getElementById('m-batch-buffer').value)||30;
+  }
+  const r = await api('/api/org/services', {method:'POST', body});
   createBtn.disabled=false; createBtn.textContent='Create Service';
-
-  if (!r.ok) { errEl.textContent = r.data.error||'Failed to create service.'; errEl.style.display='block'; return; }
-
+  if (!r.ok) { errEl.textContent=r.data.error||'Failed to create service.'; errEl.style.display='block'; return; }
   const code = r.data.service?.service_code || '—';
-  toast(`✓ Service created! Share this code: ${code}`, 's', 8000);
+  toast(`✓ Service created! Code: ${code}`, 's', 8000);
   closeModal('modal-create');
   await loadServices();
 }
 
-// ─── ACCOUNT ───
-function previewLogo(url) {
-  const el = document.getElementById('logo-preview');
-  if (!el) return;
-  if (url && url.startsWith('http')) {
-    el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.textContent='🏢'" alt="logo"/>`;
-  } else {
-    el.textContent = '🏢';
-  }
-}
-
-async function updateAccount() {
-  const phone    = document.getElementById('acc-phone').value.trim();
-  const logo_url = document.getElementById('acc-logo').value.trim();
-  const r = await api('/api/org/profile', {method:'POST', body:{phone, logo_url}});
-  if (!r.ok) { toast(r.data.error||'Error saving.','e'); return; }
-  toast('Account updated!','s');
+function openCreateModal() {
+  formFields=[]; breaks=[]; stagesEnabled=false; stageList=[]; batchEnabled=false;
+  renderFormFields(); renderBreaks(); renderStages();
+  document.getElementById('stage-toggle-row').classList.remove('enabled');
+  document.getElementById('stage-toggle-pill').classList.remove('on');
+  document.getElementById('stages-wrap').style.display='none';
+  document.getElementById('batch-toggle-row').classList.remove('enabled');
+  document.getElementById('batch-toggle-pill').classList.remove('on');
+  document.getElementById('batch-wrap').style.display='none';
+  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('m-prefix').value   = 'A';
+  document.getElementById('m-interval').value = '5';
+  document.getElementById('m-max').value      = '';
+  document.getElementById('m-err').style.display='none';
+  openModal('modal-create');
 }
 
 async function doLogout() {
@@ -1130,60 +1433,24 @@ async function doLogout() {
 
 // ─── BOOT ───
 init();
-
-// ── USER INFO MODAL ──
-function showUserInfo(entryId) {
-  var entry = _liveEntries.find(function(e){ return e.id === entryId; });
-  if (!entry) return;
-
-  // Title
-  document.getElementById('ui-title').textContent = (entry.user_name || 'Guest') + ' — ' + (entry.ticket_label || '');
-  document.getElementById('ui-subtitle').textContent = (entry.join_method === 'sms' ? '📱 Joined via SMS' : '🌐 Joined via Web') + (entry.user_id ? '' : ' · Guest');
-
-  // Basic info grid
-  var basics = [
-    {label: 'Ticket', value: entry.ticket_label || '—'},
-    {label: 'Name', value: entry.user_name || 'Guest'},
-    {label: 'Phone', value: entry.guest_phone || entry.user_phone || '—'},
-    {label: 'Status', value: (entry.status || '—').replace('_', ' ')},
-    {label: 'Position', value: entry.position != null ? '#' + entry.position : '—'},
-    {label: 'Joined', value: entry.joined_at ? new Date(entry.joined_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—'},
-  ];
-  document.getElementById('ui-basic').innerHTML = basics.map(function(b){
-    return '<div class="ui-basic-item"><div class="ui-basic-label">'+b.label+'</div><div class="ui-basic-value">'+b.value+'</div></div>';
-  }).join('');
-
-  // Custom form answers
-  var formWrap = document.getElementById('ui-form-wrap');
-  var formFields = document.getElementById('ui-form-fields');
-  var formData = null;
-  try {
-    formData = typeof entry.custom_form_data === 'string'
-      ? JSON.parse(entry.custom_form_data)
-      : entry.custom_form_data;
-  } catch(e) { formData = null; }
-
-  if (formData && typeof formData === 'object' && Object.keys(formData).length > 0) {
-    formWrap.style.display = 'block';
-    formFields.innerHTML = Object.entries(formData).map(function(pair){
-      var key = pair[0];
-      var val = pair[1];
-      // val can be {label, value} or a plain string
-      var label = (val && val.label) ? val.label : key;
-      var value = (val && val.value !== undefined) ? val.value : (typeof val === 'string' ? val : JSON.stringify(val));
-      return '<div class="ui-field"><div class="ui-field-label">'+label+'</div><div class="ui-field-value">'+(value||'<em style="color:var(--muted)">Not provided</em>')+'</div></div>';
-    }).join('');
-  } else {
-    formWrap.style.display = 'none';
-  }
-
-  document.getElementById('modal-userinfo').style.display = 'flex';
-}
-
-function closeUserInfo() {
-  document.getElementById('modal-userinfo').style.display = 'none';
-}
 </script>
 
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bn-items">
+    <button class="bn-item active" id="bn-services" onclick="showPanel('services')">
+      <span class="bn-ico">🏢</span><span>Services</span>
+    </button>
+    <button class="bn-item" id="bn-queue" onclick="showPanel('queue')">
+      <span class="bn-ico">📋</span><span>Queue</span>
+    </button>
+    <button class="bn-item" id="bn-reports" onclick="showPanel('reports')">
+      <span class="bn-ico">📊</span><span>Reports</span>
+    </button>
+    <button class="bn-item" id="bn-account" onclick="showPanel('account')">
+      <span class="bn-ico">⚙️</span><span>Account</span>
+    </button>
+  </div>
+</nav>
 </body>
 </html>
