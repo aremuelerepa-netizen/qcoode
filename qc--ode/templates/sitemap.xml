@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- ── PUBLIC PAGES ── -->
+  <url>
+    <loc>https://qcode.onrender.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <lastmod>2025-01-01</lastmod>
+  </url>
+
+  <!-- ── USER AUTH ── -->
+  <url>
+    <loc>https://qcode.onrender.com/register-user</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://qcode.onrender.com/login-user</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://qcode.onrender.com/forgot-password-user</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- ── ORG AUTH ── -->
+  <url>
+    <loc>https://qcode.onrender.com/register-org</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://qcode.onrender.com/login-org</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://qcode.onrender.com/forgot-password-org</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- NOTE: Do NOT add /user, /org, /super-admin, /staff/* — these are private dashboards -->
+
+</urlset>
