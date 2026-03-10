@@ -30,6 +30,8 @@ h1,h2,h3{font-family:var(--fh);letter-spacing:-.03em;line-height:1.1}
 .nl:hover{color:#fff;background:rgba(255,255,255,.1)}
 .nav-cta{background:var(--brand);color:#fff;border-radius:var(--r);padding:.5rem 1.125rem;font-family:var(--fh);font-size:.85rem;font-weight:700;text-decoration:none;transition:all var(--t)}
 .nav-cta:hover{background:var(--brand2);transform:translateY(-1px)}
+
+/* ── HERO ── */
 .hero{min-height:100vh;background:linear-gradient(135deg,var(--ink2) 0%,var(--brand2) 55%,#0f172a 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:6rem 1.5rem 4rem;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 70%,rgba(67,97,238,.25),transparent)}
 .hero-inner{position:relative;max-width:780px}
@@ -38,6 +40,8 @@ h1,h2,h3{font-family:var(--fh);letter-spacing:-.03em;line-height:1.1}
 .hero h1{font-size:clamp(2.8rem,8vw,5.5rem);font-weight:800;color:#fff;margin-bottom:1.25rem}
 .hero h1 span{background:linear-gradient(135deg,var(--cyan),var(--brand));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:1.1rem;color:rgba(255,255,255,.65);margin-bottom:2.5rem;line-height:1.7;max-width:560px;margin-left:auto;margin-right:auto}
+
+/* ── JOIN CARD ── */
 .join-card{background:rgba(255,255,255,.97);border-radius:var(--rxl);padding:2rem;max-width:480px;margin:0 auto 1.75rem;box-shadow:var(--shl)}
 .jc-label{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;text-align:left}
 .jc-note{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;text-align:left;line-height:1.5}
@@ -59,16 +63,27 @@ h1,h2,h3{font-family:var(--fh);letter-spacing:-.03em;line-height:1.1}
 .ferr{font-size:.8rem;color:var(--red);margin-top:.375rem;display:none;text-align:left}
 .divider{display:flex;align-items:center;gap:.75rem;margin:.875rem 0;color:var(--muted);font-size:.75rem}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.login-strip{display:flex;align-items:center;justify-content:space-between;gap:.5rem;background:rgba(67,97,238,.05);border:1px solid rgba(67,97,238,.15);border-radius:var(--r);padding:.65rem 1rem;font-size:.8rem;color:var(--ink3)}
-.login-strip a{color:var(--brand);font-weight:700;text-decoration:none;white-space:nowrap}
-.login-strip a:hover{text-decoration:underline}
+
+/* ── TWO-BUTTON LOGIN STRIP ── */
+.auth-strip{display:flex;gap:.625rem;margin-top:.5rem}
+.auth-strip a{flex:1;display:flex;align-items:center;justify-content:center;padding:.75rem;border-radius:var(--r);font-family:var(--fh);font-size:.82rem;font-weight:700;text-decoration:none;transition:all var(--t)}
+.auth-signin{background:var(--brand);color:#fff}
+.auth-signin:hover{background:var(--brand2);transform:translateY(-1px)}
+.auth-register{background:transparent;border:1.5px solid var(--border);color:var(--ink3)}
+.auth-register:hover{border-color:var(--brand);color:var(--brand)}
+
+/* ── STATS ── */
 .stats-bar{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;padding:1.75rem 2rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);max-width:520px;margin:0 auto}
 .sb-item{text-align:center}
 .sb-n{font-family:var(--fh);font-size:1.75rem;font-weight:800;color:#fff}
 .sb-l{font-size:.72rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-top:.125rem}
+
+/* ── LANG BAR ── */
 .lang-bar{display:flex;gap:.375rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem}
 .lang-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);border-radius:99px;padding:.25rem .75rem;font-family:var(--fb);font-size:.75rem;cursor:pointer;transition:all var(--t)}
 .lang-btn.active,.lang-btn:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ── SECTIONS ── */
 .section{padding:5rem 1.5rem;max-width:1100px;margin:0 auto}
 .section-title{font-size:clamp(1.75rem,4vw,2.75rem);color:var(--ink);text-align:center;margin-bottom:.75rem}
 .section-sub{color:var(--muted);text-align:center;font-size:1rem;margin-bottom:3.5rem;line-height:1.65;max-width:540px;margin-left:auto;margin-right:auto}
@@ -111,6 +126,7 @@ footer a:hover{color:rgba(255,255,255,.7)}
 .t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
 .t-i{background:#eff6ff;border-left:3px solid var(--brand);color:#1d4ed8}
 @keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
+
 /* ── MOBILE ── */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
@@ -140,7 +156,7 @@ input,select,textarea,button{font-size:16px !important}
   .cta-btns{flex-direction:column}
   .cta-btns .btn{width:100%!important}
   .lang-bar{gap:.25rem}
-  .login-strip{font-size:.75rem;flex-direction:column;text-align:center;gap:.25rem}
+  .auth-strip{flex-direction:column}
 }
 </style>
 </head>
@@ -154,7 +170,7 @@ input,select,textarea,button{font-size:16px !important}
   <div class="nav-links">
     <a href="#how" class="nl">How it works</a>
     <a href="#features" class="nl">Features</a>
-    <a href="/login-user" class="nl">Sign in</a>
+    <a href="/login-user" class="nl" id="nav-signin">Sign in</a>
     <a href="/register-org" class="nav-cta">For Orgs →</a>
   </div>
 </nav>
@@ -170,21 +186,22 @@ input,select,textarea,button{font-size:16px !important}
     </div>
     <div class="hero-badge"><span class="hero-badge-dot"></span> Live Queue Tracking</div>
     <h1 id="hero-h1">Queue Smarter,<br><span>Not Harder</span></h1>
-    <p class="hero-sub" id="hero-sub">Join any queue with a service code — no app needed. Real-time position tracking, SMS support, and instant notifications.</p>
+    <p class="hero-sub" id="hero-sub">Join any queue with your QCode account — real-time position tracking, push notifications, multi-stage progress, and full history.</p>
 
-    <!-- JOIN CARD — GUEST ONLY -->
+    <!-- JOIN CARD — login-only -->
     <div class="join-card">
-      <div class="jc-label" id="jc-title">Quick Join as Guest</div>
-      <div class="jc-note" id="jc-note">In a hurry? Enter the code and join instantly. <a href="/login-user">Sign in</a> for notifications &amp; history.</div>
+      <div class="jc-label" id="jc-title">Find & Join a Queue</div>
+      <div class="jc-note" id="jc-note">Sign in to join a queue, track your position, and receive notifications before your turn.</div>
 
       <div id="step-code">
         <div class="inp-row" style="margin-bottom:.625rem">
           <input id="code-inp" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8" autocomplete="off"/>
-          <button class="btn bp" onclick="findService()" id="find-btn">Find</button>
+          <button class="btn bp" onclick="previewService()" id="find-btn">Preview</button>
         </div>
         <div id="code-err" class="ferr"></div>
       </div>
 
+      <!-- Service preview — login to join -->
       <div id="step-found" style="display:none;margin-top:1rem">
         <div class="found-box">
           <div class="found-name" id="found-name"></div>
@@ -194,16 +211,13 @@ input,select,textarea,button{font-size:16px !important}
             <span id="found-waiting"></span>
           </div>
         </div>
-        <input id="guest-name" class="inp" type="text" placeholder="Your full name (required)" style="margin-bottom:.75rem"/>
-        <button class="btn bp btn-full" style="margin-bottom:.625rem" onclick="joinAsGuest()" id="join-btn">Join Queue as Guest</button>
-        <div class="divider">or</div>
-        <a href="/login-user" class="btn bg-btn btn-full" style="margin-bottom:.625rem">Sign in for full access</a>
-        <button class="btn bg-btn btn-full" onclick="cancelFind()">← Cancel</button>
+        <a id="join-signin-btn" href="/login-user" class="btn bp btn-full" style="margin-bottom:.5rem">Sign in to Join this Queue →</a>
+        <button class="btn bg-btn btn-full" onclick="cancelFind()">← Try another code</button>
       </div>
 
-      <div class="login-strip" id="login-strip">
-        <span>Have an account?</span>
-        <a href="/login-user">Sign in to join &amp; track →</a>
+      <div class="auth-strip" id="auth-strip">
+        <a href="/login-user" class="auth-signin">Sign In →</a>
+        <a href="/register-user" class="auth-register">Create Account</a>
       </div>
     </div>
 
@@ -220,9 +234,9 @@ input,select,textarea,button{font-size:16px !important}
   <h2 class="section-title" id="how-title">How It Works</h2>
   <p class="section-sub" id="how-sub">Three simple steps to skip the physical wait</p>
   <div class="steps">
-    <div class="step"><div class="step-num">1</div><h3>Get a Code</h3><p>Ask the organization for their service code — or browse open queues after signing in.</p></div>
-    <div class="step"><div class="step-num">2</div><h3>Join the Queue</h3><p>Enter the code here as a guest, or sign in for notifications and history. SMS joining also works.</p></div>
-    <div class="step"><div class="step-num">3</div><h3>Show Up on Time</h3><p>Track your live position. Signed-in users get notified before their turn automatically.</p></div>
+    <div class="step"><div class="step-num">1</div><h3>Create Your Account</h3><p>Sign up for free in seconds. Your account lets you join queues, track your position, and see your full history.</p></div>
+    <div class="step"><div class="step-num">2</div><h3>Enter a Service Code</h3><p>Get the code from the organization at the entrance or by SMS. Enter it on QCode to join instantly.</p></div>
+    <div class="step"><div class="step-num">3</div><h3>Show Up on Time</h3><p>Track your live position. Get push notifications before your turn so you're never caught off guard.</p></div>
   </div>
 </section>
 
@@ -231,10 +245,10 @@ input,select,textarea,button{font-size:16px !important}
   <h2 class="section-title">Everything You Need</h2>
   <p class="section-sub">Powerful features for users and organizations alike</p>
   <div class="feats">
-    <div class="feat"><div class="feat-icon">📡</div><h3>Real-Time Tracking</h3><p>Watch your position update live. Know exactly when it's your turn without refreshing.</p></div>
-    <div class="feat"><div class="feat-icon">📱</div><h3>SMS Without Internet</h3><p>No smartphone? No problem. Text a service code to join a queue from any phone.</p></div>
-    <div class="feat"><div class="feat-icon">🔔</div><h3>Smart Notifications</h3><p>Signed-in users get browser alerts before their turn. You'll always have time to show up.</p></div>
-    <div class="feat"><div class="feat-icon">🏢</div><h3>For Organizations</h3><p>Create services, manage queues, set schedules, break times, and view reports — all in one place.</p></div>
+    <div class="feat"><div class="feat-icon">📡</div><h3>Real-Time Tracking</h3><p>Watch your position update live across all stages. Know exactly when it's your turn without refreshing.</p></div>
+    <div class="feat"><div class="feat-icon">📱</div><h3>SMS Without Internet</h3><p>No smartphone? No problem. Text a service code to join a queue from any phone, anywhere.</p></div>
+    <div class="feat"><div class="feat-icon">🔔</div><h3>Push Notifications</h3><p>Get browser alerts 10 minutes before your turn, when you're called, and when you move to the next stage.</p></div>
+    <div class="feat"><div class="feat-icon">🏢</div><h3>Multi-Stage Queues</h3><p>Entry → Shopping → Checkout → Packing. Auto-progress through stages as each one completes.</p></div>
     <div class="feat"><div class="feat-icon">🌍</div><h3>Multi-Language</h3><p>Available in English, French, Arabic, Spanish, and Portuguese to serve global communities.</p></div>
     <div class="feat"><div class="feat-icon">🤖</div><h3>AI-Powered Help</h3><p>Ask our AI assistant any question about your queue, wait time, or how the system works.</p></div>
   </div>
@@ -245,13 +259,13 @@ input,select,textarea,button{font-size:16px !important}
 <div class="sms-section">
   <div class="sms-left">
     <h2>Join by SMS — No Internet Needed</h2>
-    <p>In areas with limited internet, users can join any queue by simply texting the service code to our gateway number. Instant confirmation sent back.</p>
-    <div class="sms-chip">Text to <strong>+2349155189936</strong></div>
+    <p>In areas with limited internet, users can join any queue by simply texting the service code to our gateway number. Instant confirmation sent back with your ticket and wait time.</p>
+    <div class="sms-chip">Text to <strong id="sms-number">+2349155189936</strong></div>
   </div>
   <div class="sms-steps">
-    <div class="sms-step"><div class="sms-step-num">1</div><p>Ask for the service code from the organization (e.g. <strong>VISA24</strong>)</p></div>
+    <div class="sms-step"><div class="sms-step-num">1</div><p>Ask for the service code from the organization at the entrance (e.g. <strong>PINNA</strong>)</p></div>
     <div class="sms-step"><div class="sms-step-num">2</div><p>Text the code to <strong>+2349155189936</strong> from any mobile phone</p></div>
-    <div class="sms-step"><div class="sms-step-num">3</div><p>Receive your ticket number and estimated wait time by SMS</p></div>
+    <div class="sms-step"><div class="sms-step-num">3</div><p>Receive your ticket number, position, and estimated wait time by SMS instantly</p></div>
   </div>
 </div>
 </div>
@@ -284,153 +298,123 @@ input,select,textarea,button{font-size:16px !important}
 
 <script>
 const TRANSLATIONS = {
-  en:{h1:'Queue Smarter,\nNot Harder',sub:'Join any queue with a service code — no app needed. Real-time position tracking, SMS support, and instant notifications.',jcTitle:'Quick Join as Guest',jcNote:'In a hurry? Enter the code and join instantly. <a href="/login-user">Sign in</a> for notifications & history.',howTitle:'How It Works',howSub:'Three simple steps to skip the physical wait'},
-  fr:{h1:'Faites la queue\nautrement',sub:"Rejoignez n'importe quelle file avec un code de service.",jcTitle:'Rejoindre comme invité',jcNote:'Entrez le code et rejoignez instantanément. <a href="/login-user">Connexion</a> pour les notifications.',howTitle:'Comment ça marche',howSub:"Trois étapes simples"},
-  ar:{h1:'انتظر بذكاء،\nلا بالصف',sub:'انضم إلى أي طابور بكود الخدمة.',jcTitle:'انضمام سريع كضيف',jcNote:'أدخل الكود وانضم فوراً. <a href="/login-user">تسجيل الدخول</a> للإشعارات.',howTitle:'كيف يعمل',howSub:'ثلاث خطوات بسيطة'},
-  es:{h1:'Haz Cola\nde Forma Inteligente',sub:'Únete a cualquier cola con un código de servicio.',jcTitle:'Unirse como invitado',jcNote:'Ingresa el código y únete al instante. <a href="/login-user">Iniciar sesión</a> para notificaciones.',howTitle:'Cómo Funciona',howSub:'Tres pasos simples'},
-  pt:{h1:'Fique na Fila\nde Forma Inteligente',sub:'Junte-se a qualquer fila com um código de serviço.',jcTitle:'Entrar como convidado',jcNote:'Digite o código e entre instantaneamente. <a href="/login-user">Entrar</a> para notificações.',howTitle:'Como Funciona',howSub:'Três passos simples'}
+  en:{h1:'Queue Smarter,\nNot Harder',sub:'Join any queue with your QCode account — real-time tracking, push notifications, and multi-stage progress.',jcTitle:'Find & Join a Queue',jcNote:'Sign in to join a queue, track your position, and receive notifications before your turn.',howTitle:'How It Works',howSub:'Three simple steps to skip the physical wait'},
+  fr:{h1:'Faites la queue\nautrement',sub:"Rejoignez n'importe quelle file avec votre compte QCode.",jcTitle:'Trouver une file',jcNote:'Connectez-vous pour rejoindre une file et recevoir des notifications.',howTitle:'Comment ça marche',howSub:'Trois étapes simples'},
+  ar:{h1:'انتظر بذكاء،\nلا بالصف',sub:'انضم إلى أي طابور بحساب QCode الخاص بك.',jcTitle:'ابحث عن طابور',jcNote:'سجّل دخولك للانضمام إلى طابور وتلقي الإشعارات.',howTitle:'كيف يعمل',howSub:'ثلاث خطوات بسيطة'},
+  es:{h1:'Haz Cola\nde Forma Inteligente',sub:'Únete a cualquier cola con tu cuenta QCode.',jcTitle:'Buscar una cola',jcNote:'Inicia sesión para unirte y recibir notificaciones.',howTitle:'Cómo Funciona',howSub:'Tres pasos simples'},
+  pt:{h1:'Fique na Fila\nde Forma Inteligente',sub:'Junte-se a qualquer fila com sua conta QCode.',jcTitle:'Encontrar uma fila',jcNote:'Entre com sua conta para receber notificações.',howTitle:'Como Funciona',howSub:'Três passos simples'}
 };
-
-let foundSvc = null;
 
 function setLang(l) {
   document.documentElement.lang = l;
-  document.documentElement.dir = l==='ar'?'rtl':'ltr';
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
-  const t = TRANSLATIONS[l]||TRANSLATIONS.en;
+  document.documentElement.dir  = l==='ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l.toUpperCase()));
+  const t = TRANSLATIONS[l] || TRANSLATIONS.en;
   const parts = t.h1.split('\n');
   document.getElementById('hero-h1').innerHTML = parts[0]+'<br><span>'+(parts[1]||'')+'</span>';
-  document.getElementById('hero-sub').textContent = t.sub;
-  document.getElementById('jc-title').textContent = t.jcTitle;
-  document.getElementById('jc-note').innerHTML = t.jcNote;
-  document.getElementById('how-title').textContent = t.howTitle;
-  document.getElementById('how-sub').textContent = t.howSub;
-  localStorage.setItem('qcode_lang',l);
+  document.getElementById('hero-sub').textContent    = t.sub;
+  document.getElementById('jc-title').textContent    = t.jcTitle;
+  document.getElementById('jc-note').textContent     = t.jcNote;
+  document.getElementById('how-title').textContent   = t.howTitle;
+  document.getElementById('how-sub').textContent     = t.howSub;
+  localStorage.setItem('qcode_lang', l);
 }
 
-function toast(msg,type='i',ms=4500){
-  const el=document.createElement('div');
-  el.className='toast t-'+type;
-  el.textContent=msg;
+function toast(msg, type='i', ms=4500) {
+  const el = document.createElement('div');
+  el.className = 'toast t-'+type;
+  el.textContent = msg;
   document.getElementById('toasts').appendChild(el);
-  setTimeout(()=>el.remove(),ms);
+  setTimeout(() => el.remove(), ms);
 }
 
-async function findService(){
-  const code=document.getElementById('code-inp').value.trim().toUpperCase();
-  const errEl=document.getElementById('code-err');
-  const btn=document.getElementById('find-btn');
-  errEl.style.display='none';
-  if(!code){errEl.textContent='Please enter a service code.';errEl.style.display='block';return;}
-  btn.disabled=true;btn.textContent='…';
-  const r=await fetch('/api/user/find-service?code='+encodeURIComponent(code));
-  btn.disabled=false;btn.textContent='Find';
-  if(!r.ok){const d=await r.json().catch(()=>({}));errEl.textContent=d.error||'Service not found.';errEl.style.display='block';return;}
-  foundSvc=await r.json();
-  document.getElementById('found-name').textContent=foundSvc.name;
-  document.getElementById('found-org').textContent=foundSvc.org_name?'🏢 '+foundSvc.org_name:'';
-  document.getElementById('found-eta').textContent='⏱ ~'+(foundSvc.eta_minutes||0)+' min wait';
-  document.getElementById('found-waiting').textContent='👥 '+(foundSvc.waiting_count||0)+' waiting';
-  document.getElementById('step-code').style.display='none';
-  document.getElementById('step-found').style.display='block';
-  document.getElementById('login-strip').style.display='none';
+// Preview service info without joining — directs to login
+async function previewService() {
+  const code  = document.getElementById('code-inp').value.trim().toUpperCase();
+  const errEl = document.getElementById('code-err');
+  const btn   = document.getElementById('find-btn');
+  errEl.style.display = 'none';
+  if (!code) { errEl.textContent = 'Please enter a service code.'; errEl.style.display='block'; return; }
+  btn.disabled = true; btn.textContent = '…';
+  const r = await fetch('/api/user/find-service?code=' + encodeURIComponent(code));
+  btn.disabled = false; btn.textContent = 'Preview';
+  if (!r.ok) {
+    const d = await r.json().catch(()=>({}));
+    errEl.textContent = d.error || 'Service not found.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const svc = await r.json();
+  document.getElementById('found-name').textContent    = svc.name;
+  document.getElementById('found-org').textContent     = svc.org_name ? '🏢 '+svc.org_name : '';
+  document.getElementById('found-eta').textContent     = '⏱ ~'+(svc.eta_minutes||0)+' min wait';
+  document.getElementById('found-waiting').textContent = '👥 '+(svc.waiting_count||0)+' waiting';
+  // Pass code to login page so user.html can auto-join after login
+  document.getElementById('join-signin-btn').href = '/login-user?join=' + encodeURIComponent(code);
+  document.getElementById('step-code').style.display  = 'none';
+  document.getElementById('step-found').style.display = 'block';
+  document.getElementById('auth-strip').style.display = 'none';
 }
 
-function cancelFind(){
-  foundSvc=null;
-  document.getElementById('step-found').style.display='none';
-  document.getElementById('step-code').style.display='block';
-  document.getElementById('code-inp').value='';
-  document.getElementById('code-err').style.display='none';
-  document.getElementById('login-strip').style.display='flex';
-  if(document.getElementById('guest-name'))document.getElementById('guest-name').value='';
+function cancelFind() {
+  document.getElementById('step-found').style.display = 'none';
+  document.getElementById('step-code').style.display  = 'block';
+  document.getElementById('code-inp').value           = '';
+  document.getElementById('code-err').style.display   = 'none';
+  document.getElementById('auth-strip').style.display = 'flex';
 }
 
-async function joinAsGuest(){
-  if(!foundSvc)return;
-  const btn=document.getElementById('join-btn');
-  const gname=(document.getElementById('guest-name').value||'').trim();
-  if(!gname){toast('Please enter your full name.','e');return;}
-  btn.disabled=true;btn.textContent='Joining…';
-  const r=await fetch('/api/guest/join',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({service_id:foundSvc.id,guest_name:gname})
-  });
-  const data=await r.json().catch(()=>({}));
-  btn.disabled=false;btn.textContent='Join Queue as Guest';
-  if(!r.ok){toast(data.error||'Failed to join queue.','e');return;}
-  localStorage.setItem('qc_guest',JSON.stringify(data));
-  window.location.href='/guest';
+async function loadStats() {
+  try {
+    const r = await fetch('/api/public/stats');
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById('stat-orgs').textContent   = d.approved_orgs    || 0;
+    document.getElementById('stat-served').textContent = d.total_served      || 0;
+    document.getElementById('stat-active').textContent = d.active_services   || 0;
+  } catch(e) {}
 }
 
-async function loadStats(){
-  try{
-    const r=await fetch('/api/public/stats');
-    if(!r.ok)return;
-    const d=await r.json();
-    document.getElementById('stat-orgs').textContent=d.approved_orgs||0;
-    document.getElementById('stat-served').textContent=d.total_served||0;
-    document.getElementById('stat-active').textContent=d.active_services||0;
-  }catch(e){}
-}
-
-async function checkSession(){
-  // Never auto-redirect on the homepage.
-  // If the user is already logged in, just show a dashboard button in the nav.
-  try{
-    const r=await fetch('/api/auth/me',{credentials:'include'});
-    if(!r.ok)return;
-    const d=await r.json();
-    if(d.logged_in){
-      const dash=d.role==='organization'?'/org':d.role==='super_admin'?'/super-admin':'/user';
-      const navLinks=document.querySelector('.nav-links');
-      if(navLinks){
-        const signInLink=navLinks.querySelector('a[href="/login-user"]');
-        if(signInLink)signInLink.remove();
-        const btn=document.createElement('a');
-        btn.href=dash;
-        btn.className='nav-cta';
-        btn.textContent='My Dashboard →';
-        navLinks.insertBefore(btn,navLinks.querySelector('.nav-cta'));
+async function checkSession() {
+  try {
+    const r = await fetch('/api/auth/me', {credentials:'include'});
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.logged_in) {
+      const dash = d.role==='organization' ? '/org' : d.role==='super_admin' ? '/super-admin' : '/user';
+      // Replace Sign In link with Dashboard link
+      const signinEl = document.getElementById('nav-signin');
+      if (signinEl) { signinEl.textContent='My Dashboard'; signinEl.href=dash; }
+      // Replace auth strip with dashboard button
+      const strip = document.getElementById('auth-strip');
+      if (strip) strip.innerHTML = `<a href="${dash}" class="auth-signin" style="flex:1;text-align:center">Go to My Dashboard →</a>`;
+      // Update join card note
+      const note = document.getElementById('jc-note');
+      if (note) note.textContent = `Welcome back, ${d.full_name||''}! Enter a service code to find and join a queue.`;
+      // Update join button to go straight to user dashboard join
+      const joinBtn = document.getElementById('join-signin-btn');
+      if (joinBtn) {
+        joinBtn.textContent = 'Go to Dashboard to Join →';
+        joinBtn.href = dash;
       }
     }
-  }catch(e){}
+  } catch(e) {}
 }
 
-window.addEventListener('scroll',()=>{
-  document.getElementById('nav').classList.toggle('solid',window.scrollY>40);
+// Nav scroll solid
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('solid', window.scrollY > 40);
 });
-document.getElementById('code-inp').addEventListener('input',function(){
-  this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+
+// Code input: uppercase, alphanumeric only
+document.getElementById('code-inp').addEventListener('input', function() {
+  this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 });
-document.getElementById('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')findService();});
-document.getElementById('guest-name').addEventListener('keydown',e=>{if(e.key==='Enter')joinAsGuest();});
+document.getElementById('code-inp').addEventListener('keydown', e => { if (e.key==='Enter') previewService(); });
 
-const sl=localStorage.getItem('qcode_lang');
-if(sl&&TRANSLATIONS[sl])setLang(sl);
-
-// On index.html load - reset join card (fix viewport switch showing stale UI)
-(function(){
-  // Always reset join card to fresh state - fixes issue 5
-  var sf=document.getElementById('step-found');
-  if(sf) sf.style.display='none';
-  var sc=document.getElementById('step-code');
-  if(sc) sc.style.display='block';
-  var ci=document.getElementById('code-inp');
-  if(ci) ci.value='';
-  // Clear stale guest session ONLY after 8s delay (so redirect to /guest completes first)
-  setTimeout(function(){
-    var gd=localStorage.getItem('qc_guest');
-    if(!gd) return;
-    try{
-      var p=JSON.parse(gd);
-      var entry=p.entry||p;
-      var joinedAt=new Date(entry.joined_at||0);
-      var age=(Date.now()-joinedAt.getTime())/1000;
-      if(age > 60) localStorage.removeItem('qc_guest');
-    }catch(e){ localStorage.removeItem('qc_guest'); }
-  }, 8000);
-})();
+// Restore language preference
+const sl = localStorage.getItem('qcode_lang');
+if (sl && TRANSLATIONS[sl]) setLang(sl);
 
 checkSession();
 loadStats();
