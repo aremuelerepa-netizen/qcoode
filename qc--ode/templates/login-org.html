@@ -64,6 +64,7 @@ input,select,textarea,button{font-size:16px !important}
     <div class="fg">
       <div class="lbl-row">
         <label class="lbl">Password</label>
+        <!-- FIX: route now matches app.py -->
         <a href="/forgot-password-org" class="forgot-link">Forgot password?</a>
       </div>
       <input id="password" class="inp" type="password" placeholder="Your password" autocomplete="current-password"/>
@@ -71,7 +72,10 @@ input,select,textarea,button{font-size:16px !important}
     <button id="btn" class="btn" onclick="doLogin()">Sign In</button>
     <div class="divider">or</div>
     <div class="sw">Don't have an account? <a href="/register-org">Register your organization →</a></div>
-    <div class="sw" style="margin-top:.375rem"><a href="/login-org" style="color:var(--muted);font-size:.82rem">
+    <!-- FIX: removed broken unclosed anchor tag that was here -->
+    <div class="sw" style="margin-top:.375rem">
+      <a href="/login-user" style="color:var(--muted);font-size:.82rem">Signing in as a user instead? →</a>
+    </div>
   </div>
   <a href="/" class="back">← Back to home</a>
 </div>
@@ -85,7 +89,10 @@ async function doLogin() {
   err.style.display = 'none'; warn.style.display = 'none';
   if (!email || !password) { err.textContent = 'Email and password are required.'; err.style.display = 'block'; return; }
   btn.disabled = true; btn.textContent = 'Signing in…';
-  const r = await fetch('/api/auth/login', {
+
+  // FIX: was incorrectly calling /api/auth/login (user endpoint)
+  //      now correctly calls /api/auth/login-org (org endpoint)
+  const r = await fetch('/api/auth/login-org', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({email, password}), credentials:'include'
   });
@@ -94,6 +101,8 @@ async function doLogin() {
   if (!r.ok) {
     if (d.error && d.error.toLowerCase().includes('pending')) {
       warn.textContent = '⚠ Your organization account is pending admin approval.'; warn.style.display = 'block';
+    } else if (d.error && d.error.toLowerCase().includes('suspended')) {
+      err.textContent = '⛔ This account has been suspended. Contact support.'; err.style.display = 'block';
     } else {
       err.textContent = d.error || 'Login failed.'; err.style.display = 'block';
     }
@@ -101,6 +110,7 @@ async function doLogin() {
   }
   window.location.href = d.redirect || '/org';
 }
+
 async function checkSession() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('force') === '1') return;
@@ -115,6 +125,7 @@ async function checkSession() {
     }
   } catch(e) {}
 }
+
 document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 checkSession();
 </script>
