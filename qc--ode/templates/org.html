@@ -21,8 +21,6 @@
 body{font-family:var(--fb);background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
 h1,h2,h3,h4{font-family:var(--fh);line-height:1.15;letter-spacing:-.02em}
 a{text-decoration:none;color:var(--brand)}
-
-/* ─── TOPBAR ─── */
 .topbar{background:var(--ink2);height:62px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100;flex-shrink:0}
 .tb-logo{display:flex;align-items:center;gap:.5rem;font-family:var(--fh);font-size:1.1rem;font-weight:700;color:#fff;text-decoration:none}
 .tb-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:pd 2s ease infinite}
@@ -32,35 +30,21 @@ a{text-decoration:none;color:var(--brand)}
 .tb-btn{background:none;border:none;cursor:pointer;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fb);font-size:.8rem;font-weight:600;color:rgba(255,255,255,.6);transition:all var(--t)}
 .tb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .tb-logout{color:#f87171!important}.tb-logout:hover{background:rgba(239,68,68,.15)!important}
-
-/* PENDING BAR */
 .pending-bar{background:rgba(255,209,102,.12);border-bottom:1px solid rgba(255,209,102,.25);padding:.6rem 1.5rem;text-align:center;font-size:.8rem;color:#92400e;display:none}
-
-/* ─── SHELL ─── */
 .shell{display:flex;flex:1;overflow:hidden}
 .sidebar{width:240px;background:var(--white);border-right:1px solid var(--border);padding:1.25rem 1rem;flex-shrink:0;display:flex;flex-direction:column;gap:.15rem;overflow-y:auto}
 .main{flex:1;padding:1.75rem;overflow-y:auto;max-height:calc(100vh - 62px)}
-
-/* ─── SIDEBAR ─── */
 .create-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.75rem;background:var(--brand);color:#fff;border-radius:var(--r);border:none;font-family:var(--fh);font-size:.875rem;font-weight:700;cursor:pointer;transition:all var(--t);margin-bottom:1rem}
-.create-btn:hover{background:var(--brand2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(67,97,238,.3)}
+.create-btn:hover{background:var(--brand2);transform:translateY(-1px)}
 .sb-section{font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;padding:.5rem .75rem;margin-top:.625rem}
 .sb-item{display:flex;align-items:center;gap:.625rem;padding:.65rem .875rem;border-radius:var(--r);font-size:.85rem;font-weight:500;color:var(--ink3);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:all var(--t)}
-.sb-item:hover{background:var(--bg);color:var(--ink)}
-.sb-item.active{background:rgba(67,97,238,.08);color:var(--brand);font-weight:700}
+.sb-item:hover{background:var(--bg);color:var(--ink)}.sb-item.active{background:rgba(67,97,238,.08);color:var(--brand);font-weight:700}
 .sb-badge{margin-left:auto;background:var(--brand);color:#fff;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:99px}
 .sb-divider{height:1px;background:var(--border);margin:.5rem 0}
-
-/* ─── PANELS ─── */
-.panel{display:none;animation:fi .2s ease}
-.panel.active{display:block}
+.panel{display:none;animation:fi .2s ease}.panel.active{display:block}
 @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* ─── PAGE HEADER ─── */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem}
 .ph h1{font-size:1.6rem}.ph p{color:var(--muted);margin-top:.25rem;font-size:.875rem}
-
-/* ─── STATS ─── */
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:1.75rem}
 .stat{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem 1.5rem;border-top:3px solid var(--brand)}
 .stat-n{font-family:var(--fh);font-size:2rem;font-weight:700;color:var(--brand);line-height:1}
@@ -68,12 +52,8 @@ a{text-decoration:none;color:var(--brand)}
 .stat.g{border-top-color:var(--green)}.stat.g .stat-n{color:#047857}
 .stat.r{border-top-color:var(--red)}.stat.r .stat-n{color:var(--red)}
 .stat.a{border-top-color:var(--amber)}.stat.a .stat-n{color:#92400e}
-
-/* ─── CARD ─── */
 .card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.75rem;box-shadow:var(--sh)}
 .card-title{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
-
-/* ─── BUTTONS ─── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.55rem 1.25rem;border-radius:var(--r);border:none;font-family:var(--fb);font-size:.82rem;font-weight:600;cursor:pointer;transition:all var(--t);white-space:nowrap}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .bp{background:var(--brand);color:#fff}.bp:hover:not(:disabled){background:var(--brand2);transform:translateY(-1px)}
@@ -83,8 +63,6 @@ a{text-decoration:none;color:var(--brand)}
 .bam{background:var(--amber);color:var(--ink2)}.bam:hover:not(:disabled){filter:brightness(1.06)}
 .bsm{padding:.325rem .75rem;font-size:.75rem}
 .btn-full{width:100%;display:flex}
-
-/* ─── INPUTS ─── */
 .fg{display:flex;flex-direction:column;gap:.375rem;margin-bottom:1.125rem}
 .lbl{font-size:.8rem;font-weight:700;color:var(--ink3)}
 .hint{font-size:.74rem;color:var(--muted)}
@@ -95,8 +73,7 @@ select.inp{cursor:pointer}
 textarea.inp{resize:vertical;min-height:70px}
 .inp-row{display:grid;grid-template-columns:1fr 1fr;gap:.875rem}
 .ferr{font-size:.78rem;color:var(--red);margin-top:.3rem;display:none;padding:.4rem .75rem;background:var(--red-l);border-radius:.4rem}
-
-/* ─── SERVICE CARDS ─── */
+/* Service cards */
 .svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
 .svc-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--rl);padding:1.5rem;transition:all var(--t);position:relative;overflow:hidden}
 .svc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),var(--cyan))}
@@ -110,8 +87,16 @@ textarea.inp{resize:vertical;min-height:70px}
 .svc-meta span{font-size:.76rem;color:var(--muted)}
 .svc-sched{font-size:.73rem;color:var(--muted);margin-top:.5rem;padding:.3rem .625rem;background:var(--bg);border-radius:.4rem;display:inline-block}
 .svc-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
-
-/* ─── BADGE ─── */
+/* Staff links on card */
+.stage-links{margin-top:.875rem;padding:.75rem;background:rgba(67,97,238,.04);border:1px solid rgba(67,97,238,.12);border-radius:var(--r)}
+.stage-links-title{font-size:.72rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.stage-link-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;flex-wrap:wrap}
+.stage-link-name{font-size:.78rem;color:var(--ink3);font-weight:600;min-width:100px}
+.stage-link-code{font-family:var(--fh);font-size:.78rem;color:var(--brand);background:rgba(67,97,238,.08);padding:.2rem .5rem;border-radius:.35rem;cursor:pointer;font-weight:700;letter-spacing:.08em}
+.stage-link-code:hover{background:rgba(67,97,238,.15)}
+.stage-link-url{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;word-break:break-all}
+.stage-link-url:hover{color:var(--brand)}
+/* Badge */
 .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:99px;font-size:.72rem;font-weight:700}
 .b-waiting{background:rgba(67,97,238,.1);color:var(--brand)}
 .b-called{background:var(--amber-l);color:#92400e}
@@ -124,8 +109,7 @@ textarea.inp{resize:vertical;min-height:70px}
 .b-pending{background:var(--amber-l);color:#92400e}
 .b-approved{background:var(--green-l);color:#047857}
 .b-suspended{background:var(--red-l);color:var(--red)}
-
-/* ─── QUEUE VIEW ─── */
+/* Queue view */
 .q-header{background:var(--ink2);border-radius:var(--rl);padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.875rem}
 .qh-left h2{font-family:var(--fh);color:#fff;font-size:1.2rem}
 .qh-meta{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap}
@@ -135,14 +119,11 @@ textarea.inp{resize:vertical;min-height:70px}
 @keyframes sl{from{opacity:0;transform:translateY(-.5rem)}to{opacity:1;transform:none}}
 .cb-ticket{font-family:var(--fh);font-size:2rem;font-weight:700}
 .cb-name{font-size:.875rem;opacity:.85;margin-top:.1rem}
-.cb-endcode{font-size:.8rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:.4rem;padding:.3rem .625rem;margin-top:.4rem;letter-spacing:.1em;font-family:var(--fh);display:inline-block}
-
-/* ─── TABS ─── */
+/* Tabs */
 .tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
 .tab{padding:.625rem 1.25rem;background:none;border:none;font-family:var(--fb);font-size:.875rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all var(--t)}
 .tab:hover{color:var(--brand)}.tab.active{color:var(--brand);border-bottom-color:var(--brand)}
-
-/* ─── TABLE ─── */
+/* Table */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse}
 thead{border-bottom:2px solid var(--border)}
@@ -153,8 +134,7 @@ tr:hover td{background:var(--bg)}
 .ticket-tag{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--brand)}
 .dot-on{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 2px rgba(6,214,160,.25)}
 .dot-off{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block}
-
-/* ─── FORM BUILDER ─── */
+/* Form builder */
 .form-builder{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:1.25rem}
 .fb-header{background:var(--bg);padding:.75rem 1rem;font-size:.78rem;font-weight:700;color:var(--ink3);border-bottom:1px solid var(--border)}
 .fb-body{padding:.875rem}
@@ -164,54 +144,30 @@ tr:hover td{background:var(--bg)}
 .fb-field-type{font-size:.72rem;color:var(--muted);margin-top:.1rem;text-transform:capitalize}
 .fb-add-row{display:flex;gap:.5rem;padding:.625rem;border-top:1px solid var(--border);background:var(--bg);flex-wrap:wrap}
 .fb-add-row select,.fb-add-row input{flex:1;min-width:100px;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.8rem;background:var(--white);color:var(--ink)}
-
-/* ─── BREAK TIMES ─── */
+/* Break times */
 .break-item{display:flex;align-items:center;gap:.625rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem 1rem;margin-bottom:.5rem}
 .break-item span{flex:1;font-size:.82rem;color:var(--ink3)}
-
-/* ─── SECTION HDR ─── */
+/* Section header */
 .section-hdr{font-family:var(--fh);font-size:.7rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.12em;margin:1.5rem 0 .875rem;padding-bottom:.5rem;border-bottom:1.5px solid rgba(67,97,238,.1)}
 .section-hdr:first-child{margin-top:0}
-
-/* ─── RESTORE ─── */
+/* Restore */
 .restore-item{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);margin-bottom:.625rem}
 .ri-name{font-weight:700;color:var(--ink);font-size:.88rem}
 .ri-meta{font-size:.74rem;color:var(--muted);margin-top:.2rem}
-
-/* ─── OVERLAY / MODAL ─── */
+/* Modal / overlay */
 .overlay{position:fixed;inset:0;z-index:300;background:rgba(13,15,20,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.25rem;animation:fo .15s ease}
 @keyframes fo{from{opacity:0}to{opacity:1}}
 .modal{background:var(--white);border-radius:var(--rxl);padding:2rem;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);animation:mu .2s cubic-bezier(.16,1,.3,1)}
 @keyframes mu{from{opacity:0;transform:translateY(1rem)}to{opacity:1;transform:none}}
 .modal-title{font-size:1.2rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
 .modal-footer{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
-
-/* ─── MISC ─── */
-.empty{text-align:center;padding:3.5rem 2rem;color:var(--muted)}
-.empty h3{color:var(--ink3);font-size:1.05rem;margin:.75rem 0 .375rem}
-.empty p{font-size:.875rem}
-.spin{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--muted)}
-#toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
-.toast{padding:.75rem 1.125rem;border-radius:.625rem;box-shadow:var(--shl);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
-.t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#047857}
-.t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
-.t-i{background:#eff6ff;border-left:3px solid var(--brand);color:#1d4ed8}
-.t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
-@keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
-
-/* ── USER INFO BUTTON ── */
-.info-btn{background:rgba(67,97,238,.1);border:none;color:var(--brand);cursor:pointer;width:26px;height:26px;border-radius:50%;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;transition:all var(--t);flex-shrink:0}
-.info-btn:hover{background:var(--brand);color:#fff;transform:scale(1.1)}
+/* User info modal */
 .ui-basic-item{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
 .ui-basic-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.2rem}
 .ui-basic-value{font-size:.85rem;color:var(--ink);font-weight:600}
-.ui-field{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:.625rem .875rem}
-.ui-field-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.25rem}
-.ui-field-value{font-size:.875rem;color:var(--ink);font-weight:500;word-break:break-word}
-
-/* ── LOGO UPLOAD ── */
+.info-btn{background:rgba(67,97,238,.1);border:none;color:var(--brand);cursor:pointer;width:26px;height:26px;border-radius:50%;font-size:.8rem;display:inline-flex;align-items:center;justify-content:center;transition:all var(--t);flex-shrink:0}
+.info-btn:hover{background:var(--brand);color:#fff}
+/* Logo upload */
 .logo-upload-area{border:2px dashed var(--border);border-radius:var(--rl);padding:1.5rem;text-align:center;cursor:pointer;transition:all var(--t);background:var(--bg);position:relative;overflow:hidden}
 .logo-upload-area:hover,.logo-upload-area.dragover{border-color:var(--brand);background:rgba(67,97,238,.04)}
 .logo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
@@ -219,8 +175,7 @@ tr:hover td{background:var(--bg)}
 .logo-upload-lbl{font-size:.82rem;color:var(--muted)}
 .logo-upload-lbl strong{color:var(--brand)}
 .logo-preview-img{width:72px;height:72px;border-radius:var(--r);object-fit:cover;border:2px solid var(--border);margin:0 auto .75rem;display:block}
-
-/* ── STAGE BUILDER ── */
+/* Stage builder */
 .stage-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:.875rem;cursor:pointer;transition:all var(--t)}
 .stage-toggle-row:hover,.stage-toggle-row.enabled{border-color:rgba(67,97,238,.4)}
 .stage-toggle-row.enabled{background:rgba(67,97,238,.04)}
@@ -247,22 +202,18 @@ tr:hover td{background:var(--bg)}
 .pin-label{font-size:.78rem;color:var(--muted);flex:1}
 .pin-inp{width:90px;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fh);font-size:.9rem;letter-spacing:.2em;text-align:center;font-weight:700}
 .pin-inp:focus{outline:none;border-color:var(--brand)}
-
-/* ── BATCH ── */
+/* Batch */
 .batch-section{background:rgba(67,97,238,.03);border:1.5px solid rgba(67,97,238,.15);border-radius:var(--r);padding:.875rem 1rem;margin-bottom:1rem}
-
-/* ── WALK-IN ── */
+/* Walk-in button */
 .walkin-btn{background:linear-gradient(135deg,#059669,#047857);color:#fff;border:none;border-radius:var(--r);padding:.5rem 1rem;font-family:var(--fb);font-size:.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all var(--t)}
 .walkin-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
-
-/* ── EMERGENCY CONTROLS ── */
+/* Emergency */
 .emergency-bar{background:rgba(239,69,101,.05);border:1.5px solid rgba(239,69,101,.2);border-radius:var(--rl);padding:.875rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap}
 .emergency-bar-title{font-size:.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0}
 .emergency-controls{display:flex;gap:.5rem;flex-wrap:wrap}
 .ecb{background:rgba(239,69,101,.08);border:1.5px solid rgba(239,69,101,.2);color:var(--red);border-radius:var(--r);padding:.3rem .75rem;font-family:var(--fb);font-size:.75rem;font-weight:700;cursor:pointer;transition:all var(--t)}
 .ecb:hover{background:var(--red);color:#fff}
-
-/* ── ANALYTICS ── */
+/* Analytics */
 .analytics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-bottom:1.5rem}
 .analytic-card{background:var(--white);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;border-top:3px solid var(--brand)}
 .analytic-card.g{border-top-color:var(--green)}.analytic-card.a{border-top-color:var(--amber)}.analytic-card.r{border-top-color:var(--red)}
@@ -274,52 +225,54 @@ tr:hover td{background:var(--bg)}
 .peak-bar-track{flex:1;height:8px;background:var(--bg);border-radius:999px;overflow:hidden}
 .peak-bar-fill{height:100%;background:var(--brand);border-radius:999px;transition:width .5s ease}
 .peak-bar-val{width:28px;text-align:right;flex-shrink:0;font-weight:700;font-size:.75rem;color:var(--brand)}
-.rating-stars{display:flex;gap:.25rem;align-items:center}
-.rating-star{color:var(--amber);font-size:1rem}
-
-/* ── RESPONSIVE ── */
+/* Service created success box */
+.svc-created-box{background:var(--green-l);border:1.5px solid #34d399;border-radius:var(--rl);padding:1.25rem;margin-bottom:1.25rem}
+.scb-title{font-family:var(--fh);font-weight:700;font-size:1rem;color:#065f46;margin-bottom:.5rem}
+.scb-code{font-family:var(--fh);font-size:1.75rem;font-weight:800;letter-spacing:.2em;color:var(--brand);margin:.375rem 0}
+.scb-hint{font-size:.78rem;color:#065f46;margin-bottom:.875rem}
+.staff-links-box{background:rgba(67,97,238,.05);border:1.5px solid rgba(67,97,238,.2);border-radius:var(--r);padding:.875rem 1rem;margin-top:.75rem}
+.slb-title{font-size:.75rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.625rem}
+.slb-row{display:flex;align-items:center;gap:.625rem;margin-bottom:.5rem;flex-wrap:wrap}
+.slb-name{font-size:.82rem;font-weight:700;color:var(--ink3);min-width:120px}
+.slb-link{font-size:.78rem;color:var(--brand);cursor:pointer;text-decoration:underline;word-break:break-all}
+.slb-link:hover{color:var(--brand2)}
+.slb-code{font-family:var(--fh);font-size:.82rem;color:var(--brand);background:rgba(67,97,238,.1);padding:.2rem .5rem;border-radius:.35rem;font-weight:700;cursor:pointer;letter-spacing:.08em}
+/* Misc */
+.empty{text-align:center;padding:3.5rem 2rem;color:var(--muted)}
+.empty h3{color:var(--ink3);font-size:1.05rem;margin:.75rem 0 .375rem}
+.empty p{font-size:.875rem}
+.spin{width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:var(--muted)}
+#toasts{position:fixed;top:1.25rem;right:1.25rem;display:flex;flex-direction:column;gap:.625rem;z-index:999;pointer-events:none}
+.toast{padding:.75rem 1.125rem;border-radius:.625rem;box-shadow:var(--shl);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:.5rem;pointer-events:all;min-width:220px;animation:tIn .25s ease}
+.t-s{background:#f0fdf4;border-left:3px solid var(--green);color:#047857}
+.t-e{background:#fef2f2;border-left:3px solid var(--red);color:#b91c1c}
+.t-i{background:#eff6ff;border-left:3px solid var(--brand);color:#1d4ed8}
+.t-w{background:#fffbeb;border-left:3px solid var(--amber);color:#92400e}
+@keyframes tIn{from{opacity:0;transform:translateX(1.5rem)}to{opacity:1;transform:none}}
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
-
 @media(max-width:768px){
   html,body{height:100%;overflow-x:hidden}
   .shell{flex-direction:column;flex:1;min-height:calc(100vh - 62px)}
   .sidebar{display:none!important}
-  .main{
-    flex:1;max-height:none;height:auto;
-    min-height:calc(100vh - 62px - 60px);
-    overflow-y:auto;
-    padding:1rem 1rem 5.5rem 1rem;
-    -webkit-overflow-scrolling:touch;
-  }
+  .main{flex:1;max-height:none;height:auto;min-height:calc(100vh - 62px - 60px);overflow-y:auto;padding:1rem 1rem 5.5rem 1rem;-webkit-overflow-scrolling:touch}
   .svc-grid{grid-template-columns:1fr}
   .svc-card{padding:1.125rem}
   .stats-row{gap:.5rem;flex-wrap:wrap}
-  .stat-box{padding:.625rem .75rem;flex:1;min-width:80px}
   .tbl-wrap{overflow-x:auto;font-size:.78rem}
   .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem;white-space:nowrap}
   .modal{padding:1.5rem 1rem;max-width:calc(100vw - 1.25rem)}
   .modal-footer{flex-direction:column;gap:.5rem}
   .modal-footer .btn{width:100%}
   .ph h1{font-size:1.25rem}
+  .inp-row{grid-template-columns:1fr}
 }
-
-/* ── BOTTOM NAV ── */
-.bottom-nav{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;z-index:300;
-  background:var(--white);border-top:2px solid var(--border);
-  padding:.25rem 0 env(safe-area-inset-bottom,.25rem);
-  box-shadow:0 -4px 20px rgba(13,15,20,.1);
-}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:2px solid var(--border);padding:.25rem 0 env(safe-area-inset-bottom,.25rem);box-shadow:0 -4px 20px rgba(13,15,20,.1)}
 .bn-items{display:flex}
-.bn-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;
-  color:var(--muted);cursor:pointer;border:none;background:none;
-  transition:color .15s;font-family:var(--fb);
-}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;color:var(--muted);cursor:pointer;border:none;background:none;transition:color .15s;font-family:var(--fb)}
 .bn-item.active{color:var(--brand)}
 .bn-ico{font-size:1.2rem;line-height:1}
 @media(max-width:768px){.bottom-nav{display:block}}
@@ -338,7 +291,7 @@ input,select,textarea,button{font-size:16px !important}
     <button class="tb-btn tb-logout" onclick="doLogout()">Logout</button>
   </div>
 </div>
-<div class="pending-bar" id="pending-bar">Your organization is <strong>pending approval</strong>. Services won't be visible to users until approved by QCode admin.</div>
+<div class="pending-bar" id="pending-bar">Your organization is <strong>pending approval</strong>. Services won't be visible to users until approved.</div>
 
 <div class="shell">
   <div class="sidebar">
@@ -357,7 +310,7 @@ input,select,textarea,button{font-size:16px !important}
 
   <div class="main">
 
-    <!-- ═══ SERVICES ═══ -->
+    <!-- SERVICES -->
     <div class="panel active" id="panel-services">
       <div class="ph"><div><h1>My Services</h1><p>Create and manage your queue services</p></div></div>
       <div class="stats-row">
@@ -371,7 +324,7 @@ input,select,textarea,button{font-size:16px !important}
       </div>
     </div>
 
-    <!-- ═══ QUEUE ═══ -->
+    <!-- QUEUE -->
     <div class="panel" id="panel-queue">
       <div id="no-svc-sel" class="empty">
         <div style="font-size:3rem;margin-bottom:.75rem">📋</div>
@@ -391,7 +344,7 @@ input,select,textarea,button{font-size:16px !important}
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
             <button class="btn bs" id="call-btn" onclick="callNext()">📢 Call Next</button>
-            <button class="walkin-btn" onclick="openWalkIn()">🚶 Walk-In</button>
+            <button class="walkin-btn" onclick="openWalkInModal()">🚶 Walk-In</button>
             <select class="inp" style="padding:.5rem .875rem;width:auto;font-size:.82rem" id="status-sel" onchange="changeStatus()">
               <option value="open">Open</option>
               <option value="paused">Paused</option>
@@ -400,9 +353,7 @@ input,select,textarea,button{font-size:16px !important}
             <button class="btn bg bsm" onclick="loadQueue()">↺ Refresh</button>
           </div>
         </div>
-
-        <!-- EMERGENCY CONTROLS (manager only) -->
-        <div class="emergency-bar" id="emergency-bar">
+        <div class="emergency-bar">
           <span class="emergency-bar-title">⚡ Emergency</span>
           <div class="emergency-controls">
             <button class="ecb" onclick="emergencySkip()">⏭ Skip Current</button>
@@ -411,13 +362,10 @@ input,select,textarea,button{font-size:16px !important}
             <button class="ecb" onclick="emergencyMoveTicket()">🔀 Move Ticket</button>
           </div>
         </div>
-
-        <!-- CALLED BANNER -->
         <div id="called-banner" style="display:none" class="called-banner">
           <div>
             <div class="cb-ticket" id="cb-ticket">—</div>
-            <div class="cb-name"   id="cb-name">—</div>
-            <div class="cb-endcode">End Code: <span id="cb-endcode" style="font-size:.95rem">—</span></div>
+            <div class="cb-name" id="cb-name">—</div>
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap">
             <button class="btn bsm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="markEntry('serving')">Serving ▶</button>
@@ -425,7 +373,6 @@ input,select,textarea,button{font-size:16px !important}
             <button class="btn bs bsm" onclick="markEntry('completed')">✓ Done</button>
           </div>
         </div>
-
         <div class="card" style="margin-bottom:0">
           <div class="tabs">
             <button class="tab active" id="t-live"    onclick="switchTab('live')">Live Queue</button>
@@ -433,8 +380,8 @@ input,select,textarea,button{font-size:16px !important}
           </div>
           <div id="pane-live">
             <div class="tbl-wrap"><table>
-              <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Online</th><th>ETA</th><th>Ready</th><th>End Code</th><th>Actions</th></tr></thead>
-              <tbody id="live-tbody"><tr><td colspan="10"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
+              <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Stage</th><th>Status</th><th>Online</th><th>Actions</th></tr></thead>
+              <tbody id="live-tbody"><tr><td colspan="8"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
             </table></div>
           </div>
           <div id="pane-history" style="display:none">
@@ -447,7 +394,7 @@ input,select,textarea,button{font-size:16px !important}
       </div>
     </div>
 
-    <!-- ═══ REPORTS ═══ -->
+    <!-- REPORTS -->
     <div class="panel" id="panel-reports">
       <div class="ph"><div><h1>Reports</h1><p>Download queue history for any service</p></div></div>
       <div class="card">
@@ -462,15 +409,15 @@ input,select,textarea,button{font-size:16px !important}
         </div>
         <div class="tbl-wrap"><table>
           <thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead>
-          <tbody id="report-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Select a service and load report to see data.</td></tr></tbody>
+          <tbody id="report-tbody"><tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Select a service and load report.</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- ═══ ANALYTICS ═══ -->
+    <!-- ANALYTICS -->
     <div class="panel" id="panel-analytics">
       <div class="ph">
-        <div><h1>Analytics</h1><p>Performance insights for your queues today</p></div>
+        <div><h1>Analytics</h1><p>Performance insights for today</p></div>
         <div style="display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap">
           <div class="fg" style="margin:0">
             <label class="lbl">Service</label>
@@ -482,16 +429,14 @@ input,select,textarea,button{font-size:16px !important}
       <div class="analytics-grid">
         <div class="analytic-card g"><div class="ac-n" id="an-served">—</div><div class="ac-l">Served Today</div></div>
         <div class="analytic-card"><div class="ac-n" id="an-waiting">—</div><div class="ac-l">Still Waiting</div></div>
-        <div class="analytic-card a"><div class="ac-n" id="an-avgwait">—<span style="font-size:1rem">m</span></div><div class="ac-l">Avg Wait Time</div></div>
+        <div class="analytic-card a"><div class="ac-n" id="an-avgwait">—<span style="font-size:1rem">m</span></div><div class="ac-l">Avg Wait</div></div>
         <div class="analytic-card r"><div class="ac-n" id="an-noshow">—</div><div class="ac-l">No-Shows</div></div>
-        <div class="analytic-card g"><div class="ac-n" id="an-rating" style="display:flex;align-items:center;gap:.25rem">—<span style="font-size:1rem">⭐</span></div><div class="ac-l">Avg Rating</div></div>
-        <div class="analytic-card"><div class="ac-n" id="an-throughput">—<span style="font-size:1rem">/hr</span></div><div class="ac-l">Staff Throughput</div></div>
+        <div class="analytic-card g"><div class="ac-n" id="an-rating">—<span style="font-size:1rem">⭐</span></div><div class="ac-l">Avg Rating</div></div>
+        <div class="analytic-card"><div class="ac-n" id="an-throughput">—<span style="font-size:1rem">/hr</span></div><div class="ac-l">Throughput</div></div>
       </div>
       <div class="card" style="margin-bottom:1.25rem">
         <div class="card-title">🕐 Busiest Hours</div>
-        <div id="peak-hours-chart" style="padding:.5rem 0">
-          <div class="loading"><div class="spin"></div> Loading…</div>
-        </div>
+        <div id="peak-hours-chart"><div class="loading"><div class="spin"></div> Loading…</div></div>
       </div>
       <div class="card">
         <div class="card-title">⭐ Recent Feedback</div>
@@ -499,13 +444,13 @@ input,select,textarea,button{font-size:16px !important}
       </div>
     </div>
 
-    <!-- ═══ RESTORE ═══ -->
+    <!-- RESTORE -->
     <div class="panel" id="panel-restore">
-      <div class="ph"><div><h1>Restore Deleted Services</h1><p>Recover services deleted within the last 30 days</p></div></div>
+      <div class="ph"><div><h1>Restore Deleted Services</h1><p>Recover services deleted within 30 days</p></div></div>
       <div id="restore-list"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
 
-    <!-- ═══ ACCOUNT ═══ -->
+    <!-- ACCOUNT -->
     <div class="panel" id="panel-account">
       <div class="ph"><div><h1>Account Settings</h1></div></div>
       <div class="card" style="max-width:560px">
@@ -531,52 +476,38 @@ input,select,textarea,button{font-size:16px !important}
       </div>
     </div>
 
-  </div>
-</div>
+  </div><!-- end .main -->
+</div><!-- end .shell -->
 
 <!-- ═══ CREATE SERVICE MODAL ═══ -->
 <div id="modal-create" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-create')">
   <div class="modal">
     <h2 class="modal-title">➕ Create New Queue Service</h2>
-
     <div class="section-hdr">Basic Info</div>
     <div class="inp-row">
       <div class="fg"><label class="lbl">Service Name *</label><input id="m-name" class="inp" placeholder="e.g. Window 1 – Visa"/></div>
       <div class="fg"><label class="lbl">Staff Member</label><input id="m-staff" class="inp" placeholder="e.g. John Doe"/></div>
     </div>
     <div class="fg"><label class="lbl">Description</label><textarea id="m-desc" class="inp" placeholder="Brief description (optional)"></textarea></div>
-
     <div class="section-hdr">Queue Settings</div>
     <div class="inp-row">
       <div class="fg"><label class="lbl">Ticket Prefix *</label><input id="m-prefix" class="inp" placeholder="A" maxlength="5" value="A"/><span class="hint">e.g. A → A001, A002…</span></div>
-      <div class="fg"><label class="lbl">Minutes per Person *</label><input id="m-interval" class="inp" type="number" min="1" max="120" value="5"/><span class="hint">Time slot for each person</span></div>
+      <div class="fg"><label class="lbl">Minutes per Person *</label><input id="m-interval" class="inp" type="number" min="1" max="120" value="5"/></div>
     </div>
     <div class="fg"><label class="lbl">Max Queue Size <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="m-max" class="inp" type="number" min="1" placeholder="Leave blank for unlimited"/></div>
-
     <div class="section-hdr">Schedule</div>
     <div class="inp-row">
-      <div class="fg">
-        <label class="lbl">Queue Start Time</label>
-        <input id="m-start" class="inp" type="datetime-local"/>
-        <span class="hint">When users can start joining</span>
-      </div>
-      <div class="fg">
-        <label class="lbl">Queue End Time</label>
-        <input id="m-end" class="inp" type="datetime-local"/>
-        <span class="hint">Queue closes at this time</span>
-      </div>
+      <div class="fg"><label class="lbl">Queue Start Time</label><input id="m-start" class="inp" type="datetime-local"/></div>
+      <div class="fg"><label class="lbl">Queue End Time</label><input id="m-end" class="inp" type="datetime-local"/></div>
     </div>
-
     <div class="section-hdr">Break Times <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Add break periods when the queue is paused (e.g. lunch 12:00 – 13:00).</p>
     <div id="break-list"></div>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;align-items:flex-end">
       <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break Start</label><input id="brk-start" class="inp" type="time"/></div>
       <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break End</label><input id="brk-end" class="inp" type="time"/></div>
       <button class="btn bp bsm" style="align-self:flex-end;margin-bottom:1.125rem" onclick="addBreak()">+ Add Break</button>
     </div>
-
-    <div class="section-hdr">Multi-Stage Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional — e.g. Entry → Shopping → Checkout → Packing)</span></div>
+    <div class="section-hdr">Multi-Stage Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(Entry → Shopping → Checkout → Packing)</span></div>
     <div class="stage-toggle-row" id="stage-toggle-row" onclick="toggleStages()">
       <div>
         <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Stage Queue</div>
@@ -588,24 +519,21 @@ input,select,textarea,button{font-size:16px !important}
       <div class="stage-list" id="stage-list"></div>
       <button class="btn bp bsm" onclick="addStage()" style="margin-bottom:1rem">+ Add Stage</button>
     </div>
-
-    <div class="section-hdr">Batch Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional — group customers into time batches)</span></div>
+    <div class="section-hdr">Batch Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
     <div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
       <div>
         <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Batch Queue</div>
-        <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customers join in fixed-time batches (e.g. 50 people per 30-min window)</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customers join in fixed-time batches</div>
       </div>
       <div class="toggle-pill" id="batch-toggle-pill"></div>
     </div>
     <div id="batch-wrap" style="display:none" class="batch-section">
       <div class="inp-row">
-        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Batch Size</label><input id="m-batch-size" class="inp" type="number" min="1" value="50" placeholder="e.g. 50"/><span class="hint">Max customers per batch</span></div>
-        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Buffer Between Batches (min)</label><input id="m-batch-buffer" class="inp" type="number" min="0" value="30" placeholder="e.g. 30"/><span class="hint">Gap time between batches</span></div>
+        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Batch Size</label><input id="m-batch-size" class="inp" type="number" min="1" value="50"/></div>
+        <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Buffer (min)</label><input id="m-batch-buffer" class="inp" type="number" min="0" value="30"/></div>
       </div>
     </div>
-
     <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
-    <p style="font-size:.8rem;color:var(--muted);margin-bottom:.875rem;line-height:1.5">Fields users must fill before joining. Leave empty for no custom form.</p>
     <div class="form-builder">
       <div class="fb-header">Form Fields</div>
       <div class="fb-body" id="fb-fields"><p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p></div>
@@ -615,11 +543,35 @@ input,select,textarea,button{font-size:16px !important}
         <button class="btn bp bsm" onclick="addFormField()">+ Add</button>
       </div>
     </div>
-
     <div id="m-err" class="ferr" style="margin-top:.75rem"></div>
     <div class="modal-footer">
       <button class="btn bg" onclick="closeModal('modal-create')">Cancel</button>
       <button class="btn bp" onclick="createService()" id="create-btn">Create Service</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SERVICE CREATED MODAL ═══ -->
+<div id="modal-created" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-created')">
+  <div class="modal" style="max-width:500px">
+    <h2 class="modal-title">✅ Service Created!</h2>
+    <div id="created-content"></div>
+    <div class="modal-footer">
+      <button class="btn bp" onclick="closeModal('modal-created');loadServices()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WALK-IN MODAL ═══ -->
+<div id="modal-walkin" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-walkin')">
+  <div class="modal" style="max-width:420px">
+    <h2 class="modal-title">🚶 Add Walk-In Customer</h2>
+    <div class="fg"><label class="lbl">Customer Name <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="wi-name" class="inp" type="text" placeholder="e.g. Aisha Mohammed"/></div>
+    <div class="fg"><label class="lbl">Phone Number <span style="font-weight:400;color:var(--muted)">(optional, for SMS)</span></label><input id="wi-phone" class="inp" type="tel" placeholder="+234 000 000 0000"/></div>
+    <div id="wi-err" class="ferr"></div>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="closeModal('modal-walkin')">Cancel</button>
+      <button class="btn bs" id="wi-submit-btn" onclick="submitWalkIn()">🚶 Add to Queue</button>
     </div>
   </div>
 </div>
@@ -635,10 +587,6 @@ input,select,textarea,button{font-size:16px !important}
       <button onclick="closeUserInfo()" style="background:var(--bg);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;color:var(--muted)">✕</button>
     </div>
     <div id="ui-basic" style="margin-bottom:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.625rem"></div>
-    <div id="ui-form-wrap" style="display:none">
-      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.75rem">📋 Form Responses</div>
-      <div id="ui-form-fields" style="display:flex;flex-direction:column;gap:.625rem"></div>
-    </div>
     <div style="margin-top:1.25rem;padding-top:1rem;border-top:2px solid var(--border);text-align:right">
       <button class="btn bs" onclick="closeUserInfo()">Close</button>
     </div>
@@ -648,853 +596,702 @@ input,select,textarea,button{font-size:16px !important}
 <div id="toasts"></div>
 
 <script>
-// ─── API HELPER ───
+// ─── API ───────────────────────────────────────────────────────
 async function api(url, opts) {
   try {
-    const body = opts && opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : (opts && opts.body);
-    const r = await fetch(url, { credentials:'include', headers:{'Content-Type':'application/json'}, ...opts, body });
-    const data = await r.json().catch(() => ({}));
-    return { ok: r.ok, status: r.status, data };
-  } catch(e) { return { ok: false, status: 0, data: { error: 'Network error.' } }; }
+    var body = opts && opts.body && typeof opts.body === 'object' ? JSON.stringify(opts.body) : (opts && opts.body);
+    var r = await fetch(url, {credentials:'include', headers:{'Content-Type':'application/json'}, ...opts, body});
+    var data = await r.json().catch(function(){return{};});
+    return {ok:r.ok, status:r.status, data:data};
+  } catch(e) { return {ok:false, status:0, data:{error:'Network error.'}}; }
 }
 
-function toast(msg, type='i', ms=4500) {
-  const icons = {s:'✓', e:'✕', i:'ℹ', w:'⚠'};
-  const el = document.createElement('div');
-  el.className = `toast t-${type}`;
-  el.innerHTML = `<span>${icons[type]||'ℹ'}</span><span>${msg}</span>`;
+function toast(msg, type, ms) {
+  type=type||'i'; ms=ms||4500;
+  var icons={s:'✓',e:'✕',i:'ℹ',w:'⚠'};
+  var el=document.createElement('div');
+  el.className='toast t-'+type;
+  el.innerHTML='<span>'+icons[type]+'</span><span>'+msg+'</span>';
   document.getElementById('toasts').appendChild(el);
-  setTimeout(() => el.remove(), ms);
+  setTimeout(function(){el.remove();},ms);
 }
 
-function fmt(ts) { if(!ts) return '—'; const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function fmtTime(ts) { if(!ts) return '—'; return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function diffMin(a,b) { if(!a||!b) return '—'; return Math.max(0,Math.round((new Date(b)-new Date(a))/60000)); }
-function esc(s) { return (s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;'); }
-
-function badge(s) {
-  const m = {waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved',suspended:'b-suspended'};
-  return `<span class="badge ${m[s]||''}">${(s||'').replace('_',' ')}</span>`;
+function fmt(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function diffMin(a,b){if(!a||!b)return'—';return Math.max(0,Math.round((new Date(b)-new Date(a))/60000));}
+function esc(s){return(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
+function badge(s){
+  var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved',suspended:'b-suspended'};
+  return '<span class="badge '+(m[s]||'")>"'+(s||'').replace('_',' ')+'</span>';
 }
+function closeModal(id){document.getElementById(id).style.display='none';}
+function openModal(id){document.getElementById(id).style.display='flex';}
 
-function closeModal(id) { document.getElementById(id).style.display='none'; }
-function openModal(id)  { document.getElementById(id).style.display='flex'; }
+// ─── STATE ─────────────────────────────────────────────────────
+var profile=null, services=[], activeSvc=null, calledEntry=null;
+var formFields=[], breaks=[], reportData=[];
+var pollTimer=null;
+var stagesEnabled=false, stageList=[], batchEnabled=false;
+var _uploadedLogoUrl=null;
 
-// ─── STATE ───
-let profile=null, services=[], activeSvc=null, calledEntry=null;
-let formFields=[], breaks=[], reportData=[];
-let pollTimer=null, _callTimerInterval=null;
-let _liveEntries=[];
-// Stage builder state
-let stagesEnabled=false, stageList=[], batchEnabled=false;
-// Logo upload state
-let _uploadedLogoUrl=null;
-
-// ─── INIT ───
+// ─── INIT ──────────────────────────────────────────────────────
 async function init() {
-  const me = await api('/api/auth/me');
-  if (!me.ok || !me.data.logged_in) { window.location.href='/login-org'; return; }
-  if (me.data.role !== 'organization') { window.location.href = me.data.role==='user' ? '/user' : '/super-admin'; return; }
-
-  const pr = await api('/api/org/profile');
-  if (!pr.ok) { window.location.href='/login-org'; return; }
+  var me = await api('/api/auth/me');
+  if(!me.ok || !me.data.logged_in) { window.location.href='/login-org'; return; }
+  if(me.data.role !== 'organization') { window.location.href = me.data.role==='user'?'/user':'/super-admin'; return; }
+  var pr = await api('/api/org/profile');
+  if(!pr.ok) { window.location.href='/login-org'; return; }
   profile = pr.data;
-
-  document.getElementById('org-name-display').textContent = profile.org_name || 'Dashboard';
-  const sb = document.getElementById('status-badge');
-  sb.textContent = profile.approval_status || 'pending';
-  sb.className   = `badge b-${profile.approval_status||'pending'}`;
-
-  if (profile.approval_status === 'pending') document.getElementById('pending-bar').style.display='block';
-
-  document.getElementById('acc-phone').value = profile.phone || '';
-  // Logo upload — show current logo if exists
-  if (profile.logo_url) {
-    const wrap = document.getElementById('logo-current-wrap');
-    if (wrap) { wrap.style.display='block'; document.getElementById('logo-current-img').src = profile.logo_url; }
+  document.getElementById('org-name-display').textContent = profile.org_name||'Dashboard';
+  var sb=document.getElementById('status-badge');
+  sb.textContent=profile.approval_status||'pending';
+  sb.className='badge b-'+(profile.approval_status||'pending');
+  if(profile.approval_status==='pending') document.getElementById('pending-bar').style.display='block';
+  document.getElementById('acc-phone').value=profile.phone||'';
+  if(profile.logo_url){
+    var wrap=document.getElementById('logo-current-wrap');
+    if(wrap){wrap.style.display='block';document.getElementById('logo-current-img').src=profile.logo_url;}
   }
-
-  document.getElementById('acc-info').innerHTML = `
-    <div><strong>Organization:</strong> ${profile.org_name||'—'}</div>
-    <div><strong>Email:</strong> ${profile.email||'—'}</div>
-    <div><strong>Address:</strong> ${profile.company_address||'—'}</div>
-    <div><strong>Phone:</strong> ${profile.phone||'—'}</div>
-    <div><strong>Status:</strong> ${badge(profile.approval_status||'pending')}</div>`;
-
+  document.getElementById('acc-info').innerHTML=
+    '<div><strong>Organization:</strong> '+(profile.org_name||'—')+'</div>'+
+    '<div><strong>Email:</strong> '+(profile.email||'—')+'</div>'+
+    '<div><strong>Address:</strong> '+(profile.company_address||'—')+'</div>'+
+    '<div><strong>Status:</strong> '+badge(profile.approval_status||'pending')+'</div>';
   await loadServices();
 }
 
-// ─── PANEL NAV ───
+// ─── PANEL NAV ─────────────────────────────────────────────────
 function showPanel(name) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('active');});
   document.getElementById('panel-'+name).classList.add('active');
   if(document.getElementById('nav-'+name)) document.getElementById('nav-'+name).classList.add('active');
-  var bnMap={'services':'services','queue':'queue','reports':'reports','restore':'account','account':'account'};
-  var bnKey=bnMap[name]||name;
+  var bnKey={'services':'services','queue':'queue','reports':'reports','restore':'account','account':'account'}[name]||name;
   if(document.getElementById('bn-'+bnKey)) document.getElementById('bn-'+bnKey).classList.add('active');
-  if (name==='restore')   loadRestore();
-  if (name==='reports')   populateReportSelect();
-  if (name==='analytics') { populateAnalyticsSelect(); loadAnalytics(); }
+  if(name==='restore') loadRestore();
+  if(name==='reports') populateReportSelect();
+  if(name==='analytics') { populateAnalyticsSelect(); loadAnalytics(); }
 }
 
-// ─── SERVICES ───
+// ─── SERVICES ──────────────────────────────────────────────────
 async function loadServices() {
-  const r = await api('/api/org/services');
+  var r = await api('/api/org/services');
   services = r.ok ? (r.data||[]) : [];
-  document.getElementById('svc-count').textContent = services.length;
-  document.getElementById('s-total').textContent   = services.length;
-  let waiting=0, served=0, noshow=0;
-  services.forEach(s => { waiting += (s.count_waiting||0); served += (s.count_completed||0); noshow += (s.count_no_show||0); });
-  document.getElementById('s-waiting').textContent = waiting;
-  document.getElementById('s-served').textContent  = served;
-  document.getElementById('s-noshow').textContent  = noshow;
+  document.getElementById('svc-count').textContent=services.length;
+  document.getElementById('s-total').textContent=services.length;
+  var waiting=0,served=0,noshow=0;
+  services.forEach(function(s){waiting+=(s.count_waiting||0);served+=(s.count_completed||0);noshow+=(s.count_no_show||0);});
+  document.getElementById('s-waiting').textContent=waiting;
+  document.getElementById('s-served').textContent=served;
+  document.getElementById('s-noshow').textContent=noshow;
   renderServices();
 }
 
 function fmtSched(svc) {
-  if (!svc.schedule_start && !svc.schedule_end) return '';
-  const s = svc.schedule_start ? new Date(svc.schedule_start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
-  const e = svc.schedule_end   ? new Date(svc.schedule_end).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—';
-  return `🕐 ${s} – ${e}`;
+  if(!svc.schedule_start&&!svc.schedule_end) return '';
+  var s=svc.schedule_start?new Date(svc.schedule_start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
+  var e=svc.schedule_end?new Date(svc.schedule_end).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—';
+  return '🕐 '+s+' – '+e;
 }
 
 function renderServices() {
-  const grid = document.getElementById('svc-grid');
-  if (!services.length) {
-    grid.innerHTML = `<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" above to add your first queue.</p></div>`;
+  var grid=document.getElementById('svc-grid');
+  if(!services.length) {
+    grid.innerHTML='<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" to add your first queue.</p></div>';
     return;
   }
-  grid.innerHTML = services.map(s => {
-    const sched = fmtSched(s);
-    return `<div class="svc-card">
-      <div class="svc-card-top">
-        <div style="min-width:0">
-          <div class="svc-name">${s.name}</div>
-          ${s.staff_name ? `<div class="svc-staff">👤 ${s.staff_name}</div>` : ''}
-        </div>
-        ${badge(s.status)}
-      </div>
-      <span class="svc-code" onclick="navigator.clipboard.writeText('${s.service_code}').then(()=>toast('Code copied!','s'))" title="Click to copy">${s.service_code}</span>
-      <div class="svc-meta">
-        <span>⏱ ${s.time_interval} min/person</span>
-        <span>🎫 ${s.ticket_prefix}###</span>
-        <span>👥 ${s.max_users ? 'Max '+s.max_users : 'Unlimited'}</span>
-      </div>
-      <div class="svc-meta" style="margin-top:.375rem">
-        <span>Waiting: <strong style="color:var(--brand)">${s.count_waiting||0}</strong></span>
-        <span>Served: <strong style="color:#047857">${s.count_completed||0}</strong></span>
-        <span>No-show: <strong style="color:var(--red)">${s.count_no_show||0}</strong></span>
-      </div>
-      ${sched ? `<div class="svc-sched">${sched}</div>` : ''}
-      <div class="svc-actions">
-        <button class="btn bp bsm" onclick='openQueueView(${JSON.stringify(s)})'>📋 Manage Queue</button>
-        <button class="btn bd bsm" onclick="deleteSvc('${s.id}','${esc(s.name)}')">🗑 Delete</button>
-      </div>
-    </div>`;
+  grid.innerHTML=services.map(function(s) {
+    var sched=fmtSched(s);
+    // Build staff links for staged services
+    var stageLinksHtml='';
+    if(s.stages && s.stages.length) {
+      stageLinksHtml='<div class="stage-links"><div class="stage-links-title">🔗 Staff Links</div>'+
+        s.stages.map(function(st) {
+          var code=st.stage_code||'';
+          var link=window.location.origin+'/staff/'+code;
+          return '<div class="stage-link-row">'+
+            '<span class="stage-link-name">'+(st.name||'Stage')+'</span>'+
+            (code?'<span class="stage-link-code" onclick="copyText(\''+code+'\')" title="Click to copy code">'+code+'</span>':'')+''+
+            '<span class="stage-link-url" onclick="copyText(\''+link+'\')" title="Click to copy link">📋 Copy link</span>'+
+            '</div>';
+        }).join('')+'</div>';
+    }
+    return '<div class="svc-card">'+
+      '<div class="svc-card-top">'+
+        '<div style="min-width:0">'+
+          '<div class="svc-name">'+s.name+'</div>'+
+          (s.staff_name?'<div class="svc-staff">👤 '+s.staff_name+'</div>':'')+
+        '</div>'+
+        badge(s.status)+
+      '</div>'+
+      '<span class="svc-code" onclick="copyText(\''+s.service_code+'\')" title="Click to copy">'+s.service_code+'</span>'+
+      '<div class="svc-meta">'+
+        '<span>⏱ '+s.time_interval+' min/person</span>'+
+        '<span>🎫 '+s.ticket_prefix+'###</span>'+
+        '<span>👥 '+(s.max_users?'Max '+s.max_users:'Unlimited')+'</span>'+
+        (s.stages&&s.stages.length?'<span>📊 '+s.stages.length+' stages</span>':'')+
+      '</div>'+
+      '<div class="svc-meta" style="margin-top:.375rem">'+
+        '<span>Waiting: <strong style="color:var(--brand)">'+(s.count_waiting||0)+'</strong></span>'+
+        '<span>Served: <strong style="color:#047857">'+(s.count_completed||0)+'</strong></span>'+
+        '<span>No-show: <strong style="color:var(--red)">'+(s.count_no_show||0)+'</strong></span>'+
+      '</div>'+
+      (sched?'<div class="svc-sched">'+sched+'</div>':'')+
+      stageLinksHtml+
+      '<div class="svc-actions">'+
+        '<button class="btn bp bsm" onclick=\'openQueueView('+JSON.stringify(s)+')\'>📋 Manage Queue</button>'+
+        '<button class="btn bd bsm" onclick="deleteSvc(\''+s.id+'\',\''+esc(s.name)+'\')">🗑 Delete</button>'+
+      '</div>'+
+    '</div>';
   }).join('');
 }
 
-// ─── QUEUE VIEW ───
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(function(){toast('Copied: '+text,'s',2500);}).catch(function(){
+    var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!','s',2000);
+  });
+}
+
+// ─── QUEUE VIEW ────────────────────────────────────────────────
 function openQueueView(svc) {
-  activeSvc = svc; calledEntry = null;
+  activeSvc=svc; calledEntry=null;
   showPanel('queue');
-  document.getElementById('no-svc-sel').style.display  = 'none';
-  document.getElementById('queue-view').style.display  = 'block';
-  document.getElementById('q-svc-name').textContent    = svc.name;
-  document.getElementById('q-code').textContent        = svc.service_code;
-  document.getElementById('q-staff').textContent       = svc.staff_name || '—';
-  document.getElementById('status-sel').value          = svc.status;
-  document.getElementById('q-svc-badge').textContent   = svc.status;
-  document.getElementById('q-svc-badge').className     = `badge b-${svc.status}`;
+  document.getElementById('no-svc-sel').style.display='none';
+  document.getElementById('queue-view').style.display='block';
+  document.getElementById('q-svc-name').textContent=svc.name;
+  document.getElementById('q-code').textContent=svc.service_code;
+  document.getElementById('q-staff').textContent=svc.staff_name||'—';
+  document.getElementById('status-sel').value=svc.status;
+  document.getElementById('q-svc-badge').textContent=svc.status;
+  document.getElementById('q-svc-badge').className='badge b-'+svc.status;
   switchTab('live');
   clearInterval(pollTimer);
-  pollTimer = setInterval(loadQueue, 10000);
+  pollTimer=setInterval(loadQueue, 10000);
 }
 
 async function loadQueue() {
-  if (!activeSvc) return;
-  const r = await api('/api/org/queue/'+activeSvc.id);
-  if (!r.ok) return;
-  const entries = r.data || [];
-  calledEntry = entries.find(e => e.status==='called') || null;
+  if(!activeSvc) return;
+  var r=await api('/api/org/queue/'+activeSvc.id);
+  if(!r.ok) return;
+  var entries=r.data||[];
+  calledEntry=entries.find(function(e){return e.status==='called';})||null;
   renderLiveTable(entries);
   renderCalledBanner();
 }
 
 function renderLiveTable(entries) {
-  const tb = document.getElementById('live-tbody');
-  if (!entries.length) {
-    tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">Queue is empty right now.</td></tr>';
-    return;
-  }
-  const now = Date.now();
-  tb.innerHTML = entries.map((e, i) => {
-    const method = e.join_method==='sms' ? '📱 SMS' : '🌐 Web';
-    const online = e.user_id ? (e.user_online ? '<span class="dot-on"></span>' : '<span class="dot-off"></span>') : '—';
-    const ec = `<span style="font-family:var(--fh);font-size:.82rem;font-weight:700;color:var(--brand);letter-spacing:.05em">${e.end_code||'—'}</span>`;
-
-    // ETA + Ready columns (matching sent file)
-    let etaDisplay='—', readyDisplay='';
-    if (e.estimated_time && e.status==='waiting') {
-      const etaMs  = new Date(e.estimated_time).getTime();
-      const diffMs = etaMs - now;
-      if (diffMs <= 0) {
-        etaDisplay   = '<span style="color:#047857;font-weight:700">Now</span>';
-        readyDisplay = '<span class="badge b-serving" style="font-size:.68rem">✓ Ready</span>';
-      } else {
-        const mins   = Math.ceil(diffMs / 60000);
-        etaDisplay   = fmtTime(e.estimated_time);
-        readyDisplay = `<span style="font-size:.72rem;color:var(--muted)">in ${mins}m</span>`;
-      }
-    } else {
-      readyDisplay = badge(e.status);
-    }
-
-    let acts = '';
-    if (e.status==='called') {
-      acts = `<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('${e.id}','completed')">✓ Done</button><button class="btn bd bsm" onclick="markById('${e.id}','no_show')">No-Show</button></div>`;
-    } else if (e.status==='waiting') {
-      acts = `<button class="btn bg bsm" onclick="markById('${e.id}','cancelled')">Remove</button>`;
-    } else {
-      acts = badge(e.status);
-    }
-
-    return `<tr>
-      <td style="color:var(--muted);font-size:.78rem">${i+1}</td>
-      <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
-      <td style="display:flex;align-items:center;gap:.5rem">${e.user_name||'Guest'}${!e.user_id?'<span style="font-size:.7rem;color:var(--muted)"> (guest)</span>':''} <button class="info-btn" onclick="showUserInfo('${e.id}')" title="View details">ℹ</button></td>
-      <td>${method}</td>
-      <td>${badge(e.status)}</td>
-      <td style="text-align:center">${online}</td>
-      <td style="font-size:.78rem">${etaDisplay}</td>
-      <td>${readyDisplay}</td>
-      <td>${ec}</td>
-      <td>${acts}</td>
-    </tr>`;
+  var tb=document.getElementById('live-tbody');
+  if(!entries.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Queue is empty.</td></tr>'; return; }
+  tb.innerHTML=entries.map(function(e,i) {
+    var method=e.join_method==='sms'?'📱 SMS':e.join_method==='walk_in'?'🚶 Walk-in':'🌐 Web';
+    var online=e.user_id?(e.user_online?'<span class="dot-on"></span>':'<span class="dot-off"></span>'):'—';
+    var stage=e.stage_name?'<span style="font-size:.72rem;background:rgba(67,97,238,.08);color:var(--brand);padding:.15rem .4rem;border-radius:.3rem">'+e.stage_name+'</span>':'—';
+    var acts='';
+    if(e.status==='called') acts='<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById(\''+e.id+'\',\'completed\')">✓ Done</button><button class="btn bd bsm" onclick="markById(\''+e.id+'\',\'no_show\')">No-Show</button></div>';
+    else if(e.status==='waiting') acts='<button class="btn bg bsm" onclick="markById(\''+e.id+'\',\'cancelled\')">Remove</button>';
+    else acts=badge(e.status);
+    return '<tr>'+
+      '<td style="color:var(--muted);font-size:.78rem">'+(i+1)+'</td>'+
+      '<td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
+      '<td style="display:flex;align-items:center;gap:.5rem">'+(e.user_name||'Guest')+
+        '<button class="info-btn" onclick="showUserInfo(\''+e.id+'\')" title="View details">ℹ</button></td>'+
+      '<td>'+method+'</td>'+
+      '<td>'+stage+'</td>'+
+      '<td>'+badge(e.status)+'</td>'+
+      '<td style="text-align:center">'+online+'</td>'+
+      '<td>'+acts+'</td>'+
+    '</tr>';
   }).join('');
+  // Store for userinfo modal
+  _liveEntries=entries;
 }
+var _liveEntries=[];
 
 function renderCalledBanner() {
-  const b = document.getElementById('called-banner');
-  if (!calledEntry) { b.style.display='none'; return; }
-  document.getElementById('cb-ticket').textContent  = calledEntry.ticket_label||'—';
-  document.getElementById('cb-name').textContent    = calledEntry.user_name||'Guest';
-  document.getElementById('cb-endcode').textContent = calledEntry.end_code||'—';
-  b.style.display = 'flex';
+  var b=document.getElementById('called-banner');
+  if(!calledEntry){b.style.display='none';return;}
+  document.getElementById('cb-ticket').textContent=calledEntry.ticket_label||'—';
+  document.getElementById('cb-name').textContent=calledEntry.user_name||'Guest';
+  b.style.display='flex';
 }
 
 async function callNext() {
-  const btn = document.getElementById('call-btn'); btn.disabled=true; btn.textContent='Calling…';
-
-  // Check: cannot call if someone is already being called or serving
-  const r0 = await api('/api/org/queue/'+activeSvc.id);
-  if (r0.ok) {
-    const active = (r0.data||[]).filter(e => e.status==='called'||e.status==='serving');
-    if (active.length > 0) {
-      btn.disabled=false; btn.textContent='📢 Call Next';
-      toast('⚠️ Finish serving '+active[0].ticket_label+' before calling the next person.','w',7000);
-      return;
-    }
+  var btn=document.getElementById('call-btn'); btn.disabled=true; btn.textContent='Calling…';
+  var r0=await api('/api/org/queue/'+activeSvc.id);
+  if(r0.ok) {
+    var active=(r0.data||[]).filter(function(e){return e.status==='called'||e.status==='serving';});
+    if(active.length>0) { btn.disabled=false; btn.textContent='📢 Call Next'; toast('⚠️ Finish '+active[0].ticket_label+' first.','w',6000); return; }
   }
-
-  const r = await api('/api/org/queue/call-next/'+activeSvc.id, {method:'POST'});
+  var r=await api('/api/org/queue/call-next/'+activeSvc.id,{method:'POST'});
   btn.disabled=false; btn.textContent='📢 Call Next';
-  if (!r.ok) { toast(r.data.error||'No one waiting.','i'); return; }
-  toast(`📢 Calling ${r.data.entry.ticket_label} — End code: ${r.data.entry.end_code||'—'}`, 's', 8000);
+  if(!r.ok){toast(r.data.error||'No one waiting.','i');return;}
+  toast('📢 Calling '+r.data.entry.ticket_label,'s',6000);
   await loadQueue();
 }
 
-async function markEntry(status) { if (calledEntry) await markById(calledEntry.id, status); }
-
-async function markById(id, status) {
-  const r = await api('/api/org/queue/entry/'+id, {method:'POST', body:{status}});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  if (['completed','no_show','cancelled'].includes(status)) calledEntry=null;
-  toast('Marked as ' + status.replace('_',' '), 's');
+async function markEntry(status){if(calledEntry)await markById(calledEntry.id,status);}
+async function markById(id,status) {
+  var r=await api('/api/org/queue/entry/'+id,{method:'POST',body:{status:status}});
+  if(!r.ok){toast(r.data.error||'Error.','e');return;}
+  if(['completed','no_show','cancelled'].includes(status)) calledEntry=null;
+  toast('Marked as '+status.replace('_',' '),'s');
   await loadQueue();
-  if (status==='completed') await loadServices(); // update counts
+  if(status==='completed') await loadServices();
 }
 
-function copyCode() {
-  if (!activeSvc) return;
-  navigator.clipboard.writeText(activeSvc.service_code).then(() => toast('Service code copied!','s'));
-}
+function copyCode(){if(!activeSvc)return;copyText(activeSvc.service_code);}
 
 async function changeStatus() {
-  const status = document.getElementById('status-sel').value;
-  const r = await api('/api/org/services/'+activeSvc.id+'/status', {method:'POST', body:{status}});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  activeSvc.status = status;
-  document.getElementById('q-svc-badge').textContent = status;
-  document.getElementById('q-svc-badge').className   = `badge b-${status}`;
-  toast('Queue status set to '+status, 'i');
+  var status=document.getElementById('status-sel').value;
+  var r=await api('/api/org/services/'+activeSvc.id+'/status',{method:'POST',body:{status:status}});
+  if(!r.ok){toast(r.data.error||'Error.','e');return;}
+  activeSvc.status=status;
+  document.getElementById('q-svc-badge').textContent=status;
+  document.getElementById('q-svc-badge').className='badge b-'+status;
+  toast('Status set to '+status,'i');
   await loadServices();
 }
 
 function switchTab(t) {
-  document.getElementById('t-live').classList.toggle('active',    t==='live');
-  document.getElementById('t-history').classList.toggle('active', t==='history');
-  document.getElementById('pane-live').style.display    = t==='live'    ? 'block' : 'none';
-  document.getElementById('pane-history').style.display = t==='history' ? 'block' : 'none';
-  if (t==='live')    loadQueue();
-  if (t==='history') loadQueueHistory();
+  document.getElementById('t-live').classList.toggle('active',t==='live');
+  document.getElementById('t-history').classList.toggle('active',t==='history');
+  document.getElementById('pane-live').style.display=t==='live'?'block':'none';
+  document.getElementById('pane-history').style.display=t==='history'?'block':'none';
+  if(t==='live') loadQueue();
+  if(t==='history') loadQueueHistory();
 }
 
 async function loadQueueHistory() {
-  const r  = await api('/api/org/report/'+activeSvc.id);
-  const tb = document.getElementById('hist-tbody');
-  if (!r.ok || !r.data.length) {
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No history yet.</td></tr>';
-    return;
-  }
-  tb.innerHTML = r.data.map(e => `<tr>
-    <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
-    <td>${e.guest_name||'User'}</td>
-    <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
-    <td>${badge(e.status)}</td>
-    <td style="font-size:.78rem">${fmtTime(e.joined_at)}</td>
-    <td style="font-size:.78rem">${fmtTime(e.completed_at)}</td>
-    <td>${diffMin(e.joined_at,e.completed_at)}</td>
-  </tr>`).join('');
+  var r=await api('/api/org/report/'+activeSvc.id);
+  var tb=document.getElementById('hist-tbody');
+  if(!r.ok||!r.data.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No history yet.</td></tr>';return;}
+  tb.innerHTML=r.data.map(function(e){
+    return '<tr><td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
+      '<td>'+(e.guest_name||'User')+'</td><td>'+(e.join_method==='sms'?'📱 SMS':'🌐 Web')+'</td>'+
+      '<td>'+badge(e.status)+'</td>'+
+      '<td style="font-size:.78rem">'+fmtTime(e.joined_at)+'</td>'+
+      '<td style="font-size:.78rem">'+fmtTime(e.completed_at)+'</td>'+
+      '<td>'+diffMin(e.joined_at,e.completed_at)+'</td></tr>';
+  }).join('');
 }
 
-async function deleteSvc(id, name) {
-  if (!confirm(`Delete "${name}"?\nIt can be restored from the Restore panel within 30 days.`)) return;
-  const r = await api('/api/org/services/'+id+'/delete', {method:'POST'});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  toast(`"${name}" deleted.`,'w');
-  if (activeSvc && activeSvc.id===id) {
-    clearInterval(pollTimer);
-    activeSvc=null;
-    document.getElementById('no-svc-sel').style.display  = 'block';
-    document.getElementById('queue-view').style.display  = 'none';
+async function deleteSvc(id,name) {
+  if(!confirm('Delete "'+name+'"?\nIt can be restored from the Restore panel within 30 days.')) return;
+  var r=await api('/api/org/services/'+id+'/delete',{method:'POST'});
+  if(!r.ok){toast(r.data.error||'Error.','e');return;}
+  toast('"'+name+'" deleted.','w');
+  if(activeSvc&&activeSvc.id===id){
+    clearInterval(pollTimer); activeSvc=null;
+    document.getElementById('no-svc-sel').style.display='block';
+    document.getElementById('queue-view').style.display='none';
   }
   await loadServices();
 }
-// ─── CREATE SERVICE ───
+
+// ─── CREATE SERVICE ────────────────────────────────────────────
 async function createService() {
-  const errEl     = document.getElementById('m-err');
-  const createBtn = document.getElementById('create-btn');
+  var errEl=document.getElementById('m-err');
+  var createBtn=document.getElementById('create-btn');
   errEl.style.display='none';
-  const name     = (document.getElementById('m-name').value||'').trim();
-  const staff    = (document.getElementById('m-staff').value||'').trim();
-  const desc     = (document.getElementById('m-desc').value||'').trim();
-  const prefix   = (document.getElementById('m-prefix').value||'').trim().toUpperCase();
-  const interval = parseInt(document.getElementById('m-interval').value)||5;
-  const maxVal   = document.getElementById('m-max').value;
-  const startVal = document.getElementById('m-start').value;
-  const endVal   = document.getElementById('m-end').value;
-  if (!name)   { errEl.textContent='Service name is required.';   errEl.style.display='block'; return; }
-  if (!prefix) { errEl.textContent='Ticket prefix is required.';  errEl.style.display='block'; return; }
-  if (startVal && endVal && startVal>=endVal) { errEl.textContent='End time must be after start time.'; errEl.style.display='block'; return; }
-  if (stagesEnabled) {
-    for (let i=0; i<stageList.length; i++) {
-      if (!stageList[i].name.trim()) { errEl.textContent=`Stage ${i+1} needs a name.`; errEl.style.display='block'; return; }
-      if (stageList[i].pin && !/^\d{4}$/.test(stageList[i].pin)) { errEl.textContent=`Stage ${i+1} PIN must be exactly 4 digits.`; errEl.style.display='block'; return; }
+  var name=(document.getElementById('m-name').value||'').trim();
+  var staff=(document.getElementById('m-staff').value||'').trim();
+  var desc=(document.getElementById('m-desc').value||'').trim();
+  var prefix=(document.getElementById('m-prefix').value||'').trim().toUpperCase();
+  var interval=parseInt(document.getElementById('m-interval').value)||5;
+  var maxVal=document.getElementById('m-max').value;
+  var startVal=document.getElementById('m-start').value;
+  var endVal=document.getElementById('m-end').value;
+  if(!name){errEl.textContent='Service name is required.';errEl.style.display='block';return;}
+  if(!prefix){errEl.textContent='Ticket prefix is required.';errEl.style.display='block';return;}
+  if(startVal&&endVal&&startVal>=endVal){errEl.textContent='End time must be after start time.';errEl.style.display='block';return;}
+  if(stagesEnabled) {
+    for(var i=0;i<stageList.length;i++){
+      if(!stageList[i].name.trim()){errEl.textContent='Stage '+(i+1)+' needs a name.';errEl.style.display='block';return;}
+      if(stageList[i].pin&&!/^\d{4}$/.test(stageList[i].pin)){errEl.textContent='Stage '+(i+1)+' PIN must be 4 digits.';errEl.style.display='block';return;}
     }
   }
   createBtn.disabled=true; createBtn.textContent='Creating…';
-  const body = {
-    name, staff_name: staff||null, description: desc||null,
-    ticket_prefix: prefix, time_interval: interval,
-    max_users: maxVal ? parseInt(maxVal) : null,
-    user_info_form: formFields,
-    schedule_start: startVal ? new Date(startVal).toISOString() : null,
-    schedule_end:   endVal   ? new Date(endVal).toISOString()   : null,
-    break_times: breaks,
+  var body={
+    name:name, staff_name:staff||null, description:desc||null,
+    ticket_prefix:prefix, time_interval:interval,
+    max_users:maxVal?parseInt(maxVal):null,
+    user_info_form:formFields,
+    schedule_start:startVal?new Date(startVal).toISOString():null,
+    schedule_end:endVal?new Date(endVal).toISOString():null,
+    break_times:breaks,
   };
-  if (stagesEnabled && stageList.length) {
-    body.stages = stageList.map((s, i) => ({
-      name: s.name.trim(), order: i+1, time_interval: s.interval||5,
-      staff_names: s.staff, staff_pin: s.pin||null,
-      counter_count: s.staff.length || 1,
-    }));
+  if(stagesEnabled&&stageList.length) {
+    body.stages=stageList.map(function(s,i){
+      return {name:s.name.trim(),order:i+1,time_interval:s.interval||5,staff_names:s.staff,staff_pin:s.pin||null,counter_count:s.staff.length||1};
+    });
   }
-  if (batchEnabled) {
-    body.batch_enabled   = true;
-    body.batch_size      = parseInt(document.getElementById('m-batch-size').value)||50;
-    body.batch_buffer_min= parseInt(document.getElementById('m-batch-buffer').value)||30;
+  if(batchEnabled) {
+    body.batch_enabled=true;
+    body.batch_size=parseInt(document.getElementById('m-batch-size').value)||50;
+    body.batch_buffer_min=parseInt(document.getElementById('m-batch-buffer').value)||30;
   }
-  const r = await api('/api/org/services', {method:'POST', body});
+  var r=await api('/api/org/services',{method:'POST',body:body});
   createBtn.disabled=false; createBtn.textContent='Create Service';
-  if (!r.ok) { errEl.textContent=r.data.error||'Failed to create service.'; errEl.style.display='block'; return; }
-  const code = r.data.service?.service_code || '—';
-  toast(`✓ Service created! Code: ${code}`, 's', 8000);
+  if(!r.ok){errEl.textContent=r.data.error||'Failed to create service.';errEl.style.display='block';return;}
+
+  var code=r.data.service_code||'—';
+  var createdStages=r.data.stages||[];
+
+  // Build success content
+  var html='<div class="svc-created-box">'+
+    '<div class="scb-title">✅ Service created successfully!</div>'+
+    '<div style="font-size:.82rem;color:#065f46;margin-bottom:.25rem">Share this code with customers:</div>'+
+    '<div class="scb-code" style="cursor:pointer" onclick="copyText(\''+code+'\')" title="Click to copy">'+code+'</div>'+
+    '<div class="scb-hint">Customers enter this code at qcode.onrender.com to join your queue.</div>'+
+    '<button class="btn bp bsm" onclick="copyText(\''+code+'\')">📋 Copy Code</button>'+
+  '</div>';
+
+  if(createdStages.length) {
+    html+='<div class="staff-links-box">'+
+      '<div class="slb-title">🔗 Staff Links — Share with Your Team</div>'+
+      '<p style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem">Each stage has a unique staff link. Share the link for each stage with the relevant staff. They open it on their phone, enter their name and PIN to access their counter.</p>'+
+      createdStages.map(function(st){
+        var link=window.location.origin+'/staff/'+st.stage_code;
+        return '<div class="slb-row">'+
+          '<span class="slb-name">'+(st.name||'Stage')+'</span>'+
+          '<span class="slb-code" onclick="copyText(\''+st.stage_code+'\')" title="Copy stage code">'+st.stage_code+'</span>'+
+          '<span class="slb-link" onclick="copyText(\''+link+'\')">📋 Copy staff link</span>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+  } else {
+    // Single-stage: show service code as the staff link
+    var svcLink=window.location.origin+'/staff/'+code;
+    html+='<div class="staff-links-box">'+
+      '<div class="slb-title">🔗 Staff Access Link</div>'+
+      '<p style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem">Share this link with your staff to manage the queue:</p>'+
+      '<div class="slb-row">'+
+        '<span class="slb-link" onclick="copyText(\''+svcLink+'\')">'+svcLink+'</span>'+
+        '<span class="slb-code" onclick="copyText(\''+svcLink+'\')" style="cursor:pointer">📋 Copy</span>'+
+      '</div>'+
+    '</div>';
+  }
+
+  document.getElementById('created-content').innerHTML=html;
   closeModal('modal-create');
+  openModal('modal-created');
   await loadServices();
-  }
-// ─── RESTORE ───
-async function loadRestore() {
-  const r  = await api('/api/org/services/deleted');
-  const el = document.getElementById('restore-list');
-  if (!r.ok || !r.data.length) {
-    el.innerHTML='<div class="empty"><div style="font-size:3rem">🗑</div><h3>Nothing to restore</h3><p>Deleted services appear here for 30 days.</p></div>';
-    return;
-  }
-  const now   = Date.now();
-  const valid = r.data.filter(s => now - new Date(s.deleted_at).getTime() < 30*24*60*60*1000);
-  if (!valid.length) { el.innerHTML='<div class="empty"><h3>Nothing restorable</h3></div>'; return; }
-  el.innerHTML = valid.map(s => `
-    <div class="restore-item">
-      <div>
-        <div class="ri-name">${s.name}</div>
-        <div class="ri-meta">Code: ${s.service_code} · Deleted ${new Date(s.deleted_at).toLocaleDateString()}</div>
-      </div>
-      <button class="btn bp bsm" onclick="restoreSvc('${s.id}','${esc(s.name)}')">↩ Restore</button>
-    </div>`).join('');
 }
 
-async function restoreSvc(id, name) {
-  const r = await api('/api/org/services/'+id+'/restore', {method:'POST'});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  toast(`"${name}" restored! ✓`,'s');
+// ─── WALK-IN MODAL (FIXED — no prompt()) ───────────────────────
+function openWalkInModal() {
+  if(!activeSvc){toast('Select a service queue first.','e');return;}
+  document.getElementById('wi-name').value='';
+  document.getElementById('wi-phone').value='';
+  document.getElementById('wi-err').style.display='none';
+  openModal('modal-walkin');
+}
+
+async function submitWalkIn() {
+  var name=(document.getElementById('wi-name').value||'').trim();
+  var phone=(document.getElementById('wi-phone').value||'').trim();
+  var errEl=document.getElementById('wi-err');
+  var btn=document.getElementById('wi-submit-btn');
+  errEl.style.display='none';
+  btn.disabled=true; btn.textContent='Adding…';
+  var r=await api('/api/org/queue/walk-in/'+activeSvc.id,{
+    method:'POST',
+    body:{name:name||'Walk-in Customer',phone:phone||null}
+  });
+  btn.disabled=false; btn.textContent='🚶 Add to Queue';
+  if(!r.ok){errEl.textContent=r.data.error||'Failed to add walk-in.';errEl.style.display='block';return;}
+  toast('🚶 Walk-in added: '+(r.data.entry&&r.data.entry.ticket_label||'—'),'s');
+  closeModal('modal-walkin');
+  await loadQueue();
+}
+
+// ─── RESTORE ───────────────────────────────────────────────────
+async function loadRestore() {
+  var r=await api('/api/org/services/deleted');
+  var el=document.getElementById('restore-list');
+  if(!r.ok||!r.data.length){el.innerHTML='<div class="empty"><div style="font-size:3rem">🗑</div><h3>Nothing to restore</h3><p>Deleted services appear here for 30 days.</p></div>';return;}
+  var now=Date.now();
+  var valid=r.data.filter(function(s){return now-new Date(s.deleted_at).getTime()<30*24*60*60*1000;});
+  if(!valid.length){el.innerHTML='<div class="empty"><h3>Nothing restorable</h3></div>';return;}
+  el.innerHTML=valid.map(function(s){
+    return '<div class="restore-item">'+
+      '<div><div class="ri-name">'+s.name+'</div>'+
+      '<div class="ri-meta">Code: '+s.service_code+' · Deleted '+new Date(s.deleted_at).toLocaleDateString()+'</div></div>'+
+      '<button class="btn bp bsm" onclick="restoreSvc(\''+s.id+'\',\''+esc(s.name)+'\')">↩ Restore</button>'+
+    '</div>';
+  }).join('');
+}
+
+async function restoreSvc(id,name) {
+  var r=await api('/api/org/services/'+id+'/restore',{method:'POST'});
+  if(!r.ok){toast(r.data.error||'Error.','e');return;}
+  toast('"'+name+'" restored! ✓','s');
   await loadRestore(); await loadServices();
 }
 
-// ─── REPORTS ───
+// ─── REPORTS ───────────────────────────────────────────────────
 function populateReportSelect() {
-  const sel = document.getElementById('report-svc');
-  sel.innerHTML = '<option value="">Select a service…</option>' + services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  var sel=document.getElementById('report-svc');
+  sel.innerHTML='<option value="">Select a service…</option>'+services.map(function(s){return '<option value="'+s.id+'">'+s.name+'</option>';}).join('');
 }
 
 async function loadReport() {
-  const svcId = document.getElementById('report-svc').value;
-  if (!svcId) { toast('Select a service first.','e'); return; }
-  const r = await api('/api/org/report/'+svcId);
-  reportData = r.ok ? (r.data||[]) : [];
-  const tb = document.getElementById('report-tbody');
-  if (!reportData.length) {
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No completed queue entries yet.</td></tr>';
-    return;
-  }
-  tb.innerHTML = reportData.map(e => `<tr>
-    <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
-    <td>${e.guest_name||'User'}</td>
-    <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
-    <td>${badge(e.status)}</td>
-    <td style="font-size:.78rem">${fmt(e.joined_at)}</td>
-    <td style="font-size:.78rem">${fmt(e.completed_at)}</td>
-    <td>${diffMin(e.joined_at,e.completed_at)}</td>
-  </tr>`).join('');
+  var svcId=document.getElementById('report-svc').value;
+  if(!svcId){toast('Select a service first.','e');return;}
+  var r=await api('/api/org/report/'+svcId);
+  reportData=r.ok?(r.data||[]):[];
+  var tb=document.getElementById('report-tbody');
+  if(!reportData.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No completed entries yet.</td></tr>';return;}
+  tb.innerHTML=reportData.map(function(e){
+    return '<tr><td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
+      '<td>'+(e.guest_name||'User')+'</td>'+
+      '<td>'+(e.join_method==='sms'?'📱 SMS':'🌐 Web')+'</td>'+
+      '<td>'+badge(e.status)+'</td>'+
+      '<td style="font-size:.78rem">'+fmt(e.joined_at)+'</td>'+
+      '<td style="font-size:.78rem">'+fmt(e.completed_at)+'</td>'+
+      '<td>'+diffMin(e.joined_at,e.completed_at)+'</td></tr>';
+  }).join('');
 }
 
 function downloadCSV() {
-  if (!reportData.length) { toast('Load a report first.','e'); return; }
-  const rows = reportData.map(e => [e.ticket_label,e.guest_name||'User',e.join_method,e.status,fmt(e.joined_at),fmt(e.completed_at),diffMin(e.joined_at,e.completed_at)].join(','));
-  const csv  = 'Ticket,Name,Method,Status,Joined,Completed,WaitMin\n'+rows.join('\n');
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = 'qcode-report-'+Date.now()+'.csv';
-  a.click();
+  if(!reportData.length){toast('Load a report first.','e');return;}
+  var rows=reportData.map(function(e){return[e.ticket_label,e.guest_name||'User',e.join_method,e.status,fmt(e.joined_at),fmt(e.completed_at),diffMin(e.joined_at,e.completed_at)].join(',');});
+  var csv='Ticket,Name,Method,Status,Joined,Completed,WaitMin\n'+rows.join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='qcode-report-'+Date.now()+'.csv'; a.click();
   toast('CSV downloaded!','s');
 }
 
 function printReport() {
-  if (!reportData.length) { toast('Load a report first.','e'); return; }
-  const win  = window.open('','_blank');
-  const rows = reportData.map(e => `<tr><td>${e.ticket_label}</td><td>${e.guest_name||'User'}</td><td>${e.join_method}</td><td>${e.status}</td><td>${fmt(e.joined_at)}</td><td>${fmt(e.completed_at)}</td><td>${diffMin(e.joined_at,e.completed_at)}</td></tr>`).join('');
-  win.document.write(`<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:'Plus Jakarta Sans',sans-serif;padding:2rem}h1{font-family:'Space Grotesk',sans-serif;color:#0d0f14}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-size:.78rem;font-weight:700;color:#8892a4;text-transform:uppercase}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4;margin:.5rem 0 0">Exported ${new Date().toLocaleString()} · ${profile?.org_name||''}</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+  if(!reportData.length){toast('Load a report first.','e');return;}
+  var win=window.open('','_blank');
+  var rows=reportData.map(function(e){return'<tr><td>'+e.ticket_label+'</td><td>'+(e.guest_name||'User')+'</td><td>'+e.join_method+'</td><td>'+e.status+'</td><td>'+fmt(e.joined_at)+'</td><td>'+fmt(e.completed_at)+'</td><td>'+diffMin(e.joined_at,e.completed_at)+'</td></tr>';}).join('');
+  win.document.write('<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:sans-serif;padding:2rem}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-weight:700;color:#8892a4;text-transform:uppercase;font-size:.78rem}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4">'+new Date().toLocaleString()+' · '+(profile&&profile.org_name||'')+'</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>');
   win.document.close(); win.print();
 }
 
-// ─── CREATE SERVICE ───
-// ─── ACCOUNT ───
+// ─── ACCOUNT ───────────────────────────────────────────────────
 function renderFormFields() {
-  const el = document.getElementById('fb-fields');
-  if (!formFields.length) {
-    el.innerHTML = '<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>';
-    return;
-  }
-  el.innerHTML = formFields.map((f, i) => `
-    <div class="fb-field-row">
-      <div class="fb-field-info">
-        <div class="fb-field-label">${f.label}</div>
-        <div class="fb-field-type">${f.type}</div>
-      </div>
-      <button class="btn bd bsm" onclick="formFields.splice(${i},1);renderFormFields()">✕</button>
-    </div>`).join('');
+  var el=document.getElementById('fb-fields');
+  if(!formFields.length){el.innerHTML='<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>';return;}
+  el.innerHTML=formFields.map(function(f,i){
+    return '<div class="fb-field-row"><div class="fb-field-info"><div class="fb-field-label">'+f.label+'</div><div class="fb-field-type">'+f.type+'</div></div>'+
+      '<button class="btn bd bsm" onclick="formFields.splice('+i+',1);renderFormFields()">✕</button></div>';
+  }).join('');
 }
 
 function addFormField() {
-  const type  = document.getElementById('fb-type').value;
-  const label = document.getElementById('fb-label').value.trim();
-  if (!label) { toast('Enter a field label first.','e'); return; }
-  formFields.push({ type, label });
-  document.getElementById('fb-label').value = '';
+  var type=document.getElementById('fb-type').value;
+  var label=document.getElementById('fb-label').value.trim();
+  if(!label){toast('Enter a field label first.','e');return;}
+  formFields.push({type:type,label:label});
+  document.getElementById('fb-label').value='';
   renderFormFields();
 }
 
 function renderBreaks() {
-  const el = document.getElementById('break-list');
-  if (!breaks.length) { el.innerHTML = ''; return; }
-  el.innerHTML = breaks.map((b, i) => `
-    <div class="break-item">
-      <span>🕐 ${b.start} – ${b.end}</span>
-      <button class="btn bd bsm" onclick="breaks.splice(${i},1);renderBreaks()">✕</button>
-    </div>`).join('');
+  var el=document.getElementById('break-list');
+  if(!breaks.length){el.innerHTML='';return;}
+  el.innerHTML=breaks.map(function(b,i){
+    return '<div class="break-item"><span>🕐 '+b.start+' – '+b.end+'</span>'+
+      '<button class="btn bd bsm" onclick="breaks.splice('+i+',1);renderBreaks()">✕</button></div>';
+  }).join('');
 }
 
 function addBreak() {
-  const start = document.getElementById('brk-start').value;
-  const end   = document.getElementById('brk-end').value;
-  if (!start || !end) { toast('Enter both start and end times.','e'); return; }
-  if (start >= end)   { toast('Break end must be after start.','e'); return; }
-  breaks.push({ start, end });
-  document.getElementById('brk-start').value = '';
-  document.getElementById('brk-end').value   = '';
+  var start=document.getElementById('brk-start').value;
+  var end=document.getElementById('brk-end').value;
+  if(!start||!end){toast('Enter both start and end times.','e');return;}
+  if(start>=end){toast('Break end must be after start.','e');return;}
+  breaks.push({start:start,end:end});
+  document.getElementById('brk-start').value='';
+  document.getElementById('brk-end').value='';
   renderBreaks();
 }
 
-// ─── ACCOUNT ───
 async function handleLogoFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.size > 2*1024*1024) { toast('Logo must be under 2MB.','e'); return; }
-  const status = document.getElementById('logo-upload-status');
-  status.textContent = '⏳ Uploading…';
-  const fd = new FormData();
-  fd.append('logo', file);
+  var file=input.files[0]; if(!file)return;
+  if(file.size>2*1024*1024){toast('Logo must be under 2MB.','e');return;}
+  var status=document.getElementById('logo-upload-status');
+  status.textContent='⏳ Uploading…';
+  var fd=new FormData(); fd.append('logo',file);
   try {
-    const r = await fetch('/api/org/upload-logo', { method:'POST', credentials:'include', body: fd });
-    const d = await r.json().catch(()=>({}));
-    if (!r.ok) { status.textContent = '✕ Upload failed: ' + (d.error||'Error'); return; }
-    _uploadedLogoUrl = d.logo_url;
-    status.textContent = '✓ Logo uploaded';
-    // Show preview
-    const inner = document.getElementById('logo-upload-inner');
-    inner.innerHTML = `<img src="${d.logo_url}" class="logo-preview-img" alt="logo"/><div class="logo-upload-lbl"><strong>Tap to change</strong></div>`;
-    const wrap = document.getElementById('logo-current-wrap');
-    if (wrap) { wrap.style.display='none'; }
+    var r=await fetch('/api/org/upload-logo',{method:'POST',credentials:'include',body:fd});
+    var d=await r.json().catch(function(){return{};});
+    if(!r.ok){status.textContent='✕ Upload failed: '+(d.error||'Error');return;}
+    _uploadedLogoUrl=d.logo_url;
+    status.textContent='✓ Logo uploaded successfully';
+    document.getElementById('logo-upload-inner').innerHTML='<img src="'+d.logo_url+'" class="logo-preview-img" alt="logo"/><div class="logo-upload-lbl"><strong>Tap to change</strong></div>';
+    var wrap=document.getElementById('logo-current-wrap'); if(wrap)wrap.style.display='none';
     toast('Logo uploaded!','s');
-  } catch(e) { status.textContent = '✕ Upload error'; }
+  } catch(e){status.textContent='✕ Upload error';}
 }
 
 async function updateAccount() {
-  const phone = document.getElementById('acc-phone').value.trim();
-  const body  = { phone };
-  if (_uploadedLogoUrl) body.logo_url = _uploadedLogoUrl;
-  const r = await api('/api/org/profile', {method:'POST', body});
-  if (!r.ok) { toast(r.data.error||'Error saving.','e'); return; }
+  var phone=document.getElementById('acc-phone').value.trim();
+  var body={phone:phone};
+  if(_uploadedLogoUrl) body.logo_url=_uploadedLogoUrl;
+  var r=await api('/api/org/profile',{method:'POST',body:body});
+  if(!r.ok){toast(r.data.error||'Error saving.','e');return;}
   toast('Account updated!','s');
 }
 
-// ─── STAGE BUILDER ───
+// ─── STAGE BUILDER ─────────────────────────────────────────────
 function toggleStages() {
-  stagesEnabled = !stagesEnabled;
-  document.getElementById('stage-toggle-row').classList.toggle('enabled', stagesEnabled);
-  document.getElementById('stage-toggle-pill').classList.toggle('on', stagesEnabled);
-  document.getElementById('stages-wrap').style.display = stagesEnabled ? 'block' : 'none';
-  if (stagesEnabled && stageList.length === 0) {
-    // Pre-populate with default Pinnacle stages
-    stageList = [
-      { name:'Entry Queue',     interval:5,  staff:[], pin:'' },
-      { name:'Shopping',        interval:30, staff:[], pin:'' },
-      { name:'Checkout Queue',  interval:5,  staff:[], pin:'' },
-      { name:'Packing Queue',   interval:10, staff:[], pin:'' },
+  stagesEnabled=!stagesEnabled;
+  document.getElementById('stage-toggle-row').classList.toggle('enabled',stagesEnabled);
+  document.getElementById('stage-toggle-pill').classList.toggle('on',stagesEnabled);
+  document.getElementById('stages-wrap').style.display=stagesEnabled?'block':'none';
+  if(stagesEnabled&&stageList.length===0) {
+    stageList=[
+      {name:'Entry Queue',interval:5,staff:[],pin:''},
+      {name:'Shopping',interval:30,staff:[],pin:''},
+      {name:'Checkout Queue',interval:5,staff:[],pin:''},
+      {name:'Packing Queue',interval:10,staff:[],pin:''},
     ];
     renderStages();
   }
 }
 
 function toggleBatch() {
-  batchEnabled = !batchEnabled;
-  document.getElementById('batch-toggle-row').classList.toggle('enabled', batchEnabled);
-  document.getElementById('batch-toggle-pill').classList.toggle('on', batchEnabled);
-  document.getElementById('batch-wrap').style.display = batchEnabled ? 'block' : 'none';
+  batchEnabled=!batchEnabled;
+  document.getElementById('batch-toggle-row').classList.toggle('enabled',batchEnabled);
+  document.getElementById('batch-toggle-pill').classList.toggle('on',batchEnabled);
+  document.getElementById('batch-wrap').style.display=batchEnabled?'block':'none';
 }
 
-function addStage() {
-  stageList.push({ name:'', interval:5, staff:[], pin:'' });
-  renderStages();
-}
-
-function removeStage(i) {
-  stageList.splice(i, 1);
-  renderStages();
-}
-function renderFormFields() {
-  const el = document.getElementById('fb-fields');
-  if (!formFields.length) {
-    el.innerHTML = '<p style="font-size:.8rem;color:var(--muted);text-align:center;padding:.5rem">No fields added yet.</p>';
-    return;
-  }
-  el.innerHTML = formFields.map((f, i) => `
-    <div class="fb-field-row">
-      <div class="fb-field-info">
-        <div class="fb-field-label">${f.label}</div>
-        <div class="fb-field-type">${f.type}</div>
-      </div>
-      <button class="btn bd bsm" onclick="formFields.splice(${i},1);renderFormFields()">✕</button>
-    </div>`).join('');
-}
-
-function addFormField() {
-  const type  = document.getElementById('fb-type').value;
-  const label = document.getElementById('fb-label').value.trim();
-  if (!label) { toast('Enter a field label first.','e'); return; }
-  formFields.push({ type, label });
-  document.getElementById('fb-label').value = '';
-  renderFormFields();
-}
-
-function renderBreaks() {
-  const el = document.getElementById('break-list');
-  if (!breaks.length) { el.innerHTML = ''; return; }
-  el.innerHTML = breaks.map((b, i) => `
-    <div class="break-item">
-      <span>🕐 ${b.start} – ${b.end}</span>
-      <button class="btn bd bsm" onclick="breaks.splice(${i},1);renderBreaks()">✕</button>
-    </div>`).join('');
-}
-
-function addBreak() {
-  const start = document.getElementById('brk-start').value;
-  const end   = document.getElementById('brk-end').value;
-  if (!start || !end) { toast('Enter both start and end times.','e'); return; }
-  if (start >= end)   { toast('Break end must be after start.','e'); return; }
-  breaks.push({ start, end });
-  document.getElementById('brk-start').value = '';
-  document.getElementById('brk-end').value   = '';
-  renderBreaks();
-}
-function addStaffTag(i, inputEl) {
-  const val = inputEl.value.trim();
-  if (!val) return;
-  if (inputEl.key !== undefined && inputEl.key !== 'Enter') return;
-  stageList[i].staff.push(val);
-  inputEl.value = '';
-  renderStages();
-}
-
-function removeStaffTag(stageIdx, staffIdx) {
-  stageList[stageIdx].staff.splice(staffIdx, 1);
-  renderStages();
-}
+function addStage(){stageList.push({name:'',interval:5,staff:[],pin:''});renderStages();}
+function removeStage(i){stageList.splice(i,1);renderStages();}
 
 function renderStages() {
-  const list = document.getElementById('stage-list');
-  if (!stageList.length) { list.innerHTML = '<p style="font-size:.78rem;color:var(--muted)">No stages added yet.</p>'; return; }
-  list.innerHTML = stageList.map((s, i) => `
-    <div class="stage-item">
-      <div class="stage-item-header">
-        <div class="stage-num">${i+1}</div>
-        <input class="stage-name-inp" placeholder="Stage name (e.g. Checkout)" value="${esc(s.name)}"
-          oninput="stageList[${i}].name=this.value"/>
-        <input class="stage-interval-inp" type="number" min="1" placeholder="min" value="${s.interval||5}"
-          oninput="stageList[${i}].interval=parseInt(this.value)||5" title="Minutes per person"/>
-        ${stageList.length > 1 ? `<button class="stage-remove-btn" onclick="removeStage(${i})" title="Remove stage">✕</button>` : ''}
-      </div>
-      <div style="font-size:.75rem;color:var(--muted);margin-bottom:.375rem">Staff Members <span style="font-size:.7rem">(type name + Enter)</span></div>
-      <div class="staff-tags-wrap" onclick="this.querySelector('.staff-tags-input').focus()">
-        ${s.staff.map((st, si) => `<span class="staff-tag">${st}<button onclick="removeStaffTag(${i},${si})">×</button></span>`).join('')}
-        <input class="staff-tags-input" placeholder="Add staff name…"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();stageList[${i}].staff.push(this.value.trim());this.value='';renderStages();}"/>
-      </div>
-      <div class="stage-counter-count" id="sc-count-${i}">Counters: ${s.staff.length || '—'}</div>
-      <div class="pin-row">
-        <span class="pin-label">🔑 Staff PIN for this stage</span>
-        <input class="pin-inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="0000"
-          value="${esc(s.pin)}" oninput="stageList[${i}].pin=this.value" title="4-digit PIN for staff access"/>
-      </div>
-    </div>`).join('');
+  var list=document.getElementById('stage-list');
+  if(!stageList.length){list.innerHTML='<p style="font-size:.78rem;color:var(--muted)">No stages added yet.</p>';return;}
+  list.innerHTML=stageList.map(function(s,i){
+    return '<div class="stage-item">'+
+      '<div class="stage-item-header">'+
+        '<div class="stage-num">'+(i+1)+'</div>'+
+        '<input class="stage-name-inp" placeholder="Stage name (e.g. Checkout)" value="'+esc(s.name)+'" oninput="stageList['+i+'].name=this.value"/>'+
+        '<input class="stage-interval-inp" type="number" min="1" placeholder="min" value="'+(s.interval||5)+'" oninput="stageList['+i+'].interval=parseInt(this.value)||5" title="Minutes per person"/>'+
+        (stageList.length>1?'<button class="stage-remove-btn" onclick="removeStage('+i+')" title="Remove">✕</button>':'')+
+      '</div>'+
+      '<div style="font-size:.75rem;color:var(--muted);margin-bottom:.375rem">Staff Members <span style="font-size:.7rem">(type name + Enter)</span></div>'+
+      '<div class="staff-tags-wrap" onclick="this.querySelector(\'.staff-tags-input\').focus()">'+
+        s.staff.map(function(st,si){return '<span class="staff-tag">'+st+'<button onclick="removeStaffTag('+i+','+si+')">×</button></span>';}).join('')+
+        '<input class="staff-tags-input" placeholder="Add staff name…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();var v=this.value.trim();if(v){stageList['+i+'].staff.push(v);this.value=\'\';renderStages();}}"/>'+
+      '</div>'+
+      '<div class="stage-counter-count">Counters: '+(s.staff.length||'—')+'</div>'+
+      '<div class="pin-row">'+
+        '<span class="pin-label">🔑 Staff PIN for this stage</span>'+
+        '<input class="pin-inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="0000" value="'+esc(s.pin)+'" oninput="stageList['+i+'].pin=this.value" title="4-digit PIN"/>'+
+      '</div>'+
+    '</div>';
+  }).join('');
 }
 
-// ─── WALK-IN ───
-function openWalkIn() {
-  const name  = prompt('Customer name (optional):') || '';
-  const phone = prompt('Phone number (optional, for SMS notifications):') || '';
-  if (name === null && phone === null) return; // cancelled both
-  addWalkIn(name.trim(), phone.trim());
-}
+function removeStaffTag(stageIdx,staffIdx){stageList[stageIdx].staff.splice(staffIdx,1);renderStages();}
 
-async function addWalkIn(name, phone) {
-  if (!activeSvc) return;
-  const r = await api('/api/org/queue/walk-in/'+activeSvc.id, {
-    method: 'POST',
-    body: { name: name||'Walk-in Customer', phone: phone||null }
-  });
-  if (!r.ok) { toast(r.data.error||'Failed to add walk-in.','e'); return; }
-  toast('🚶 Walk-in added: '+(r.data.entry?.ticket_label||'—'),'s');
-  await loadQueue();
-}
-
-// ─── EMERGENCY CONTROLS ───
+// ─── EMERGENCY CONTROLS ────────────────────────────────────────
 async function emergencySkip() {
-  if (!activeSvc || !calledEntry) { toast('No one is currently called.','w'); return; }
-  if (!confirm('Skip current ticket and mark as no-show?')) return;
-  await markById(calledEntry.id, 'no_show');
+  if(!activeSvc||!calledEntry){toast('No one is currently called.','w');return;}
+  if(!confirm('Skip current ticket and mark as no-show?'))return;
+  await markById(calledEntry.id,'no_show');
   toast('Ticket skipped.','w');
 }
 
 async function emergencyPause() {
-  if (!activeSvc) return;
-  const current = document.getElementById('status-sel').value;
-  const newStatus = current === 'paused' ? 'open' : 'paused';
-  document.getElementById('status-sel').value = newStatus;
+  if(!activeSvc)return;
+  var cur=document.getElementById('status-sel').value;
+  var newStatus=cur==='paused'?'open':'paused';
+  document.getElementById('status-sel').value=newStatus;
   await changeStatus();
-  toast(newStatus === 'paused' ? '⏸ Queue paused.' : '▶ Queue resumed.', 'i');
+  toast(newStatus==='paused'?'⏸ Queue paused.':'▶ Queue resumed.','i');
 }
 
 async function emergencyAdjustInterval() {
-  if (!activeSvc) return;
-  const current = activeSvc.time_interval || 5;
-  const val = prompt(`Current interval: ${current} min/person.\nEnter new interval (minutes):`, current);
-  if (!val || isNaN(parseInt(val))) return;
-  const newInterval = Math.max(1, parseInt(val));
-  const r = await api('/api/org/services/'+activeSvc.id+'/interval', {method:'POST', body:{time_interval: newInterval}});
-  if (!r.ok) { toast(r.data.error||'Error.','e'); return; }
-  activeSvc.time_interval = newInterval;
-  toast(`⏱ Interval updated to ${newInterval} min/person.`,'s');
+  if(!activeSvc)return;
+  var cur=activeSvc.time_interval||5;
+  var val=prompt('Current: '+cur+' min/person.\nNew interval (minutes):',cur);
+  if(!val||isNaN(parseInt(val)))return;
+  var newVal=Math.max(1,parseInt(val));
+  var r=await api('/api/org/services/'+activeSvc.id+'/interval',{method:'POST',body:{time_interval:newVal}});
+  if(!r.ok){toast(r.data.error||'Error.','e');return;}
+  activeSvc.time_interval=newVal;
+  toast('⏱ Interval updated to '+newVal+' min/person.','s');
 }
 
 async function emergencyMoveTicket() {
-  if (!activeSvc) return;
-  const ticket = prompt('Enter ticket label to move (e.g. A005):');
-  if (!ticket) return;
-  const newPos = prompt('Move to position # (1 = next):');
-  if (!newPos || isNaN(parseInt(newPos))) return;
-  const r = await api('/api/org/queue/move-ticket/'+activeSvc.id, {
-    method:'POST', body:{ticket_label: ticket.trim().toUpperCase(), position: parseInt(newPos)}
-  });
-  if (!r.ok) { toast(r.data.error||'Ticket not found.','e'); return; }
-  toast(`🔀 ${ticket.toUpperCase()} moved to position ${newPos}.`,'s');
+  if(!activeSvc)return;
+  var ticket=prompt('Ticket label to move (e.g. A005):');
+  if(!ticket)return;
+  var newPos=prompt('Move to position # (1 = next):');
+  if(!newPos||isNaN(parseInt(newPos)))return;
+  var r=await api('/api/org/queue/move-ticket/'+activeSvc.id,{method:'POST',body:{ticket_label:ticket.trim().toUpperCase(),position:parseInt(newPos)}});
+  if(!r.ok){toast(r.data.error||'Ticket not found.','e');return;}
+  toast('🔀 '+ticket.toUpperCase()+' moved to position '+newPos+'.','s');
   await loadQueue();
 }
 
-// ─── ANALYTICS ───
+// ─── ANALYTICS ─────────────────────────────────────────────────
 function populateAnalyticsSelect() {
-  const sel = document.getElementById('analytics-svc');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">All services</option>' + services.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  var sel=document.getElementById('analytics-svc'); if(!sel)return;
+  sel.innerHTML='<option value="">All services</option>'+services.map(function(s){return'<option value="'+s.id+'">'+s.name+'</option>';}).join('');
 }
 
 async function loadAnalytics() {
-  const svcId = document.getElementById('analytics-svc')?.value || '';
-  const url = svcId ? `/api/org/analytics?service_id=${svcId}` : '/api/org/analytics';
-  const r = await api(url);
-  if (!r.ok) { toast('Could not load analytics.','e'); return; }
-  const d = r.data || {};
-
-  document.getElementById('an-served').textContent     = d.served_today    ?? '—';
-  document.getElementById('an-waiting').textContent    = d.waiting_now      ?? '—';
-  document.getElementById('an-noshow').textContent     = d.no_shows_today   ?? '—';
-  document.getElementById('an-throughput').textContent = d.throughput_per_hr ?? '—';
-
-  const avgWait = document.getElementById('an-avgwait');
-  avgWait.innerHTML = (d.avg_wait_min != null) ? `${d.avg_wait_min}<span style="font-size:1rem">m</span>` : '—';
-
-  const ratingEl = document.getElementById('an-rating');
-  ratingEl.innerHTML = (d.avg_rating != null) ? `${Number(d.avg_rating).toFixed(1)}<span style="font-size:1rem">⭐</span>` : `—<span style="font-size:1rem">⭐</span>`;
-
-  // Peak hours bar chart
-  const chartEl = document.getElementById('peak-hours-chart');
-  if (d.peak_hours && d.peak_hours.length) {
-    const max = Math.max(...d.peak_hours.map(h=>h.count), 1);
-    chartEl.innerHTML = d.peak_hours.map(h => `
-      <div class="peak-bar-row">
-        <div class="peak-bar-label">${String(h.hour).padStart(2,'0')}:00</div>
-        <div class="peak-bar-track"><div class="peak-bar-fill" style="width:${Math.round(h.count/max*100)}%"></div></div>
-        <div class="peak-bar-val">${h.count}</div>
-      </div>`).join('');
-  } else {
-    chartEl.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:.5rem">No data yet for today.</p>';
-  }
-
-  // Recent feedback
-  const fbList = document.getElementById('feedback-list');
-  if (d.feedback && d.feedback.length) {
-    fbList.innerHTML = d.feedback.slice(0,10).map(f => `
-      <div style="padding:.75rem;border-bottom:1px solid var(--border);display:flex;gap:.75rem;align-items:flex-start">
-        <div class="rating-stars">${'⭐'.repeat(f.rating||0)}</div>
-        <div style="flex:1">
-          <div style="font-size:.82rem;color:var(--ink3)">${f.comment||'<em style="color:var(--muted)">No comment</em>'}</div>
-          <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">${f.service_name||''} · ${fmtTime(f.created_at)}</div>
-        </div>
-      </div>`).join('');
-  } else {
-    fbList.innerHTML = '<p style="font-size:.82rem;color:var(--muted);padding:1rem">No feedback yet.</p>';
-  }
-}
-
-// ─── USER INFO MODAL ───
-function showUserInfo(entryId) {
-  const entry = _liveEntries.find(e => e.id === entryId);
-  if (!entry) return;
-  document.getElementById('ui-title').textContent = (entry.user_name || 'Guest') + ' — ' + (entry.ticket_label || '');
-  document.getElementById('ui-subtitle').textContent = (entry.join_method==='sms' ? '📱 Joined via SMS' : '🌐 Joined via Web') + (entry.user_id ? '' : ' · Guest');
-  const basics = [
-    {label:'Ticket',   value: entry.ticket_label||'—'},
-    {label:'Name',     value: entry.user_name||'Guest'},
-    {label:'Phone',    value: entry.guest_phone||entry.user_phone||'—'},
-    {label:'Status',   value: (entry.status||'—').replace('_',' ')},
-    {label:'Position', value: entry.position != null ? '#'+entry.position : '—'},
-    {label:'Joined',   value: entry.joined_at ? new Date(entry.joined_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '—'},
-  ];
-  document.getElementById('ui-basic').innerHTML = basics.map(b =>
-    `<div class="ui-basic-item"><div class="ui-basic-label">${b.label}</div><div class="ui-basic-value">${b.value}</div></div>`
-  ).join('');
-  const formWrap = document.getElementById('ui-form-wrap');
-  const formFieldsEl = document.getElementById('ui-form-fields');
-  let formData = null;
-  try { formData = typeof entry.custom_form_data==='string' ? JSON.parse(entry.custom_form_data) : entry.custom_form_data; } catch(e) {}
-  if (formData && typeof formData==='object' && Object.keys(formData).length) {
-    formWrap.style.display = 'block';
-    formFieldsEl.innerHTML = Object.entries(formData).map(([key, val]) => {
-      const label = (val && val.label) ? val.label : key;
-      const value = (val && val.value !== undefined) ? val.value : (typeof val==='string' ? val : JSON.stringify(val));
-      return `<div class="ui-field"><div class="ui-field-label">${label}</div><div class="ui-field-value">${value||'<em style="color:var(--muted)">Not provided</em>'}</div></div>`;
+  var svcId=document.getElementById('analytics-svc')&&document.getElementById('analytics-svc').value||'';
+  var url=svcId?'/api/org/analytics?service_id='+svcId:'/api/org/analytics';
+  var r=await api(url);
+  if(!r.ok){toast('Could not load analytics.','e');return;}
+  var d=r.data||{};
+  document.getElementById('an-served').textContent=d.served_today??'—';
+  document.getElementById('an-waiting').textContent=d.waiting_now??'—';
+  document.getElementById('an-noshow').textContent=d.no_shows_today??'—';
+  document.getElementById('an-throughput').textContent=d.throughput_per_hr??'—';
+  document.getElementById('an-avgwait').innerHTML=(d.avg_wait_min!=null)?d.avg_wait_min+'<span style="font-size:1rem">m</span>':'—<span style="font-size:1rem">m</span>';
+  document.getElementById('an-rating').innerHTML=(d.avg_rating!=null)?Number(d.avg_rating).toFixed(1)+'<span style="font-size:1rem">⭐</span>':'—<span style="font-size:1rem">⭐</span>';
+  var chartEl=document.getElementById('peak-hours-chart');
+  if(d.peak_hours&&d.peak_hours.length) {
+    var max=Math.max(...d.peak_hours.map(function(h){return h.count;}),1);
+    chartEl.innerHTML=d.peak_hours.map(function(h){
+      return '<div class="peak-bar-row"><div class="peak-bar-label">'+String(h.hour).padStart(2,'0')+':00</div>'+
+        '<div class="peak-bar-track"><div class="peak-bar-fill" style="width:'+Math.round(h.count/max*100)+'%"></div></div>'+
+        '<div class="peak-bar-val">'+h.count+'</div></div>';
     }).join('');
-  } else {
-    formWrap.style.display = 'none';
-  }
-  document.getElementById('modal-userinfo').style.display = 'flex';
+  } else { chartEl.innerHTML='<p style="font-size:.82rem;color:var(--muted);padding:.5rem">No data yet for today.</p>'; }
+  var fbList=document.getElementById('feedback-list');
+  if(d.feedback&&d.feedback.length) {
+    fbList.innerHTML=d.feedback.slice(0,10).map(function(f){
+      return '<div style="padding:.75rem;border-bottom:1px solid var(--border);display:flex;gap:.75rem;align-items:flex-start">'+
+        '<div style="display:flex;gap:.25rem;align-items:center;color:var(--amber)">'+'⭐'.repeat(f.rating||0)+'</div>'+
+        '<div style="flex:1"><div style="font-size:.82rem;color:var(--ink3)">'+(f.comment||'<em style="color:var(--muted)">No comment</em>')+'</div>'+
+        '<div style="font-size:.72rem;color:var(--muted);margin-top:.2rem">'+fmtTime(f.created_at)+'</div></div></div>';
+    }).join('');
+  } else { fbList.innerHTML='<p style="font-size:.82rem;color:var(--muted);padding:1rem">No feedback yet.</p>'; }
 }
 
-function closeUserInfo() { document.getElementById('modal-userinfo').style.display='none'; }
-
-// ─── CALL TIMER ───
-function startCallTimer() {
-  clearInterval(_callTimerInterval);
-  _callTimerInterval = setInterval(updateCallTimer, 1000);
+// ─── USER INFO MODAL ───────────────────────────────────────────
+function showUserInfo(entryId) {
+  var entry=_liveEntries.find(function(e){return e.id===entryId;});
+  if(!entry)return;
+  document.getElementById('ui-title').textContent=(entry.user_name||'Guest')+' — '+(entry.ticket_label||'');
+  document.getElementById('ui-subtitle').textContent=(entry.join_method==='sms'?'📱 Joined via SMS':'🌐 Joined via Web')+(entry.user_id?'':' · Walk-in/Guest');
+  var basics=[
+    {label:'Ticket',value:entry.ticket_label||'—'},
+    {label:'Name',value:entry.user_name||'Guest'},
+    {label:'Phone',value:entry.guest_phone||entry.user_phone||'—'},
+    {label:'Status',value:(entry.status||'—').replace('_',' ')},
+    {label:'Stage',value:entry.stage_name||'—'},
+    {label:'Joined',value:entry.joined_at?new Date(entry.joined_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'},
+  ];
+  document.getElementById('ui-basic').innerHTML=basics.map(function(b){
+    return '<div class="ui-basic-item"><div class="ui-basic-label">'+b.label+'</div><div class="ui-basic-value">'+b.value+'</div></div>';
+  }).join('');
+  openModal('modal-userinfo');
 }
+function closeUserInfo(){closeModal('modal-userinfo');}
 
-function updateCallTimer() {
-  if (!activeSvc || !_liveEntries) return;
-  const nextWaiting = _liveEntries.find(e => e.status === 'waiting');
-  const box     = document.getElementById('call-timer-box');
-  const callBtn = document.getElementById('call-btn');
-  if (!nextWaiting || !nextWaiting.estimated_time) {
-    box.style.display = 'none'; callBtn.disabled = false; callBtn.title = ''; return;
-  }
-  const diffMs  = new Date(nextWaiting.estimated_time).getTime() - Date.now();
-  const diffSec = Math.ceil(diffMs / 1000);
-  box.style.display = 'flex';
-  if (diffSec <= 0) {
-    box.className = 'call-timer-box ready';
-    document.getElementById('ctb-ico').textContent        = '✅';
-    document.getElementById('ctb-title').textContent      = "It's time — you can call " + (nextWaiting.user_name||nextWaiting.guest_name||'next person');
-    document.getElementById('ctb-sub').textContent        = 'Their scheduled slot has arrived';
-    document.getElementById('ctb-countdown').textContent  = 'Ready';
-    document.getElementById('ctb-countdown').className    = 'ctb-countdown green';
-    callBtn.disabled = false; callBtn.title = '';
-  } else {
-    const mins = Math.floor(diffSec/60), secs = diffSec%60;
-    const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
-    const isClose = diffSec <= 60;
-    box.className = 'call-timer-box' + (isClose ? ' soon' : '');
-    document.getElementById('ctb-ico').textContent        = isClose ? '⏰' : '🕐';
-    document.getElementById('ctb-title').textContent      = 'Next: '+(nextWaiting.ticket_label||'—')+' — '+(nextWaiting.user_name||nextWaiting.guest_name||'Guest');
-    document.getElementById('ctb-sub').textContent        = 'Wait until their scheduled time before calling';
-    document.getElementById('ctb-countdown').textContent  = timeStr;
-    document.getElementById('ctb-countdown').className    = 'ctb-countdown' + (isClose ? ' amber' : '');
-    callBtn.disabled = true;
-    callBtn.title = `Cannot call yet — wait ${timeStr}`;
-  }
-}
-
+// ─── OPEN CREATE MODAL ─────────────────────────────────────────
 function openCreateModal() {
   formFields=[]; breaks=[]; stagesEnabled=false; stageList=[]; batchEnabled=false;
   renderFormFields(); renderBreaks(); renderStages();
@@ -1504,39 +1301,30 @@ function openCreateModal() {
   document.getElementById('batch-toggle-row').classList.remove('enabled');
   document.getElementById('batch-toggle-pill').classList.remove('on');
   document.getElementById('batch-wrap').style.display='none';
-  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('m-prefix').value   = 'A';
-  document.getElementById('m-interval').value = '5';
-  document.getElementById('m-max').value      = '';
+  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-prefix').value='A';
+  document.getElementById('m-interval').value='5';
+  document.getElementById('m-max').value='';
   document.getElementById('m-err').style.display='none';
   openModal('modal-create');
 }
 
+// ─── LOGOUT ────────────────────────────────────────────────────
 async function doLogout() {
-  clearInterval(pollTimer); clearInterval(_callTimerInterval);
-  await api('/api/auth/logout', {method:'POST'});
-  window.location.href = '/';
+  clearInterval(pollTimer);
+  await api('/api/auth/logout',{method:'POST'});
+  window.location.href='/';
 }
 
-// ─── BOOT ───
 init();
 </script>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <div class="bn-items">
-    <button class="bn-item active" id="bn-services" onclick="showPanel('services')">
-      <span class="bn-ico">🏢</span><span>Services</span>
-    </button>
-    <button class="bn-item" id="bn-queue" onclick="showPanel('queue')">
-      <span class="bn-ico">📋</span><span>Queue</span>
-    </button>
-    <button class="bn-item" id="bn-reports" onclick="showPanel('reports')">
-      <span class="bn-ico">📊</span><span>Reports</span>
-    </button>
-    <button class="bn-item" id="bn-account" onclick="showPanel('account')">
-      <span class="bn-ico">⚙️</span><span>Account</span>
-    </button>
+    <button class="bn-item active" id="bn-services" onclick="showPanel('services')"><span class="bn-ico">🏢</span><span>Services</span></button>
+    <button class="bn-item" id="bn-queue" onclick="showPanel('queue')"><span class="bn-ico">📋</span><span>Queue</span></button>
+    <button class="bn-item" id="bn-reports" onclick="showPanel('reports')"><span class="bn-ico">📊</span><span>Reports</span></button>
+    <button class="bn-item" id="bn-account" onclick="showPanel('account')"><span class="bn-ico">⚙️</span><span>Account</span></button>
   </div>
 </nav>
 </body>
