@@ -5,8 +5,9 @@
 <link rel="manifest" href="/static/manifest.json"/>
 <meta name="theme-color" content="#4361ee"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>My Dashboard — QCode</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Queue — QCode</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -15,12 +16,9 @@
   --accent:#4361ee;--accent2:#3a0ca3;--vivid:#7209b7;
   --teal:#06d6a0;--amber:#ffbe0b;--rose:#ef233c;
   --white:#ffffff;
-  --fd:'Plus Jakarta Sans',sans-serif;
-  --fi:'Instrument Serif',serif;
+  --fd:'Plus Jakarta Sans',sans-serif;--fi:'Instrument Serif',serif;
   --r:10px;--r2:16px;--r3:24px;
-  --sh:0 2px 12px rgba(13,17,23,.08);
-  --shm:0 8px 32px rgba(13,17,23,.12);
-  --shl:0 20px 60px rgba(13,17,23,.18);
+  --sh:0 2px 12px rgba(13,17,23,.08);--shm:0 8px 32px rgba(13,17,23,.12);--shl:0 20px 60px rgba(13,17,23,.18);
   --t:.2s cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -46,9 +44,7 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .main{flex:1;padding:2rem;overflow-y:auto;max-height:calc(100vh - 62px)}
 .panel{display:none;animation:fadeUp .25s ease}.panel.active{display:block}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.ph{margin-bottom:2rem}
-.ph h1{font-size:1.75rem;font-weight:800;color:var(--ink)}
-.ph p{color:#64748b;margin-top:.25rem;font-size:.9rem}
+.ph{margin-bottom:2rem}.ph h1{font-size:1.75rem;font-weight:800;color:var(--ink)}.ph p{color:#64748b;margin-top:.25rem;font-size:.9rem}
 .card{background:var(--white);border:1px solid rgba(13,17,23,.06);border-radius:var(--r2);padding:1.75rem;box-shadow:var(--sh);margin-bottom:1.25rem}
 .card-title{font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:1.25rem;text-transform:uppercase;letter-spacing:.05em}
 .profile-hero{background:linear-gradient(135deg,var(--ink2) 0%,var(--accent2) 60%,var(--vivid) 100%);border-radius:var(--r3);padding:2rem;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;position:relative;overflow:hidden}
@@ -67,7 +63,7 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .inp-row{display:flex;gap:.625rem}.inp-row .inp{flex:1}
 .code-inp{text-transform:uppercase;letter-spacing:.2em;font-weight:800;font-size:1.1rem;text-align:center}
 .ferr{font-size:.8rem;color:var(--rose);margin-top:.375rem;display:none;padding:.5rem .75rem;background:rgba(239,35,60,.06);border-radius:var(--r)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:var(--r);border:none;font-family:var(--fd);font-size:.875rem;font-weight:700;cursor:pointer;transition:all var(--t);white-space:nowrap;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.65rem 1.5rem;border-radius:var(--r);border:none;font-family:var(--fd);font-size:.875rem;font-weight:700;cursor:pointer;transition:all var(--t);white-space:nowrap}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover:not(:disabled){background:#3451d1;transform:translateY(-1px);box-shadow:0 6px 20px rgba(67,97,238,.35)}
 .btn-success{background:var(--teal);color:var(--ink)}.btn-success:hover:not(:disabled){filter:brightness(1.08)}
@@ -92,6 +88,8 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .sb-wait{background:rgba(67,97,238,.05);border-color:rgba(67,97,238,.15)}
 .sb-call{background:rgba(6,214,160,.08);border-color:var(--teal);animation:pBorder 1.8s ease infinite}
 .sb-serv{background:rgba(255,190,11,.08);border-color:var(--amber)}
+.sb-shop{background:rgba(6,214,160,.05);border-color:rgba(6,214,160,.2)}
+.sb-pack{background:rgba(114,9,183,.05);border-color:rgba(114,9,183,.2)}
 @keyframes pBorder{0%,100%{box-shadow:0 0 0 0 rgba(6,214,160,.3)}50%{box-shadow:0 0 0 12px rgba(6,214,160,0)}}
 .sbi-ico{font-size:2rem;flex-shrink:0}
 .sbi-title{font-weight:700;font-size:1rem;color:var(--ink)}
@@ -100,7 +98,6 @@ h1,h2,h3,h4{letter-spacing:-.025em;line-height:1.2}
 .sp{background:var(--mist);border-radius:var(--r2);padding:1.25rem;text-align:center}
 .sp-n{font-family:var(--fi);font-size:2rem;font-weight:800;color:var(--accent);line-height:1;font-style:italic}
 .sp-l{font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-top:.25rem}
-/* LOCKED ETA BOX */
 .exact-time{background:linear-gradient(135deg,rgba(255,190,11,.12),rgba(255,190,11,.06));border:2px solid rgba(255,190,11,.25);border-radius:var(--r2);padding:1rem 1.25rem;margin-bottom:1.25rem;text-align:center}
 .et-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#92400e;margin-bottom:.375rem}
 .et-time{font-family:var(--fi);font-size:2.25rem;font-weight:800;color:var(--ink);font-style:italic}
@@ -148,22 +145,10 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .spin{width:20px;height:20px;border:2.5px solid rgba(13,17,23,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .5s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading{display:flex;align-items:center;justify-content:center;gap:.75rem;padding:2.5rem;color:#64748b}
-.notif-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--mist);border-radius:var(--r);margin-bottom:.625rem}
-.toggle{position:relative;width:48px;height:26px;cursor:pointer}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:#cbd5e1;border-radius:999px;transition:.3s}
-.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.toggle input:checked + .toggle-slider{background:var(--accent)}
-.toggle input:checked + .toggle-slider::before{transform:translateX(22px)}
-
-/* ── OFFLINE BANNER ── */
 .offline-banner{display:none;position:fixed;top:62px;left:0;right:0;z-index:190;background:var(--amber);color:var(--ink);padding:.5rem 1.5rem;font-size:.825rem;font-weight:700;text-align:center}
-
-/* ── ORG LOGO ── */
 .org-logo-img{width:44px;height:44px;border-radius:var(--r);object-fit:cover;border:2px solid rgba(255,255,255,.2);flex-shrink:0}
 .org-logo-placeholder{width:44px;height:44px;border-radius:var(--r);background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;flex-shrink:0;border:2px solid rgba(255,255,255,.2)}
-
-/* ── STAGE PROGRESS ── */
+/* STAGE PROGRESS */
 .stage-progress{background:var(--white);border:1px solid rgba(13,17,23,.06);border-radius:var(--r2);padding:1.125rem 1.5rem;margin-bottom:1.25rem;box-shadow:var(--sh)}
 .stage-progress-title{font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.875rem}
 .stage-steps{display:flex;align-items:center;overflow-x:auto;padding-bottom:.25rem}
@@ -178,8 +163,7 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .step-label{font-size:.62rem;font-weight:600;color:#94a3b8;text-align:center;white-space:nowrap}
 .stage-step.done .step-label{color:var(--teal)}
 .stage-step.active .step-label{color:var(--accent);font-weight:700}
-
-/* ── COUNTDOWN ── */
+/* COUNTDOWN */
 .countdown-box{background:var(--mist2);border:2px solid var(--mist3);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;text-align:center}
 .countdown-label{font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
 .countdown-timer{display:flex;justify-content:center;align-items:center;gap:.5rem}
@@ -189,81 +173,33 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .cd-sep{font-family:var(--fi);font-size:1.75rem;font-weight:800;color:var(--mist3);line-height:1;font-style:italic;margin-top:-.25rem}
 .progress-bar-wrap{height:4px;background:var(--mist3);border-radius:999px;margin-top:.875rem;overflow:hidden}
 .progress-bar-fill{height:100%;background:var(--accent);border-radius:999px;transition:width 1s linear}
-
-/* ── BATCH TAG ── */
-.td-batch{display:inline-flex;align-items:center;gap:.375rem;border-radius:999px;padding:.3rem .875rem;font-size:.75rem;font-weight:600;margin:.25rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
-
-/* ── COUNTER ASSIGNMENT ── */
-.td-counter{background:rgba(255,190,11,.2);border:1px solid rgba(255,190,11,.35);color:var(--amber);border-radius:999px;padding:.4rem 1rem;font-size:.825rem;font-weight:700;margin:.4rem auto;display:inline-flex;align-items:center;gap:.375rem}
+/* COUNTER ASSIGNMENT */
 .counter-box{background:linear-gradient(135deg,rgba(255,190,11,.1),rgba(255,190,11,.04));border:2px solid rgba(255,190,11,.3);border-radius:var(--r2);padding:1.25rem;margin-bottom:1.25rem;text-align:center}
 .counter-box-label{font-size:.7rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.375rem}
 .counter-box-name{font-family:var(--fi);font-size:2rem;font-weight:800;color:var(--ink);font-style:italic;line-height:1.2}
 .counter-box-sub{font-size:.8rem;color:#64748b;margin-top:.25rem}
-
-/* ── CHECKOUT BUTTON ── */
+/* CHECKOUT BUTTON */
 .checkout-card{background:linear-gradient(135deg,rgba(245,158,11,.08),rgba(217,119,6,.04));border:2px solid rgba(245,158,11,.25);border-radius:var(--r2);padding:1.5rem;margin-bottom:1.25rem;text-align:center}
 .checkout-card-title{font-weight:800;font-size:1.05rem;color:var(--ink);margin-bottom:.375rem}
 .checkout-card-sub{font-size:.825rem;color:#64748b;margin-bottom:1.25rem;line-height:1.5}
 .btn-checkout{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:1rem;padding:.875rem 2rem;width:100%;border-radius:var(--r2);box-shadow:0 4px 20px rgba(245,158,11,.35);display:flex;align-items:center;justify-content:center;border:none;font-family:var(--fd);font-weight:700;cursor:pointer;transition:all var(--t)}
 .btn-checkout:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
 .btn-checkout:disabled{opacity:.4;cursor:not-allowed}
-
-/* ── CROWD INDICATOR ── */
-.nb-crowd{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:700;padding:.2rem .6rem;border-radius:999px;margin-top:.5rem}
-.nb-crowd-low{background:rgba(6,214,160,.1);color:#065f46}
-.nb-crowd-med{background:rgba(255,190,11,.15);color:#92400e}
-.nb-crowd-high{background:rgba(239,35,60,.08);color:var(--rose)}
-
-/* ── STATUS BOX EXTRA STATES ── */
-.sb-shop{background:rgba(6,214,160,.05);border-color:rgba(6,214,160,.2)}
-.sb-pack{background:rgba(114,9,183,.05);border-color:rgba(114,9,183,.2)}
-.b-shopping{background:rgba(6,214,160,.1);color:#065f46}
-.b-checkout{background:rgba(255,190,11,.15);color:#92400e}
-.b-packing{background:rgba(114,9,183,.08);color:#7209b7}
-
-/* ── QUEUE CLOSED BOX ── */
-.queue-closed-box{background:var(--mist2);border:2px solid var(--mist3);border-radius:var(--r2);padding:1.25rem;text-align:center}
-.qc-time{font-family:var(--fi);font-size:1.25rem;font-weight:800;color:var(--accent);font-style:italic}
-
-/* ── PWA BANNER ── */
+/* PWA BANNER */
 .pwa-banner{background:linear-gradient(135deg,var(--accent2),var(--vivid));color:#fff;border-radius:var(--r2);padding:1rem 1.25rem;display:flex;align-items:center;gap:.875rem;margin-bottom:1.25rem}
 .pwa-banner-text{flex:1;font-size:.825rem;line-height:1.5}
 .pwa-banner-text strong{display:block;font-size:.9rem;margin-bottom:.2rem}
 .pwa-install-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);color:#fff;padding:.4rem .875rem;border-radius:var(--r);font-family:var(--fd);font-size:.8rem;font-weight:700;cursor:pointer;transition:all var(--t)}
 .pwa-install-btn:hover{background:rgba(255,255,255,.3)}
 .pwa-dismiss{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:1.1rem;padding:.25rem;line-height:1}
-
-/* ══ DRAGGABLE ASK AI BUTTON ══ */
-#faq-widget{
-  position:fixed;bottom:5rem;right:1.5rem;z-index:500;
-  user-select:none;touch-action:none;-webkit-user-select:none;
-}
-#faq-btn{
-  display:flex;align-items:center;gap:.5rem;
-  background:var(--accent);color:#fff;border:none;border-radius:999px;
-  padding:.75rem 1.25rem;font-family:var(--fd);font-weight:700;font-size:.875rem;
-  cursor:grab;box-shadow:0 4px 20px rgba(67,97,238,.4);
-  transition:box-shadow var(--t);-webkit-user-drag:none;
-}
+/* FAQ WIDGET */
+#faq-widget{position:fixed;bottom:5rem;right:1.5rem;z-index:500;user-select:none;touch-action:none;-webkit-user-select:none}
+#faq-btn{display:flex;align-items:center;gap:.5rem;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:.75rem 1.25rem;font-family:var(--fd);font-weight:700;font-size:.875rem;cursor:grab;box-shadow:0 4px 20px rgba(67,97,238,.4);transition:box-shadow var(--t);-webkit-user-drag:none}
 #faq-btn:hover{box-shadow:0 8px 30px rgba(67,97,238,.5)}
 #faq-widget.dragging #faq-btn{cursor:grabbing;box-shadow:0 12px 40px rgba(67,97,238,.55);transform:scale(1.04)}
-
-/* ══ FAQ CENTERED OVERLAY ══ */
-.faq-overlay{
-  position:fixed;inset:0;z-index:600;
-  background:rgba(13,17,23,.55);backdrop-filter:blur(6px);
-  display:flex;align-items:center;justify-content:center;padding:1rem;
-  animation:fIn .18s ease;
-}
+.faq-overlay{position:fixed;inset:0;z-index:600;background:rgba(13,17,23,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fIn .18s ease}
 .faq-overlay.hidden{display:none!important}
-.faq-panel{
-  width:390px;max-width:calc(100vw - 2rem);
-  background:var(--white);border:2px solid rgba(13,17,23,.08);
-  border-radius:var(--r3);box-shadow:var(--shl);
-  display:flex;flex-direction:column;overflow:hidden;
-  max-height:min(580px,88vh);
-  animation:sUp .22s cubic-bezier(.16,1,.3,1);
-}
+.faq-panel{width:390px;max-width:calc(100vw - 2rem);background:var(--white);border:2px solid rgba(13,17,23,.08);border-radius:var(--r3);box-shadow:var(--shl);display:flex;flex-direction:column;overflow:hidden;max-height:min(580px,88vh);animation:sUp .22s cubic-bezier(.16,1,.3,1)}
 .faq-hdr{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;background:var(--ink);color:#fff}
 .faq-hdr-left{display:flex;align-items:center;gap:.75rem}
 .faq-title{font-weight:700;font-size:.9rem}
@@ -283,8 +219,6 @@ tr:last-child td{border-bottom:none}tr:hover td{background:var(--mist)}
 .faq-inp:focus{outline:none;border-color:var(--accent);background:var(--white)}
 #faq-send{background:var(--accent);color:#fff;border:none;border-radius:var(--r);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--t);flex-shrink:0}
 #faq-send:hover{background:#3451d1}#faq-send:disabled{opacity:.5}
-
-/* ══ RESPONSIVE ══ */
 html{-webkit-text-size-adjust:100%;touch-action:manipulation}
 *{-webkit-tap-highlight-color:transparent}
 input,select,textarea,button{font-size:16px !important}
@@ -292,16 +226,14 @@ input,select,textarea,button{font-size:16px !important}
   html,body{height:100%;overflow-x:hidden}
   .shell{flex-direction:column;flex:1;min-height:calc(100vh - 62px)}
   .sidebar{display:none!important}
-  .main{flex:1;max-height:none;height:auto;min-height:calc(100vh - 62px - 60px);overflow-y:auto;padding:1rem 1rem 5.5rem 1rem;-webkit-overflow-scrolling:touch;}
+  .main{flex:1;max-height:none;height:auto;min-height:calc(100vh - 62px - 60px);overflow-y:auto;padding:1rem 1rem 5.5rem 1rem;-webkit-overflow-scrolling:touch}
   .card{padding:1.25rem 1rem}
   .ph h1{font-size:1.25rem}.ph p{font-size:.82rem}
   .td-num{font-size:3rem}
   .stat-pair{grid-template-columns:1fr 1fr;gap:.625rem}
-  .inp-row .inp{min-width:0}
-  .found-box{padding:.75rem}
   .nearby-grid{grid-template-columns:1fr}
   .tbl-wrap{font-size:.78rem;overflow-x:auto}
-  .tbl-wrap th,.tbl-wrap td{padding:.5rem .5rem;white-space:nowrap}
+  .tbl-wrap th,.tbl-wrap td{padding:.5rem;white-space:nowrap}
   .profile-hero{flex-direction:column;text-align:center;padding:1.5rem 1rem}
   .modal{padding:1.5rem 1.125rem;max-width:calc(100vw - 1.5rem)}
   .modal-footer{flex-direction:column}.modal-footer .btn{width:100%}
@@ -309,12 +241,12 @@ input,select,textarea,button{font-size:16px !important}
   .faq-panel{width:calc(100vw - 2rem);max-height:82vh}
   #faq-widget{bottom:5.5rem;right:.875rem}
 }
-.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:2px solid rgba(13,17,23,.08);padding:.25rem 0 env(safe-area-inset-bottom,.25rem);box-shadow:0 -4px 20px rgba(13,17,23,.12);}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:2px solid rgba(13,17,23,.08);padding:.25rem 0 env(safe-area-inset-bottom,.25rem);box-shadow:0 -4px 20px rgba(13,17,23,.12)}
 .bn-items{display:flex;align-items:stretch}
-.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;color:#94a3b8;cursor:pointer;border:none;background:none;transition:all .15s;position:relative;font-family:var(--fd);}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;padding:.5rem .25rem;font-size:.6rem;font-weight:600;color:#94a3b8;cursor:pointer;border:none;background:none;transition:all .15s;position:relative;font-family:var(--fd)}
 .bn-item.active{color:var(--accent)}
 .bn-item .bn-ico{font-size:1.25rem;line-height:1}
-.bn-dot{position:absolute;top:.4rem;right:calc(50% - .8rem);width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--white);display:none;animation:pulse-dot 2s ease infinite;}
+.bn-dot{position:absolute;top:.4rem;right:calc(50% - .8rem);width:8px;height:8px;border-radius:50%;background:var(--teal);border:2px solid var(--white);display:none;animation:pulse-dot 2s ease infinite}
 @media(max-width:768px){.bottom-nav{display:block}}
 </style>
 </head>
@@ -348,7 +280,7 @@ input,select,textarea,button{font-size:16px !important}
 
     <!-- JOIN -->
     <div class="panel active" id="panel-join">
-      <div class="ph"><h1>Join a Queue</h1><p>Enter the 6-character service code given to you</p></div>
+      <div class="ph"><h1>Join a Queue</h1><p>Enter the service code you received at the entrance</p></div>
       <div class="pwa-banner" id="pwa-banner" style="display:none">
         <div style="font-size:1.5rem">📱</div>
         <div class="pwa-banner-text"><strong>Add QCode to your home screen</strong>Get notified when it's your turn — even with the screen off.</div>
@@ -361,7 +293,7 @@ input,select,textarea,button{font-size:16px !important}
         <div class="card-title">🎫 Service Code</div>
         <div id="step-code">
           <div class="inp-row">
-            <input id="code-in" class="inp code-inp" type="text" placeholder="VISA24" maxlength="8"/>
+            <input id="code-in" class="inp code-inp" type="text" placeholder="e.g. PINNA1" maxlength="8"/>
             <button class="btn btn-primary" onclick="findService()" id="find-btn">Find →</button>
           </div>
           <div id="code-err" class="ferr"></div>
@@ -373,11 +305,10 @@ input,select,textarea,button{font-size:16px !important}
               <div class="found-name" id="found-name"></div>
             </div>
             <div class="found-meta">
-              <span id="found-org"></span><span id="found-staff"></span>
-              <span id="found-eta"><strong>⏱</strong> Calculating…</span>
+              <span id="found-org"></span>
+              <span id="found-eta">⏱ Calculating…</span>
               <span id="found-waiting">👥 — waiting</span>
             </div>
-            <div id="found-crowd" style="margin-top:.5rem"></div>
           </div>
           <div id="custom-form-wrap" style="display:none;margin-bottom:1rem">
             <div style="font-weight:700;font-size:.875rem;color:var(--ink3);margin-bottom:.875rem;padding:.75rem 1rem;background:var(--mist);border-radius:var(--r)">📋 Please fill in the required information</div>
@@ -405,7 +336,7 @@ input,select,textarea,button{font-size:16px !important}
         </div>
       </div>
       <div id="active-view" style="display:none">
-        <!-- Org header with logo -->
+        <!-- Org header -->
         <div style="background:var(--ink2);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap">
           <div id="a-org-logo-wrap"><div class="org-logo-placeholder" id="a-org-logo-ph">Q</div></div>
           <div style="flex:1">
@@ -424,7 +355,7 @@ input,select,textarea,button{font-size:16px !important}
           <div class="sbi-ico" id="sb-ico">⏳</div>
           <div><div class="sbi-title" id="sb-title">Waiting in queue</div><div class="sbi-desc" id="sb-desc">Position updates automatically. Stay nearby.</div></div>
         </div>
-        <!-- Ticket display -->
+        <!-- Ticket -->
         <div class="ticket-display">
           <div class="td-bg"></div>
           <div class="td-inner">
@@ -432,19 +363,20 @@ input,select,textarea,button{font-size:16px !important}
             <div class="td-lbl">Your Ticket</div>
             <div class="td-num" id="td-num">—</div>
             <div><span class="td-pos">Position <strong id="td-pos" style="margin-left:.25rem">—</strong></span></div>
-            <div id="td-batch-wrap" style="display:none"><span class="td-batch" id="td-batch">Batch 1</span></div>
             <div><span class="td-eta" id="td-eta">Your turn at: —</span></div>
-            <div id="td-counter-wrap" style="display:none"><span class="td-counter" id="td-counter">🏷 Counter —</span></div>
+            <div id="td-counter-wrap" style="display:none">
+              <span style="background:rgba(255,190,11,.2);border:1px solid rgba(255,190,11,.35);color:var(--amber);border-radius:999px;padding:.4rem 1rem;font-size:.825rem;font-weight:700;margin:.4rem auto;display:inline-flex;align-items:center;gap:.375rem" id="td-counter">🏷 Counter —</span>
+            </div>
           </div>
         </div>
-        <!-- Locked ETA box -->
+        <!-- Locked ETA -->
         <div class="exact-time" id="exact-time-box" style="display:none">
           <div class="et-label">⏰ Your scheduled turn time</div>
           <div class="et-time" id="et-time">—</div>
           <div class="et-date" id="et-date">—</div>
           <div class="et-locked">🔒 Fixed when you joined — won't change</div>
         </div>
-        <!-- Countdown timer -->
+        <!-- Countdown -->
         <div class="countdown-box" id="countdown-box" style="display:none">
           <div class="countdown-label">⏳ Time until your turn</div>
           <div class="countdown-timer">
@@ -461,19 +393,19 @@ input,select,textarea,button{font-size:16px !important}
           <div class="sp"><div class="sp-n" id="sp-ahead">—</div><div class="sp-l">Ahead of You</div></div>
           <div class="sp"><div class="sp-n" id="sp-wait-mins">—</div><div class="sp-l">Est. Wait (mins)</div></div>
         </div>
-        <!-- Counter assignment card -->
+        <!-- Counter assignment -->
         <div class="counter-box" id="counter-assign-box" style="display:none">
           <div class="counter-box-label">Your assigned counter</div>
           <div class="counter-box-name" id="counter-assign-name">—</div>
           <div class="counter-box-sub">Please proceed to this counter when called</div>
         </div>
-        <!-- Ready to Checkout (shopping stage only) -->
+        <!-- READY TO CHECKOUT (shown during shopping stage) -->
         <div class="checkout-card" id="checkout-card" style="display:none">
-          <div class="checkout-card-title">🛒 Done shopping?</div>
-          <div class="checkout-card-sub">Press the button below when you are ready to checkout. You will be automatically assigned to the next available counter.</div>
+          <div class="checkout-card-title">🛒 Done Shopping?</div>
+          <div class="checkout-card-sub">Press the button below when you have finished shopping and are ready to check out. You will be automatically assigned to the least busy counter.</div>
           <button class="btn-checkout" onclick="readyToCheckout()" id="checkout-btn">✅ Ready for Checkout →</button>
         </div>
-        <button class="btn btn-danger btn-full btn-lg" id="leave-btn" onclick="leaveQueue()">✕ Leave Queue</button>
+        <button class="btn btn-danger btn-full btn-lg" id="leave-btn" onclick="leaveQueue()" style="margin-top:.5rem">✕ Leave Queue</button>
       </div>
     </div>
 
@@ -490,26 +422,23 @@ input,select,textarea,button{font-size:16px !important}
 
     <!-- NEARBY -->
     <div class="panel" id="panel-nearby">
-      <div class="ph"><h1>Open Services</h1><p>Browse live queues or search by service code</p></div>
-      <div class="card" style="margin-bottom:1.25rem" id="nearby-search-card">
-        <div class="card-title">🔍 Find by Service Code</div>
+      <div class="ph"><h1>Open Services</h1><p>Browse live queues</p></div>
+      <div class="card" style="margin-bottom:1.25rem">
+        <div class="card-title">🔍 Find by Code</div>
         <div id="ns-step-code">
           <div class="inp-row">
-            <input id="ns-code-in" class="inp code-inp" type="text" placeholder="e.g. VISA24" maxlength="8"/>
+            <input id="ns-code-in" class="inp code-inp" type="text" placeholder="e.g. PINNA1" maxlength="8"/>
             <button class="btn btn-primary" onclick="nearbyFindService()" id="ns-find-btn">Find →</button>
           </div>
           <div id="ns-code-err" class="ferr"></div>
         </div>
         <div id="ns-step-found" style="display:none;margin-top:1.25rem">
           <div class="found-box">
-            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
-              <img id="ns-found-logo" class="found-logo" src="" alt="" style="display:none"/>
-              <div class="found-name" id="ns-found-name"></div>
-            </div>
+            <div class="found-name" id="ns-found-name"></div>
             <div class="found-meta">
               <span id="ns-found-org"></span>
-              <span id="ns-found-eta">⏱ Calculating…</span>
-              <span id="ns-found-waiting">👥 — waiting</span>
+              <span id="ns-found-eta">⏱ —</span>
+              <span id="ns-found-waiting">👥 —</span>
             </div>
           </div>
           <div id="ns-custom-form-wrap" style="display:none;margin-bottom:1rem">
@@ -520,8 +449,8 @@ input,select,textarea,button{font-size:16px !important}
           <button class="btn btn-ghost btn-full" onclick="nsCancelFind()" style="margin-top:.625rem">← Back to list</button>
         </div>
       </div>
-      <div style="margin-bottom:1rem;display:flex;gap:.5rem;align-items:center">
-        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or organization…" style="max-width:320px" oninput="filterNearby(this.value)"/>
+      <div style="margin-bottom:1rem">
+        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or org…" style="max-width:320px" oninput="filterNearby(this.value)"/>
       </div>
       <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
@@ -541,44 +470,7 @@ input,select,textarea,button{font-size:16px !important}
   </div>
 </div>
 
-<!-- MODALS -->
-<div id="modal-notif" class="overlay" style="display:none">
-  <div class="modal">
-    <h2 class="modal-title">🔔 Queue Notifications</h2>
-    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1.25rem">Do you want to be notified before your turn?</p>
-    <div class="fg">
-      <label class="lbl">Notify me when I have this many minutes left</label>
-      <input id="notif-mins" class="inp" type="number" min="1" max="60" value="5" placeholder="e.g. 5"/>
-      <span style="font-size:.78rem;color:#64748b;margin-top:.25rem">The system will alert you in-app and via SMS if you provided your phone number.</span>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeNotifModal(false)">No thanks</button>
-      <button class="btn btn-primary" onclick="closeNotifModal(true)">Yes, notify me</button>
-    </div>
-  </div>
-</div>
-
-<div id="modal-endcode" class="overlay" style="display:none">
-  <div class="modal">
-    <h2 class="modal-title">📢 You're Being Called!</h2>
-    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1rem">Go to the counter now. <strong>Ask the staff for your End Code</strong> — you have 5 minutes before your slot is removed.</p>
-    <div style="background:rgba(67,97,238,.07);border:2px solid rgba(67,97,238,.2);border-radius:var(--r);padding:.875rem;text-align:center;margin-bottom:1.25rem">
-      <div style="font-size:1.75rem;margin-bottom:.2rem">🎫</div>
-      <div style="font-weight:800;font-size:1.1rem;color:var(--ink)">Your Ticket: <span id="modal-ticket-label">—</span></div>
-      <div style="font-size:.78rem;color:#64748b;margin-top:.2rem">Show this to the staff and request your End Code</div>
-    </div>
-    <div class="fg">
-      <label class="lbl">End Code (from staff)</label>
-      <input id="end-code-inp" class="inp code-inp" type="text" placeholder="XXXX" maxlength="4"/>
-      <span id="end-code-err" class="ferr"></span>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('modal-endcode').style.display='none'">Later</button>
-      <button class="btn btn-success" onclick="submitEndCode()">Submit End Code →</button>
-    </div>
-  </div>
-</div>
-
+<!-- FEEDBACK MODAL -->
 <div id="modal-feedback" class="overlay" style="display:none">
   <div class="modal">
     <h2 class="modal-title">⭐ Rate Your Experience</h2>
@@ -598,6 +490,18 @@ input,select,textarea,button{font-size:16px !important}
   </div>
 </div>
 
+<!-- NOTIF MODAL -->
+<div id="modal-notif" class="overlay" style="display:none">
+  <div class="modal">
+    <h2 class="modal-title">🔔 Enable Notifications</h2>
+    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1.25rem">Allow QCode to notify you before your turn, when you're called, and when you move to the next stage — even if this tab is in the background.</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeNotifModal(false)">No thanks</button>
+      <button class="btn btn-primary" onclick="closeNotifModal(true)">Yes, notify me 🔔</button>
+    </div>
+  </div>
+</div>
+
 <!-- DRAGGABLE ASK AI BUTTON -->
 <div id="faq-widget">
   <button id="faq-btn" title="Ask AI — drag to move">
@@ -606,25 +510,25 @@ input,select,textarea,button{font-size:16px !important}
   </button>
 </div>
 
-<!-- FAQ PANEL — opens centered over page -->
+<!-- FAQ PANEL -->
 <div class="faq-overlay hidden" id="faq-overlay">
-  <div class="faq-panel" id="faq-panel">
+  <div class="faq-panel">
     <div class="faq-hdr">
       <div class="faq-hdr-left">
         <div style="width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem">🤖</div>
         <div><div class="faq-title">QCode Assistant</div><div class="faq-sub">Powered by Llama AI</div></div>
       </div>
       <div class="faq-hdr-btns">
-        <button onclick="clearChat()" title="Clear chat">↺</button>
-        <button onclick="closeFAQ()" title="Close">✕</button>
+        <button onclick="clearChat()">↺</button>
+        <button onclick="closeFAQ()">✕</button>
       </div>
     </div>
     <div class="faq-msgs" id="faq-msgs">
-      <div class="faq-msg ai"><div class="faq-bubble">👋 Hi! I'm your QCode Assistant.<br><br>I can help with joining queues, checking your position, understanding wait times, and more. What do you need?</div></div>
+      <div class="faq-msg ai"><div class="faq-bubble">👋 Hi! I'm your QCode Assistant.<br><br>I can help with joining queues, checking your position, understanding the checkout process, and more. What do you need?</div></div>
     </div>
     <div class="faq-quickbtns">
       <button class="faq-qbtn" onclick="quickQ('How do I join a queue?')">How to join</button>
-      <button class="faq-qbtn" onclick="quickQ('What is an end code?')">End codes</button>
+      <button class="faq-qbtn" onclick="quickQ('What does Ready to Checkout do?')">Checkout button</button>
       <button class="faq-qbtn" onclick="quickQ('How does SMS queue joining work?')">SMS joining</button>
     </div>
     <div class="faq-input-row">
@@ -639,114 +543,100 @@ input,select,textarea,button{font-size:16px !important}
 <div id="toasts"></div>
 
 <script>
-// ═══ UTILITIES ═══
+// ── UTILS ─────────────────────────────────────────────────────
 async function api(url,opts){
   try{
-    var r=await fetch(url,{headers:{'Content-Type':'application/json'},...opts,body:opts&&opts.body&&typeof opts.body==='object'?JSON.stringify(opts.body):(opts&&opts.body)});
-    var data=await r.json().catch(function(){return{};});
-    return{ok:r.ok,status:r.status,data:data};
+    const r=await fetch(url,{headers:{'Content-Type':'application/json'},credentials:'include',...opts,
+      body:opts&&opts.body&&typeof opts.body==='object'?JSON.stringify(opts.body):(opts&&opts.body)});
+    const data=await r.json().catch(()=>({}));
+    return{ok:r.ok,status:r.status,data};
   }catch(e){return{ok:false,status:0,data:{error:'Network error.'}};}
 }
 function toast(msg,type,ms){
   type=type||'i';ms=ms||4500;
-  var icons={s:'✓',e:'✕',i:'ℹ',w:'⚠'};
-  var el=document.createElement('div');el.className='toast t-'+type;
+  const icons={s:'✓',e:'✕',i:'ℹ',w:'⚠'};
+  const el=document.createElement('div');el.className='toast t-'+type;
   el.innerHTML='<span>'+icons[type]+'</span><span>'+msg+'</span>';
-  document.getElementById('toasts').appendChild(el);setTimeout(function(){el.remove();},ms);
+  document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),ms);
 }
-function fmt(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function fmt(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function fmtTime(ts){if(!ts)return'—';return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
-function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});}
-function badge(s){var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return '<span class="badge '+(m[s]||'')+'">'+(( s||'').replace('_',' '))+'</span>';}
+function badge(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled'};return`<span class="badge ${m[s]||''}">${(s||'').replace('_',' ')}</span>`;}
 
-// ═══ STATE ═══
-var profile=null,activeEntry=null,foundSvc=null,pollTimer=null,cdTimer=null;
-var fbEntryId=null,fbRating=0;
-var notifEnabled=false,notifMins=10,notifSent=false;
-var endCodePrompted=false,faqHistory=[];
-// LOCKED ETA: set ONCE at join time, NEVER recalculated
-var lockedEtaISO=null;
-var _404count=0;
-var _pwaDeferredPrompt=null;
-var _joinedAt=null;
+// ── STATE ─────────────────────────────────────────────────────
+let profile=null,activeEntry=null,foundSvc=null,_nsSvc=null;
+let pollTimer=null,cdTimer=null;
+let fbEntryId=null,fbRating=0;
+let notifEnabled=false,notifSent=false;
+let lockedEtaISO=null,_joinedAt=null;
+let _404count=0,_pwaDeferredPrompt=null;
+let faqHistory=[];
+let _allNearbyServices=[];
 
-const FAQ_SYS=`You are QCode Assistant — the helpful AI for QCode, a digital queue management platform.
-QCode lets users join queues with a 6-character service code. Features: real-time position tracking, SMS joining, multi-stage queues (Entry → Shopping → Checkout → Packing), end codes to confirm service, smart counter assignment, batch queue system, push notifications, automated pushback if user doesn't respond within 5 minutes (3 strikes = no-show), guest mode, organization dashboards.
-Answer questions helpfully, concisely and accurately. If user writes in another language, respond in that language.`;
+const FAQ_SYS=`You are QCode Assistant — the AI helper for QCode, a digital queue management platform in Nigeria.
+QCode lets users join queues by entering a 6-character service code at qcode.onrender.com.
+Key features: multi-stage queues (Entry → Shopping → Checkout → Packing), Ready to Checkout button (press when done shopping to auto-join checkout queue), smart counter assignment (least busy counter), push notifications, SMS joining, automated pushback after missed calls, staff counter pages.
+Be concise, friendly and helpful. If user writes in Yoruba, Hausa or Pidgin, respond in kind.`;
 
-// ═══ PWA ═══
-window.addEventListener('beforeinstallprompt',function(e){
+// ── PWA ───────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault();_pwaDeferredPrompt=e;
-  var b=document.getElementById('pwa-banner');
+  const b=document.getElementById('pwa-banner');
   if(b&&!localStorage.getItem('pwa-dismissed'))b.style.display='flex';
 });
 function triggerPWAInstall(){if(_pwaDeferredPrompt){_pwaDeferredPrompt.prompt();_pwaDeferredPrompt=null;}dismissPWA();}
-function dismissPWA(){localStorage.setItem('pwa-dismissed','1');var b=document.getElementById('pwa-banner');if(b)b.style.display='none';}
+function dismissPWA(){localStorage.setItem('pwa-dismissed','1');const b=document.getElementById('pwa-banner');if(b)b.style.display='none';}
 
-// ═══ OFFLINE ═══
-window.addEventListener('online',function(){document.getElementById('offline-banner').style.display='none';});
-window.addEventListener('offline',function(){document.getElementById('offline-banner').style.display='block';});
+// ── OFFLINE ───────────────────────────────────────────────────
+window.addEventListener('online',()=>{document.getElementById('offline-banner').style.display='none';});
+window.addEventListener('offline',()=>{document.getElementById('offline-banner').style.display='block';});
 
-// ═══ SERVICE WORKER ═══
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/service-worker.js').catch(function(){});}
+// ── SERVICE WORKER ────────────────────────────────────────────
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/service-worker.js').catch(()=>{});}
 
-// ═══ INIT ═══
+// ── INIT ──────────────────────────────────────────────────────
 async function init(){
-  var session=await api('/api/auth/me');
+  const session=await api('/api/auth/me');
   if(!session.ok||!session.data.logged_in){window.location.href='/login-user';return;}
   if(session.data.role!=='user'){window.location.href=session.data.role==='organization'?'/org':'/super-admin';return;}
-  var pr=await api('/api/user/profile');
+  const pr=await api('/api/user/profile');
   if(!pr.ok){window.location.href='/login-user';return;}
   profile=pr.data;
   document.getElementById('tb-name').textContent=profile.full_name||profile.email||'—';
   document.getElementById('acc-name').value=profile.full_name||'';
   document.getElementById('acc-phone').value=profile.phone||'';
-  var initials=((profile.full_name||profile.email||'U').split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2));
+  const initials=((profile.full_name||profile.email||'U').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));
   document.getElementById('profile-hero').innerHTML=
-    '<div class="avatar">'+initials+'</div>'+
-    '<div><div class="pf-name">'+(profile.full_name||profile.email)+'</div>'+
-    '<div class="pf-sub">'+(profile.email||'')+'</div>'+
-    (profile.phone?'<div class="pf-sub">📞 '+profile.phone+'</div>':'')+'</div>'+
-    '<div class="pf-stats"><div class="pf-n">'+(profile.total_queues||0)+'</div><div class="pf-l">Total Queues</div></div>';
-
-  // Restore active entry from localStorage immediately
-  var stored=localStorage.getItem('activeEntry_'+profile.id);
-  if(!stored) stored=localStorage.getItem('qc_active_entry');
-  if(stored){try{var parsed=JSON.parse(stored);activeEntry=parsed.entry||parsed;}catch(e){activeEntry=null;}}
-
-  // Restore locked ETA for this entry (never recalculate)
+    `<div class="avatar">${initials}</div>`+
+    `<div><div class="pf-name">${profile.full_name||profile.email}</div>`+
+    `<div class="pf-sub">${profile.email||''}</div>`+
+    (profile.phone?`<div class="pf-sub">📞 ${profile.phone}</div>`:'')+`</div>`+
+    `<div class="pf-stats"><div class="pf-n">${profile.total_queues||0}</div><div class="pf-l">Total Queues</div></div>`;
+  // Restore active entry
+  let stored=localStorage.getItem('activeEntry_'+profile.id)||localStorage.getItem('qc_active_entry');
+  if(stored){try{const p=JSON.parse(stored);activeEntry=p.entry||p;}catch(e){activeEntry=null;}}
   if(activeEntry&&activeEntry.id){
-    var savedEta=localStorage.getItem('lockedEta_'+activeEntry.id);
-    if(savedEta) lockedEtaISO=savedEta;
-    else if(activeEntry.estimated_time){
-      lockedEtaISO=activeEntry.estimated_time;
-      localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
-    }
+    const savedEta=localStorage.getItem('lockedEta_'+activeEntry.id);
+    if(savedEta)lockedEtaISO=savedEta;
+    else if(activeEntry.estimated_time){lockedEtaISO=activeEntry.estimated_time;localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);}
     _joinedAt=localStorage.getItem('joinedAt_'+activeEntry.id)||null;
-  }
-
-  // Show active queue immediately from storage without waiting for server
-  if(activeEntry&&activeEntry.id){
     document.getElementById('active-dot').style.display='';
-    if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
-    renderActive();
-    startPolling();
+    const bd=document.getElementById('bn-dot');if(bd)bd.style.display='';
+    renderActive();startPolling();
   }
   await loadHistory();
-  // Register push if already allowed
-  if('Notification' in window&&Notification.permission==='granted'){notifEnabled=true;registerPushSubscription();}
+  if('Notification' in window&&Notification.permission==='granted'){notifEnabled=true;registerPush();}
 }
 
-// ═══ PANELS ═══
+// ── PANELS ────────────────────────────────────────────────────
 function show(name){
-  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
-  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   if(document.getElementById('nav-'+name))document.getElementById('nav-'+name).classList.add('active');
   if(document.getElementById('bn-'+name))document.getElementById('bn-'+name).classList.add('active');
-  // Re-render active queue when navigating to it, so ticket is always visible
-  if(name==='active'&&activeEntry&&activeEntry.id){
+  if(name==='active'&&activeEntry){
     document.getElementById('no-active').style.display='none';
     document.getElementById('active-view').style.display='block';
     document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
@@ -760,42 +650,33 @@ function show(name){
   if(name==='nearby')loadNearby();
 }
 
-// ═══ FIND SERVICE ═══
+// ── FIND SERVICE ──────────────────────────────────────────────
 async function findService(){
-  var code=document.getElementById('code-in').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
-  var err=document.getElementById('code-err');var btn=document.getElementById('find-btn');
+  const code=document.getElementById('code-in').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const err=document.getElementById('code-err');const btn=document.getElementById('find-btn');
   err.style.display='none';
   if(!code){err.textContent='Please enter a service code.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='…';
-  var r=await api('/api/user/find-service?code='+encodeURIComponent(code));
+  const r=await api('/api/user/find-service?code='+encodeURIComponent(code));
   btn.disabled=false;btn.textContent='Find →';
   if(!r.ok){err.textContent=r.data.error||'Service not found.';err.style.display='block';return;}
   foundSvc=r.data;
   document.getElementById('found-name').textContent=r.data.name;
   document.getElementById('found-org').textContent=r.data.org_name?'🏢 '+r.data.org_name:'';
-  document.getElementById('found-staff').textContent=r.data.staff_name?'👤 '+r.data.staff_name:'';
-  document.getElementById('found-eta').innerHTML='<strong>⏱</strong> ~'+r.data.eta_minutes+' min wait';
+  document.getElementById('found-eta').innerHTML='⏱ ~'+r.data.eta_minutes+' min wait';
   document.getElementById('found-waiting').textContent='👥 '+(r.data.waiting_count||0)+' waiting';
-  if(r.data.org_logo){var li=document.getElementById('found-logo');li.src=r.data.org_logo;li.style.display='';}
-  // Crowd level indicator
-  var cl=r.data.crowd_level||'';
-  var crowdEl=document.getElementById('found-crowd');
-  if(crowdEl){
-    var crowdMap={low:'🟢 Low crowd',medium:'🟡 Moderate',high:'🔴 Very Busy'};
-    var crowdCls={low:'nb-crowd-low',medium:'nb-crowd-med',high:'nb-crowd-high'};
-    crowdEl.innerHTML=cl?'<span class="nb-crowd '+( crowdCls[cl]||'')+'">'+( crowdMap[cl]||cl)+'</span>':'';
-  }
+  const li=document.getElementById('found-logo');
+  if(r.data.org_logo){li.src=r.data.org_logo;li.style.display='';}
   document.getElementById('step-code').style.display='none';
   document.getElementById('step-found').style.display='block';
-  var fields=[];try{fields=JSON.parse(r.data.user_info_form||'[]');}catch(e){}
+  // Custom form
+  let fields=[];try{fields=typeof r.data.user_info_form==='string'?JSON.parse(r.data.user_info_form||'[]'):(r.data.user_info_form||[]);}catch(e){}
   if(fields.length){
     document.getElementById('custom-form-wrap').style.display='block';
-    document.getElementById('custom-form-fields').innerHTML=fields.map(function(f){
-      return '<div class="fg"><label class="lbl">'+f.label+(f.required?' *':'')+'</label>'+
-        (f.type==='textarea'?'<textarea id="cf-'+f.id+'" class="inp" rows="3"></textarea>':
-         f.type==='select'?'<select id="cf-'+f.id+'" class="inp"><option value="">Select…</option>'+(f.options||[]).map(function(o){return'<option>'+o+'</option>';}).join('')+'</select>':
-         '<input id="cf-'+f.id+'" class="inp" type="'+(f.type||'text')+'"/>')+'</div>';
-    }).join('');
+    document.getElementById('custom-form-fields').innerHTML=fields.map((f,i)=>
+      `<div class="fg"><label class="lbl">${f.label||f}${f.required?' *':''}</label>`+
+      `<input id="cf-${i}" class="inp" type="${f.type==='textarea'?'text':f.type||'text'}" placeholder="${f.placeholder||''}"/></div>`
+    ).join('');
   }
 }
 function cancelFind(){
@@ -807,109 +688,105 @@ function cancelFind(){
   document.getElementById('custom-form-wrap').style.display='none';
 }
 
-// ═══ JOIN QUEUE ═══
+// ── JOIN QUEUE ────────────────────────────────────────────────
 async function confirmJoin(){
   if(!foundSvc)return;
-  var formData={};
+  const formData={};
   try{
-    var fields=JSON.parse(foundSvc.user_info_form||'[]');
-    for(var i=0;i<fields.length;i++){
-      var f=fields[i];var el=document.getElementById('cf-'+f.id);
-      if(!el)continue;
-      if(f.required&&!el.value){toast('"'+f.label+'" is required.','e');return;}
-      formData[f.id]={label:f.label,value:el.value};
-    }
-  }catch(e){}
-  var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:foundSvc.id,custom_form_data:formData}});
+    let fields=[];try{fields=typeof foundSvc.user_info_form==='string'?JSON.parse(foundSvc.user_info_form||'[]'):(foundSvc.user_info_form||[]);}catch(e){}
+    fields.forEach((f,i)=>{
+      const el=document.getElementById('cf-'+i);if(!el)return;
+      if(f.required&&!el.value){toast('"'+(f.label||f)+'" is required.','e');throw '';}
+      formData[f.label||f]=el.value;
+    });
+  }catch(e){if(e)return;}
+  const r=await api('/api/user/join-queue',{method:'POST',body:{service_id:foundSvc.id,custom_form_data:formData}});
   if(!r.ok){toast(r.data.error||'Failed to join queue.','e');return;}
   activeEntry=r.data.entry||r.data;
-
-  // ── LOCK ETA at join time — this value NEVER changes ──
+  // Lock ETA at join time — NEVER recalculate
   lockedEtaISO=activeEntry.estimated_time||null;
   _joinedAt=new Date().toISOString();
   if(activeEntry.id){
     if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
     localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);
   }
-
-  if(profile){
-    localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
-    localStorage.removeItem('qc_active_entry');
-  }
+  if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
   cancelFind();
-
-  // Show active queue immediately
   document.getElementById('active-dot').style.display='';
-  if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
-  renderActive();
-  show('active');
-  toast('🎉 You joined the queue! Ticket: '+(activeEntry.ticket_label||''),'s');
+  const bd=document.getElementById('bn-dot');if(bd)bd.style.display='';
+  renderActive();show('active');
+  toast('🎉 Joined! Ticket: '+(activeEntry.ticket_label||''),'s');
   startPolling();
-  setTimeout(function(){document.getElementById('modal-notif').style.display='flex';},700);
+  setTimeout(()=>{document.getElementById('modal-notif').style.display='flex';},700);
 }
 
-// ═══ ACTIVE QUEUE ═══
-// ── Org logo ──
+// ── RENDER ACTIVE ─────────────────────────────────────────────
 function _renderOrgLogo(logoUrl,orgName){
-  var wrap=document.getElementById('a-org-logo-wrap');if(!wrap)return;
-  if(logoUrl){
-    wrap.innerHTML='<img class="org-logo-img" src="'+logoUrl+'" alt="'+(orgName||'')+'"/>';
-  }else{
-    var ini=((orgName||'Q').trim().split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2));
-    wrap.innerHTML='<div class="org-logo-placeholder">'+ini+'</div>';
-  }
+  const wrap=document.getElementById('a-org-logo-wrap');if(!wrap)return;
+  if(logoUrl){wrap.innerHTML=`<img class="org-logo-img" src="${logoUrl}" alt="${orgName||''}"/>`;}
+  else{const ini=((orgName||'Q').trim().split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));wrap.innerHTML=`<div class="org-logo-placeholder">${ini}</div>`;}
 }
 
-// ── Stage progress ──
 function _renderStageProgress(stages,currentIdx){
-  var card=document.getElementById('stage-progress-card');
-  var row=document.getElementById('stage-steps-row');
+  const card=document.getElementById('stage-progress-card');
+  const row=document.getElementById('stage-steps-row');
   if(!stages||!stages.length){card.style.display='none';return;}
   card.style.display='';
-  var icons={'entry':'🚪','shopping':'🛒','checkout':'💳','packing':'📦'};
-  row.innerHTML=stages.map(function(s,i){
-    var n=(s.name||s).toLowerCase();var ico=icons[n]||'📍';
-    var cls='stage-step'+(i<currentIdx?' done':i===currentIdx?' active':'');
-    var dot=i<currentIdx?'✓':(i===currentIdx?ico:(i+1).toString());
-    return '<div class="'+cls+'"><div class="step-dot">'+dot+'</div><div class="step-label">'+(s.label||s.name||s)+'</div></div>';
+  const icons={'entry':'🚪','shopping':'🛒','checkout':'💳','packing':'📦'};
+  row.innerHTML=stages.map((s,i)=>{
+    const n=(s.name||'').toLowerCase();const ico=icons[n]||'📍';
+    const cls='stage-step'+(i<currentIdx?' done':i===currentIdx?' active':'');
+    const dot=i<currentIdx?'✓':(i===currentIdx?ico:(i+1).toString());
+    return `<div class="${cls}"><div class="step-dot">${dot}</div><div class="step-label">${s.name||s}</div></div>`;
   }).join('');
 }
 
-// ── Stage-specific UI ──
+function _applyLockedEta(){
+  const eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
+  if(!eta)return;
+  const d=new Date(eta);
+  document.getElementById('td-eta').textContent='Your turn at: '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('et-time').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('et-date').textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('exact-time-box').style.display='';
+}
+
 function _renderStageUI(stageName){
-  var cc=document.getElementById('checkout-card');
-  var cb=document.getElementById('counter-assign-box');
-  var tcw=document.getElementById('td-counter-wrap');
+  const cc=document.getElementById('checkout-card');
+  const cb=document.getElementById('counter-assign-box');
+  const tcw=document.getElementById('td-counter-wrap');
   cc.style.display='none';cb.style.display='none';tcw.style.display='none';
-  var s=(stageName||'').toLowerCase();
-  if(s==='shopping'||s==='entry_completed'){
+  const s=(stageName||'').toLowerCase();
+  // Show checkout button during shopping stage
+  if(s.includes('shopping')||s==='entry'||s.includes('browse')){
     cc.style.display='block';
-  }else if((s==='checkout'||s==='packing')&&activeEntry&&activeEntry.assigned_counter){
+  }
+  // Show counter assignment during checkout or packing
+  if((s.includes('checkout')||s.includes('packing'))&&activeEntry&&activeEntry.assigned_counter){
     document.getElementById('counter-assign-name').textContent=activeEntry.assigned_counter;
     document.getElementById('td-counter').textContent='🏷 '+activeEntry.assigned_counter;
     cb.style.display='block';tcw.style.display='';
   }
 }
 
-// ── Countdown ──
 function startCountdown(){
   clearInterval(cdTimer);
-  var eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
+  const eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
   if(!eta){document.getElementById('countdown-box').style.display='none';return;}
-  var etaMs=new Date(eta).getTime();
-  var joinMs=_joinedAt?new Date(_joinedAt).getTime():Date.now();
-  var totalMs=Math.max(1,etaMs-joinMs);
+  const etaMs=new Date(eta).getTime();
+  const joinMs=_joinedAt?new Date(_joinedAt).getTime():Date.now();
+  const totalMs=Math.max(1,etaMs-joinMs);
   document.getElementById('countdown-box').style.display='';
-  function tick(){
-    var now=Date.now();var left=Math.max(0,etaMs-now);
-    var h=Math.floor(left/3600000);var m=Math.floor((left%3600000)/60000);var s=Math.floor((left%60000)/1000);
+  const tick=()=>{
+    const now=Date.now();const left=Math.max(0,etaMs-now);
+    const h=Math.floor(left/3600000);const m=Math.floor((left%3600000)/60000);const s=Math.floor((left%60000)/1000);
     document.getElementById('cd-h').textContent=String(h).padStart(2,'0');
     document.getElementById('cd-m').textContent=String(m).padStart(2,'0');
     document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
-    var pct=Math.min(100,Math.max(0,((totalMs-left)/totalMs)*100));
+    const pct=Math.min(100,Math.max(0,((totalMs-left)/totalMs)*100));
     document.getElementById('progress-fill').style.width=pct+'%';
     if(left<=0){clearInterval(cdTimer);document.getElementById('countdown-box').style.display='none';}
-  }
+  };
   tick();cdTimer=setInterval(tick,1000);
 }
 
@@ -922,92 +799,63 @@ function renderActive(){
   document.getElementById('td-svc').textContent=activeEntry.svc_name||'';
   document.getElementById('td-num').textContent=activeEntry.ticket_label||'—';
   _renderOrgLogo(activeEntry.org_logo,activeEntry.org_name);
-  // Batch
-  if(activeEntry.batch_number){
-    document.getElementById('td-batch').textContent='Batch '+activeEntry.batch_number;
-    document.getElementById('td-batch-wrap').style.display='';
-  }
-  // Stages
   if(activeEntry.stages&&activeEntry.stages.length){
     _renderStageProgress(activeEntry.stages,activeEntry.current_stage_index||0);
   }
   _renderStageUI(activeEntry.stage_name||'');
-  // Apply locked ETA immediately
   _applyLockedEta();
   startCountdown();
-  // Trigger a background refresh for position/status
   refreshActive();
 }
 
-// Apply locked ETA to UI — VALUE never changes
-function _applyLockedEta(){
-  var eta=lockedEtaISO||(activeEntry&&activeEntry.estimated_time)||null;
-  if(!eta)return;
-  var d=new Date(eta);
-  var timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  var dateStr=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
-  document.getElementById('td-eta').textContent='Your turn at: '+timeStr;
-  document.getElementById('et-time').textContent=timeStr;
-  document.getElementById('et-date').textContent=dateStr;
-  document.getElementById('exact-time-box').style.display='';
-}
-
-var _404count=0;
+// ── POLL / REFRESH ────────────────────────────────────────────
 async function refreshActive(){
   if(!activeEntry)return;
-  var r=await api('/api/user/queue-status/'+activeEntry.id);
+  const r=await api('/api/user/queue-status/'+activeEntry.id);
   if(!r.ok){
-    if(r.status===404){
-      _404count++;
-      if(_404count>=3){clearActiveEntry();return;}
-    }
-    return; // Network error — keep showing stored data
+    if(r.status===404){_404count++;if(_404count>=3){clearActiveEntry();return;}}
+    return;
   }
   _404count=0;
-  var d=r.data;
-
+  const d=r.data;
   if(['completed','cancelled','no_show'].includes(d.status)){
     clearInterval(pollTimer);clearInterval(cdTimer);
-    if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-    if(activeEntry){localStorage.removeItem('lockedEta_'+activeEntry.id);localStorage.removeItem('joinedAt_'+activeEntry.id);}
+    clearActiveStorage();
     activeEntry=null;lockedEtaISO=null;_joinedAt=null;
     document.getElementById('no-active').style.display='';
     document.getElementById('active-view').style.display='none';
     document.getElementById('active-dot').style.display='none';
-    if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
+    const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
     toast('Your queue session has ended.','i');
     if(d.status==='completed'&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
     return;
   }
-
-  var pos=d.position||1;
+  const pos=d.position||1;
   document.getElementById('td-pos').textContent=pos;
   document.getElementById('sp-ahead').textContent=Math.max(0,pos-1);
-  // Estimated wait in minutes
-  var waitMins=d.estimated_wait_minutes||Math.max(0,(pos-1)*(activeEntry.time_interval||5));
+  const waitMins=d.eta_minutes||Math.max(0,(pos-1)*(activeEntry.time_interval||5));
   document.getElementById('sp-wait-mins').textContent=waitMins>0?waitMins+'m':'Soon';
-
-  // ETA is LOCKED — NEVER update from server response
+  // ETA is LOCKED — never update from server
   _applyLockedEta();
-
-  // Stage change detection
-  if(d.stage_name&&d.stage_name!==(activeEntry.stage_name||'')){
-    activeEntry.stage_name=d.stage_name;
+  // Stage change
+  const newStage=d.stage_name||'';
+  if(newStage&&newStage!==(activeEntry.stage_name||'')){
+    activeEntry.stage_name=newStage;
     activeEntry.current_stage_index=d.current_stage_index||0;
-    activeEntry.assigned_counter=d.assigned_counter||null;
+    if(d.stages)activeEntry.stages=d.stages;
+    if(d.assigned_counter)activeEntry.assigned_counter=d.assigned_counter;
     if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
-    _renderStageUI(d.stage_name);
+    _renderStageUI(newStage);
     if(d.stages)_renderStageProgress(d.stages,d.current_stage_index||0);
     // Lock new ETA when entering checkout or packing
-    if((d.stage_name==='checkout'||d.stage_name==='packing')&&d.estimated_time){
+    if((newStage.toLowerCase().includes('checkout')||newStage.toLowerCase().includes('packing'))&&d.estimated_time){
       lockedEtaISO=d.estimated_time;
       localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
-      activeEntry.estimated_time=d.estimated_time;
       _applyLockedEta();startCountdown();
     }
+    toast('➡️ Moved to: '+newStage,'i',6000);
   }
-
-  // Counter assignment update
+  // Counter update
   if(d.assigned_counter&&d.assigned_counter!==activeEntry.assigned_counter){
     activeEntry.assigned_counter=d.assigned_counter;
     document.getElementById('counter-assign-name').textContent=d.assigned_counter;
@@ -1015,208 +863,206 @@ async function refreshActive(){
     document.getElementById('counter-assign-box').style.display='block';
     document.getElementById('td-counter-wrap').style.display='';
   }
-
-  // Org logo late load
   if(d.org_logo&&!activeEntry.org_logo){activeEntry.org_logo=d.org_logo;_renderOrgLogo(d.org_logo,d.org_name||activeEntry.org_name);}
-
-  var box=document.getElementById('status-box');
-  var ico=document.getElementById('sb-ico');
-  var title=document.getElementById('sb-title');
-  var desc=document.getElementById('sb-desc');
-  box.className='status-box';
-  var badgeEl=document.getElementById('a-svc-badge');
+  // Badge
+  const badgeEl=document.getElementById('a-svc-badge');
   badgeEl.textContent=d.svc_status||d.status||'';
   badgeEl.className='badge b-'+(d.svc_status||d.status||'');
-
+  // Status box
+  const box=document.getElementById('status-box');
+  const ico=document.getElementById('sb-ico');
+  const title=document.getElementById('sb-title');
+  const desc=document.getElementById('sb-desc');
+  box.className='status-box';
   if(d.status==='called'){
     box.classList.add('sb-call');ico.textContent='📢';title.textContent="You're being called!";
     desc.textContent='Please proceed to the counter immediately! You have 5 minutes.';
     toast('📢 You are being called! Go to the counter NOW.','w',10000);
-    showBrowserNotification('QCode — It\'s Your Turn!','Head to the counter now. You have 5 minutes!');
-    if(!endCodePrompted){endCodePrompted=true;setTimeout(function(){
-      if(document.getElementById('modal-ticket-label'))document.getElementById('modal-ticket-label').textContent=activeEntry.ticket_label||'—';
-      document.getElementById('modal-endcode').style.display='flex';
-    },500);}
+    showBrowserNotif('QCode — It\'s Your Turn!','Head to the counter now. You have 5 minutes!');
   } else if(d.status==='serving'){
-    box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are currently at the counter.';
-  } else if((d.stage_name||'').toLowerCase()==='shopping'){
+    box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are at the counter.';
+  } else if(newStage.toLowerCase().includes('shopping')){
     box.classList.add('sb-shop');ico.textContent='🛒';title.textContent='Happy Shopping!';desc.textContent='Take your time. Press Ready to Checkout when done.';
-  } else if((d.stage_name||'').toLowerCase()==='packing'){
-    box.classList.add('sb-pack');ico.textContent='📦';title.textContent='Packing & Verification';desc.textContent='Head to the packing desk for item verification.';
+  } else if(newStage.toLowerCase().includes('packing')){
+    box.classList.add('sb-pack');ico.textContent='📦';title.textContent='Packing & Verification';desc.textContent='Head to the packing desk.';
   } else {
     box.classList.add('sb-wait');
-    if(pos===1){ico.textContent='🔔';title.textContent="You're next!";desc.textContent='You will be called very soon. Get ready!';}
+    if(pos===1){ico.textContent='🔔';title.textContent="You're next!";desc.textContent='You will be called very soon!';}
     else if(pos<=3){ico.textContent='⏰';title.textContent='Almost your turn';desc.textContent='Only a few people ahead of you.';}
     else{ico.textContent='⏳';title.textContent='Waiting in queue';desc.textContent='Position updates automatically. Stay nearby.';}
   }
-
+  // Proximity notification
   if(notifEnabled&&!notifSent&&lockedEtaISO){
-    var minsLeft=Math.max(0,Math.round((new Date(lockedEtaISO)-Date.now())/60000));
-    if(minsLeft<=notifMins){
+    const minsLeft=Math.max(0,Math.round((new Date(lockedEtaISO)-Date.now())/60000));
+    if(minsLeft<=10){
       notifSent=true;
-      showBrowserNotification('QCode — Your Turn Soon!','~'+minsLeft+' minutes left. Get ready!');
+      showBrowserNotif('QCode — Your Turn Soon!','~'+minsLeft+' minutes left. Get ready!');
       toast('🔔 Your turn is coming up in ~'+minsLeft+' min!','w',8000);
     }
   }
 }
 
-// ── Ready to Checkout ──
+// ── READY TO CHECKOUT ─────────────────────────────────────────
 async function readyToCheckout(){
   if(!activeEntry)return;
-  var btn=document.getElementById('checkout-btn');
-  btn.disabled=true;btn.textContent='Assigning counter…';
-  var r=await api('/api/user/ready-checkout',{method:'POST',body:{entry_id:activeEntry.id}});
-  if(!r.ok){toast(r.data.error||'Failed. Please try again.','e');btn.disabled=false;btn.textContent='✅ Ready for Checkout →';return;}
-  activeEntry.stage_name='checkout';
-  activeEntry.assigned_counter=r.data.assigned_counter||null;
-  if(r.data.ticket_label)activeEntry.ticket_label=r.data.ticket_label;
-  if(r.data.estimated_time){
-    lockedEtaISO=r.data.estimated_time;
-    localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
-    activeEntry.estimated_time=r.data.estimated_time;
+  const btn=document.getElementById('checkout-btn');
+  btn.disabled=true;btn.textContent='⏳ Assigning counter…';
+  const r=await api('/api/user/ready-checkout',{method:'POST',body:{entry_id:activeEntry.id}});
+  if(!r.ok){
+    toast(r.data.error||'Failed. Please try again.','e');
+    btn.disabled=false;btn.textContent='✅ Ready for Checkout →';
+    return;
   }
+  const d=r.data;
+  // Update active entry with new checkout info
+  activeEntry.stage_name='checkout';
+  activeEntry.assigned_counter=d.assigned_counter||null;
+  if(d.ticket_label){activeEntry.ticket_label=d.ticket_label;document.getElementById('td-num').textContent=d.ticket_label;}
+  if(d.estimated_time){
+    lockedEtaISO=d.estimated_time;
+    localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+    activeEntry.estimated_time=d.estimated_time;
+  }
+  if(d.new_entry_id){activeEntry.id=d.new_entry_id;}
   if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+  // Hide checkout button, show counter
   document.getElementById('checkout-card').style.display='none';
-  if(r.data.assigned_counter){
-    document.getElementById('counter-assign-name').textContent=r.data.assigned_counter;
-    document.getElementById('td-counter').textContent='🏷 '+r.data.assigned_counter;
+  if(d.assigned_counter){
+    document.getElementById('counter-assign-name').textContent=d.assigned_counter;
+    document.getElementById('td-counter').textContent='🏷 '+d.assigned_counter;
     document.getElementById('counter-assign-box').style.display='block';
     document.getElementById('td-counter-wrap').style.display='';
   }
-  if(r.data.ticket_label)document.getElementById('td-num').textContent=r.data.ticket_label;
   _applyLockedEta();startCountdown();
-  toast('✅ Assigned to '+(r.data.assigned_counter||'checkout')+' — head there now!','s',7000);
-  showBrowserNotification('QCode — Checkout Ready!','Assigned to '+(r.data.assigned_counter||'checkout')+'. Head over now!');
-  await refreshActive();
-}
-
-function clearActiveEntry(){
-  clearInterval(pollTimer);clearInterval(cdTimer);
-  if(profile)localStorage.removeItem('activeEntry_'+profile.id);
-  if(activeEntry){localStorage.removeItem('lockedEta_'+activeEntry.id);localStorage.removeItem('joinedAt_'+activeEntry.id);}
-  localStorage.removeItem('qc_active_entry');
-  activeEntry=null;lockedEtaISO=null;_joinedAt=null;
-  document.getElementById('no-active').style.display='';
-  document.getElementById('active-view').style.display='none';
-  document.getElementById('active-dot').style.display='none';
-  if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='none';
+  toast('✅ Assigned to '+(d.assigned_counter||'checkout counter')+'! Head there now.','s',8000);
+  showBrowserNotif('QCode — Checkout Ready!','Assigned to '+(d.assigned_counter||'checkout')+'. Head over!');
 }
 
 function startPolling(){
   clearInterval(pollTimer);
   pollTimer=setInterval(refreshActive,12000);
-  setInterval(function(){api('/api/system/auto-cancel',{method:'POST'});},60000);
 }
 
 async function leaveQueue(){
   if(!activeEntry||!confirm('Leave this queue?'))return;
   document.getElementById('leave-btn').disabled=true;
-  var r=await api('/api/user/leave-queue/'+activeEntry.id,{method:'POST'});
+  const r=await api('/api/user/leave-queue/'+activeEntry.id,{method:'POST'});
   if(!r.ok){toast(r.data.error||'Error.','e');document.getElementById('leave-btn').disabled=false;return;}
   clearActiveEntry();toast('You have left the queue.','i');
 }
 
+function clearActiveEntry(){
+  clearInterval(pollTimer);clearInterval(cdTimer);
+  clearActiveStorage();
+  activeEntry=null;lockedEtaISO=null;_joinedAt=null;
+  document.getElementById('no-active').style.display='';
+  document.getElementById('active-view').style.display='none';
+  document.getElementById('active-dot').style.display='none';
+  const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
+}
+
+function clearActiveStorage(){
+  if(profile)localStorage.removeItem('activeEntry_'+profile.id);
+  localStorage.removeItem('qc_active_entry');
+  if(activeEntry&&activeEntry.id){
+    localStorage.removeItem('lockedEta_'+activeEntry.id);
+    localStorage.removeItem('joinedAt_'+activeEntry.id);
+  }
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────
 function closeNotifModal(yes){
   document.getElementById('modal-notif').style.display='none';
   if(yes){
-    notifEnabled=true;notifMins=parseInt(document.getElementById('notif-mins').value)||10;
-    toast('✓ You will be notified ~'+notifMins+' min before your turn.','s');
+    notifEnabled=true;
     if('Notification' in window&&Notification.permission==='default'){
-      Notification.requestPermission().then(function(p){if(p==='granted')registerPushSubscription();});
-    }
+      Notification.requestPermission().then(p=>{if(p==='granted')registerPush();});
+    } else if(Notification.permission==='granted'){registerPush();}
+    toast('🔔 Notifications enabled!','s');
   }
 }
-function showBrowserNotification(title,body){
+function showBrowserNotif(title,body){
   if('Notification' in window&&Notification.permission==='granted'){
-    new Notification(title,{body:body,icon:'/static/icon-192.png'});
+    new Notification(title,{body,icon:'/static/icons/icon-192.png'});
   }
 }
-async function registerPushSubscription(){
+async function registerPush(){
   if(!('serviceWorker' in navigator)||!('PushManager' in window))return;
   try{
-    var reg=await navigator.serviceWorker.ready;
-    var keyMeta=document.querySelector('meta[name="vapid-public-key"]');
-    if(!keyMeta)return;
-    var sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:keyMeta.content});
-    await api('/api/user/push-subscribe',{method:'POST',body:{subscription:JSON.parse(JSON.stringify(sub))}});
-  }catch(e){}
+    const reg=await navigator.serviceWorker.ready;
+    const keyR=await api('/api/push/vapid-public-key');
+    if(!keyR.ok||!keyR.data.publicKey)return;
+    const key=keyR.data.publicKey;
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(key)});
+    await api('/api/push/subscribe',{method:'POST',body:{subscription:JSON.parse(JSON.stringify(sub))}});
+  }catch(e){console.warn('[Push]',e);}
+}
+function urlB64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const rawData=window.atob(base64);
+  const outputArray=new Uint8Array(rawData.length);
+  for(let i=0;i<rawData.length;++i)outputArray[i]=rawData.charCodeAt(i);
+  return outputArray;
 }
 
-// ═══ END CODE ═══
-async function submitEndCode(){
-  var code=document.getElementById('end-code-inp').value.trim().toUpperCase();
-  var err=document.getElementById('end-code-err');err.style.display='none';
-  if(!code||code.length<4){err.textContent='Please enter the 4-character end code.';err.style.display='block';return;}
-  if(!activeEntry){document.getElementById('modal-endcode').style.display='none';return;}
-  var r=await api('/api/user/verify-end-code',{method:'POST',body:{entry_id:activeEntry.id,end_code:code}});
-  if(!r.ok){err.textContent=r.data.error||'Invalid code. Ask the staff for the correct end code.';err.style.display='block';return;}
-  document.getElementById('modal-endcode').style.display='none';
-  toast('✓ Service confirmed! Thank you.','s');
-  fbEntryId=activeEntry.id;
-  clearActiveEntry();
-  setTimeout(openFeedbackModal,800);
-}
-
-// ═══ FEEDBACK ═══
-function openFeedbackModal(){document.getElementById('modal-feedback').style.display='flex';fbRating=0;document.querySelectorAll('.star').forEach(function(s){s.classList.remove('active');});}
+// ── FEEDBACK ──────────────────────────────────────────────────
+function openFeedbackModal(){document.getElementById('modal-feedback').style.display='flex';fbRating=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('active'));}
 function closeFeedbackModal(){document.getElementById('modal-feedback').style.display='none';}
-function setStar(n){fbRating=n;document.querySelectorAll('.star').forEach(function(s){s.classList.toggle('active',parseInt(s.dataset.v)<=n);});}
+function setStar(n){fbRating=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('active',parseInt(s.dataset.v)<=n));}
 async function submitFeedback(){
   if(!fbRating){toast('Please select a rating.','e');return;}
   if(!fbEntryId){closeFeedbackModal();return;}
-  var comment=document.getElementById('fb-comment').value.trim();
-  var r=await api('/api/user/feedback',{method:'POST',body:{entry_id:fbEntryId,rating:fbRating,comment:comment}});
+  const comment=document.getElementById('fb-comment').value.trim();
+  const r=await api('/api/user/feedback',{method:'POST',body:{entry_id:fbEntryId,rating:fbRating,comment}});
   if(!r.ok){toast(r.data.error||'Failed to submit feedback.','e');return;}
   closeFeedbackModal();toast('Thank you for your feedback! ⭐','s');
 }
 
-// ═══ HISTORY ═══
+// ── HISTORY ───────────────────────────────────────────────────
 async function loadHistory(){
-  var r=await api('/api/user/history');
-  var tb=document.getElementById('hist-tbody');
-  if(!r.ok||!r.data.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8">No queue history yet. Join a queue to get started!</td></tr>';return;}
-  tb.innerHTML=r.data.map(function(e){
-    return '<tr><td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
-      '<td>'+(e.svc_name||'—')+'</td><td>'+(e.org_name||'—')+'</td>'+
-      '<td>'+(e.join_method==='sms'?'📱 SMS':'🌐 Web')+'</td>'+
-      '<td>'+badge(e.status)+'</td>'+
-      '<td style="font-size:.8rem">'+fmt(e.joined_at)+'</td></tr>';
-  }).join('');
+  const r=await api('/api/user/history');
+  const tb=document.getElementById('hist-tbody');
+  if(!r.ok||!r.data.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8">No queue history yet.</td></tr>';return;}
+  tb.innerHTML=r.data.map(e=>`<tr>
+    <td><span class="ticket-tag">${e.ticket_label||'—'}</span></td>
+    <td>${e.svc_name||'—'}</td><td>${e.org_name||'—'}</td>
+    <td>${e.join_method==='sms'?'📱 SMS':'🌐 Web'}</td>
+    <td>${badge(e.status)}</td>
+    <td style="font-size:.8rem">${fmt(e.joined_at)}</td>
+  </tr>`).join('');
 }
 
-// ═══ NEARBY ═══
-var _allNearbyServices=[];
+// ── NEARBY ────────────────────────────────────────────────────
 async function loadNearby(){
-  var r=await api('/api/user/open-services');
-  var grid=document.getElementById('nearby-grid');
+  const r=await api('/api/user/open-services');
+  const grid=document.getElementById('nearby-grid');
   if(!r.ok||!r.data.length){_allNearbyServices=[];grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">🔍</div><p>No open services right now.</p></div>';return;}
   _allNearbyServices=r.data;renderNearbyGrid(_allNearbyServices);
 }
 function renderNearbyGrid(svcs){
-  var grid=document.getElementById('nearby-grid');
+  const grid=document.getElementById('nearby-grid');
   if(!svcs.length){grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><p>No matching services found.</p></div>';return;}
-  grid.innerHTML=svcs.map(function(s){
-    return '<div class="nb-card" onclick="nsLoadService(\''+s.service_code+'\')">'+
-      '<div class="nb-name">'+s.name+'</div>'+
-      '<div class="nb-meta">🏢 '+(s.org_name||'—')+'<br>👥 '+s.waiting_count+' waiting · ⏱ '+s.time_interval+' min/person'+(s.staff_name?'<br>👤 '+s.staff_name:'')+'</div>'+
-      '<div class="nb-code">'+s.service_code+'</div></div>';
-  }).join('');
+  grid.innerHTML=svcs.map(s=>
+    `<div class="nb-card" onclick="nsLoadService('${s.service_code}')">
+      <div class="nb-name">${s.name}</div>
+      <div class="nb-meta">🏢 ${s.org_name||'—'}<br>👥 ${s.waiting_count||0} waiting · ⏱ ${s.time_interval||5} min/person</div>
+      <div class="nb-code">${s.service_code}</div>
+    </div>`
+  ).join('');
 }
 function filterNearby(q){
   if(!q.trim()){renderNearbyGrid(_allNearbyServices);return;}
-  var low=q.toLowerCase();
-  renderNearbyGrid(_allNearbyServices.filter(function(s){
-    return (s.name||'').toLowerCase().includes(low)||(s.org_name||'').toLowerCase().includes(low)||(s.service_code||'').toLowerCase().includes(low);
-  }));
+  const low=q.toLowerCase();
+  renderNearbyGrid(_allNearbyServices.filter(s=>(s.name||'').toLowerCase().includes(low)||(s.org_name||'').toLowerCase().includes(low)||(s.service_code||'').toLowerCase().includes(low)));
 }
-var _nsSvc=null;
 async function nearbyFindService(){
-  var code=document.getElementById('ns-code-in').value.trim().toUpperCase();
-  var errEl=document.getElementById('ns-code-err');var btn=document.getElementById('ns-find-btn');
+  const code=document.getElementById('ns-code-in').value.trim().toUpperCase();
+  const errEl=document.getElementById('ns-code-err');const btn=document.getElementById('ns-find-btn');
   errEl.style.display='none';
   if(!code){errEl.textContent='Please enter a service code.';errEl.style.display='block';return;}
   btn.disabled=true;btn.textContent='…';
-  var r=await api('/api/user/find-service?code='+encodeURIComponent(code));
+  const r=await api('/api/user/find-service?code='+encodeURIComponent(code));
   btn.disabled=false;btn.textContent='Find →';
   if(!r.ok){errEl.textContent=(r.data&&r.data.error)||'Service not found.';errEl.style.display='block';return;}
   _nsSvc=r.data;
@@ -1224,181 +1070,126 @@ async function nearbyFindService(){
   document.getElementById('ns-found-org').textContent=_nsSvc.org_name?'🏢 '+_nsSvc.org_name:'';
   document.getElementById('ns-found-eta').textContent='⏱ ~'+(_nsSvc.eta_minutes||0)+' min wait';
   document.getElementById('ns-found-waiting').textContent='👥 '+(_nsSvc.waiting_count||0)+' waiting';
-  var logoEl=document.getElementById('ns-found-logo');
-  if(_nsSvc.org_logo){logoEl.src=_nsSvc.org_logo;logoEl.style.display='block';}else{logoEl.style.display='none';}
-  var formWrap=document.getElementById('ns-custom-form-wrap');
-  var formFields=document.getElementById('ns-custom-form-fields');
-  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
-  if(fields.length){
-    formWrap.style.display='block';
-    formFields.innerHTML=fields.map(function(f,i){
-      return '<div class="fg"><label class="lbl">'+(f.label||f)+(f.required?'*':'')+'</label>'+
-        '<input class="inp" id="ns-cf-'+i+'" type="text" placeholder="'+(f.placeholder||'')+'" '+(f.required?'required':'')+'/></div>';
-    }).join('');
-  }else{formWrap.style.display='none';}
   document.getElementById('ns-step-code').style.display='none';
   document.getElementById('ns-step-found').style.display='block';
+  let fields=[];try{fields=typeof _nsSvc.user_info_form==='string'?JSON.parse(_nsSvc.user_info_form||'[]'):(_nsSvc.user_info_form||[]);}catch(e){}
+  const fw=document.getElementById('ns-custom-form-wrap');const ff=document.getElementById('ns-custom-form-fields');
+  if(fields.length){fw.style.display='block';ff.innerHTML=fields.map((f,i)=>`<div class="fg"><label class="lbl">${f.label||f}</label><input class="inp" id="ns-cf-${i}" type="text"/></div>`).join('');}
+  else fw.style.display='none';
 }
-async function nsLoadService(code){
-  document.getElementById('ns-code-in').value=code;
-  nearbyFindService();
-  document.getElementById('nearby-search-card').scrollIntoView({behavior:'smooth',block:'start'});
-}
-function nsCancelFind(){
-  _nsSvc=null;
-  document.getElementById('ns-step-found').style.display='none';
-  document.getElementById('ns-step-code').style.display='block';
-  document.getElementById('ns-code-in').value='';
-  document.getElementById('ns-code-err').style.display='none';
-}
+async function nsLoadService(code){document.getElementById('ns-code-in').value=code;await nearbyFindService();}
+function nsCancelFind(){_nsSvc=null;document.getElementById('ns-step-found').style.display='none';document.getElementById('ns-step-code').style.display='block';document.getElementById('ns-code-in').value='';document.getElementById('ns-code-err').style.display='none';}
 async function nsConfirmJoin(){
   if(!_nsSvc)return;
-  var customData={};
-  var fields=[];try{fields=JSON.parse(_nsSvc.user_info_form||'[]');}catch(e){}
-  for(var i=0;i<fields.length;i++){
-    var el=document.getElementById('ns-cf-'+i);
+  const customData={};
+  let fields=[];try{fields=typeof _nsSvc.user_info_form==='string'?JSON.parse(_nsSvc.user_info_form||'[]'):(_nsSvc.user_info_form||[]);}catch(e){}
+  for(let i=0;i<fields.length;i++){
+    const el=document.getElementById('ns-cf-'+i);
     if(fields[i].required&&(!el||!el.value.trim())){toast('Please fill in all required fields.','e');return;}
     if(el)customData[fields[i].label||fields[i]]=el.value.trim();
   }
-  var r=await api('/api/user/join-queue',{method:'POST',body:{service_id:_nsSvc.id,custom_form_data:customData}});
+  const r=await api('/api/user/join-queue',{method:'POST',body:{service_id:_nsSvc.id,custom_form_data:customData}});
   if(r.status===409){toast('You are already in this queue.','i');show('active');return;}
   if(!r.ok){toast((r.data&&r.data.error)||'Failed to join queue.','e');return;}
   activeEntry=r.data.entry||r.data;
-  lockedEtaISO=activeEntry.estimated_time||null;
-  _joinedAt=new Date().toISOString();
-  if(activeEntry.id){
-    if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
-    localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);
-  }
+  lockedEtaISO=activeEntry.estimated_time||null;_joinedAt=new Date().toISOString();
+  if(activeEntry.id){if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);}
   if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
   toast('🎉 Joined! Ticket: '+activeEntry.ticket_label,'s');
   nsCancelFind();
   document.getElementById('active-dot').style.display='';
-  if(document.getElementById('bn-dot'))document.getElementById('bn-dot').style.display='';
-  renderActive();show('active');
-  startPolling();
-  setTimeout(function(){document.getElementById('modal-notif').style.display='flex';},700);
+  const bd=document.getElementById('bn-dot');if(bd)bd.style.display='';
+  renderActive();show('active');startPolling();
+  setTimeout(()=>{document.getElementById('modal-notif').style.display='flex';},700);
 }
 
-// ═══ ACCOUNT ═══
+// ── ACCOUNT ───────────────────────────────────────────────────
 async function saveAccount(){
-  var name=document.getElementById('acc-name').value.trim();
-  var phone=document.getElementById('acc-phone').value.trim();
-  var r=await api('/api/user/profile',{method:'POST',body:{full_name:name,phone:phone}});
+  const name=document.getElementById('acc-name').value.trim();
+  const phone=document.getElementById('acc-phone').value.trim();
+  const r=await api('/api/user/profile',{method:'POST',body:{full_name:name,phone:phone}});
   if(!r.ok){toast(r.data.error||'Save failed.','e');return;}
   document.getElementById('tb-name').textContent=name||profile.email||'—';
   toast('Account saved! ✓','s');
 }
 
-// ═══ FAQ AI — draggable button + centered panel ═══
-function openFAQ(){
-  document.getElementById('faq-overlay').classList.remove('hidden');
-  setTimeout(function(){document.getElementById('faq-inp').focus();},120);
-}
+// ── FAQ AI ────────────────────────────────────────────────────
+function openFAQ(){document.getElementById('faq-overlay').classList.remove('hidden');setTimeout(()=>document.getElementById('faq-inp').focus(),120);}
 function closeFAQ(){document.getElementById('faq-overlay').classList.add('hidden');}
-document.getElementById('faq-overlay').addEventListener('click',function(e){if(e.target===this)closeFAQ();});
+document.getElementById('faq-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('faq-overlay'))closeFAQ();});
 function quickQ(q){openFAQ();document.getElementById('faq-inp').value=q;sendFAQ();}
 function clearChat(){faqHistory=[];document.getElementById('faq-msgs').innerHTML='<div class="faq-msg ai"><div class="faq-bubble">Chat cleared! How can I help you?</div></div>';}
 async function sendFAQ(){
-  var inp=document.getElementById('faq-inp');var msg=inp.value.trim();if(!msg)return;
+  const inp=document.getElementById('faq-inp');const msg=inp.value.trim();if(!msg)return;
   inp.value='';appendMsg('user',msg);faqHistory.push({role:'user',content:msg});
   if(faqHistory.length>20)faqHistory=faqHistory.slice(-20);
-  var typingId='t'+Date.now();appendMsg('ai','Thinking…','',typingId);document.getElementById('faq-send').disabled=true;
+  const tid='t'+Date.now();appendMsg('ai','Thinking…','',tid);
+  document.getElementById('faq-send').disabled=true;
   try{
-    var res=await api('/api/ai/faq',{method:'POST',body:{messages:faqHistory,system:FAQ_SYS}});
-    var reply=(res.data&&res.data.response)||'Sorry, I could not get a response. Please try again.';
+    const res=await api('/api/ai/faq',{method:'POST',body:{messages:faqHistory,system:FAQ_SYS}});
+    const reply=(res.data&&(res.data.response||res.data.reply))||'Sorry, I could not get a response. Please try again.';
     faqHistory.push({role:'assistant',content:reply});
-    var el=document.getElementById(typingId);if(el)el.remove();
+    const el=document.getElementById(tid);if(el)el.remove();
     appendMsg('ai',reply);
-  }catch(e){var el2=document.getElementById(typingId);if(el2)el2.remove();appendMsg('ai','⚠️ AI temporarily unavailable.');}
+  }catch(e){const el=document.getElementById(tid);if(el)el.remove();appendMsg('ai','⚠️ AI temporarily unavailable.');}
   finally{document.getElementById('faq-send').disabled=false;inp.focus();}
 }
 function appendMsg(role,text,cls,id){
-  var wrap=document.getElementById('faq-msgs');var div=document.createElement('div');
+  const wrap=document.getElementById('faq-msgs');const div=document.createElement('div');
   div.className='faq-msg '+role;if(id)div.id=id;
   div.innerHTML='<div class="faq-bubble'+(cls?' '+cls:'')+'">' +text.replace(/\n/g,'<br>')+'</div>';
   wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;
 }
 
-// ── DRAGGABLE BUTTON LOGIC ──
+// ── DRAGGABLE BUTTON ──────────────────────────────────────────
 (function(){
-  var widget=document.getElementById('faq-widget');
-  var btn=document.getElementById('faq-btn');
-  var dragging=false,moved=false;
-  var sx=0,sy=0,ox=0,oy=0;
-
+  const widget=document.getElementById('faq-widget');
+  const btn=document.getElementById('faq-btn');
+  let dragging=false,moved=false,sx=0,sy=0,ox=0,oy=0;
   function start(e){
-    var pt=e.touches?e.touches[0]:e;
-    if(e.button&&e.button!==0)return;
-    dragging=true;moved=false;
-    widget.classList.add('dragging');
-    var rect=widget.getBoundingClientRect();
-    ox=rect.left;oy=rect.top;
-    sx=pt.clientX;sy=pt.clientY;
-    widget.style.right='auto';widget.style.bottom='auto';
-    widget.style.left=ox+'px';widget.style.top=oy+'px';
-    e.preventDefault();
+    const pt=e.touches?e.touches[0]:e;if(e.button&&e.button!==0)return;
+    dragging=true;moved=false;widget.classList.add('dragging');
+    const rect=widget.getBoundingClientRect();ox=rect.left;oy=rect.top;sx=pt.clientX;sy=pt.clientY;
+    widget.style.right='auto';widget.style.bottom='auto';widget.style.left=ox+'px';widget.style.top=oy+'px';e.preventDefault();
   }
   function move(e){
-    if(!dragging)return;
-    var pt=e.touches?e.touches[0]:e;
-    var dx=pt.clientX-sx,dy=pt.clientY-sy;
-    if(Math.abs(dx)>5||Math.abs(dy)>5)moved=true;
-    var nl=Math.max(4,Math.min(ox+dx,window.innerWidth-widget.offsetWidth-4));
-    var nt=Math.max(4,Math.min(oy+dy,window.innerHeight-widget.offsetHeight-4));
-    widget.style.left=nl+'px';widget.style.top=nt+'px';
-    e.preventDefault();
+    if(!dragging)return;const pt=e.touches?e.touches[0]:e;
+    const dx=pt.clientX-sx,dy=pt.clientY-sy;if(Math.abs(dx)>5||Math.abs(dy)>5)moved=true;
+    const nl=Math.max(4,Math.min(ox+dx,window.innerWidth-widget.offsetWidth-4));
+    const nt=Math.max(4,Math.min(oy+dy,window.innerHeight-widget.offsetHeight-4));
+    widget.style.left=nl+'px';widget.style.top=nt+'px';e.preventDefault();
   }
-  function end(){
-    if(!dragging)return;
-    dragging=false;widget.classList.remove('dragging');
-    if(!moved)openFAQ();
-  }
-
-  btn.addEventListener('mousedown',start);
-  btn.addEventListener('touchstart',start,{passive:false});
-  document.addEventListener('mousemove',move);
-  document.addEventListener('touchmove',move,{passive:false});
-  document.addEventListener('mouseup',end);
-  document.addEventListener('touchend',end);
+  function end(){if(!dragging)return;dragging=false;widget.classList.remove('dragging');if(!moved)openFAQ();}
+  btn.addEventListener('mousedown',start);btn.addEventListener('touchstart',start,{passive:false});
+  document.addEventListener('mousemove',move);document.addEventListener('touchmove',move,{passive:false});
+  document.addEventListener('mouseup',end);document.addEventListener('touchend',end);
 })();
 
-// ═══ LOGOUT ═══
+// ── LOGOUT ────────────────────────────────────────────────────
 async function doLogout(){
   clearInterval(pollTimer);clearInterval(cdTimer);
   await api('/api/auth/logout',{method:'POST'});
   window.location.href='/';
 }
 
-// ═══ INPUT EVENTS ═══
+// ── INPUT EVENTS ──────────────────────────────────────────────
 document.getElementById('code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
-document.getElementById('code-in').addEventListener('keydown',function(e){if(e.key==='Enter')findService();});
-document.getElementById('ns-code-in').addEventListener('keydown',function(e){if(e.key==='Enter')nearbyFindService();});
+document.getElementById('code-in').addEventListener('keydown',e=>{if(e.key==='Enter')findService();});
 document.getElementById('ns-code-in').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
+document.getElementById('ns-code-in').addEventListener('keydown',e=>{if(e.key==='Enter')nearbyFindService();});
 
 init();
 </script>
 
-<!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav">
   <div class="bn-items">
-    <button class="bn-item active" id="bn-join" onclick="show('join')">
-      <span class="bn-ico">🎫</span><span>Join</span>
-    </button>
+    <button class="bn-item active" id="bn-join" onclick="show('join')"><span class="bn-ico">🎫</span><span>Join</span></button>
     <button class="bn-item" id="bn-active" onclick="show('active')">
-      <span class="bn-ico">📡</span>
-      <span class="bn-dot" id="bn-dot"></span>
-      <span>Active</span>
+      <span class="bn-ico">📡</span><span class="bn-dot" id="bn-dot"></span><span>Active</span>
     </button>
-    <button class="bn-item" id="bn-nearby" onclick="show('nearby')">
-      <span class="bn-ico">🗺</span><span>Services</span>
-    </button>
-    <button class="bn-item" id="bn-history" onclick="show('history')">
-      <span class="bn-ico">🕐</span><span>History</span>
-    </button>
-    <button class="bn-item" id="bn-account" onclick="show('account')">
-      <span class="bn-ico">👤</span><span>Account</span>
-    </button>
+    <button class="bn-item" id="bn-nearby" onclick="show('nearby')"><span class="bn-ico">🗺</span><span>Services</span></button>
+    <button class="bn-item" id="bn-history" onclick="show('history')"><span class="bn-ico">🕐</span><span>History</span></button>
+    <button class="bn-item" id="bn-account" onclick="show('account')"><span class="bn-ico">👤</span><span>Account</span></button>
   </div>
 </nav>
 </body>
