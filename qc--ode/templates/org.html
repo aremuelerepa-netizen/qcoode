@@ -622,14 +622,14 @@ function diffMin(a,b){if(!a||!b)return'—';return Math.max(0,Math.round((new Da
 function esc(s){return(s||'').replace(/'/g,"&#39;").replace(/"/g,'&quot;');}
 function badge(s){
   var m={waiting:'b-waiting',called:'b-called',serving:'b-serving',completed:'b-completed',no_show:'b-no_show',cancelled:'b-cancelled',open:'b-open',paused:'b-paused',closed:'b-closed',pending:'b-pending',approved:'b-approved',suspended:'b-suspended'};
-  return '<span class="badge '+(m[s]||'")>"'+(s||'').replace('_',' ')+'</span>';
+  return '<span class="badge '+(m[s]||'')+'">'+((s||'').replace('_',' '))+'</span>';
 }
 function closeModal(id){document.getElementById(id).style.display='none';}
 function openModal(id){document.getElementById(id).style.display='flex';}
 
 // ─── STATE ─────────────────────────────────────────────────────
 var profile=null, services=[], activeSvc=null, calledEntry=null;
-var formFields=[], breaks=[], reportData=[];
+var formFields=[], breaks=[], reportData=[], _reportFormFields=[];
 var pollTimer=null;
 var stagesEnabled=false, stageList=[], batchEnabled=false;
 var _uploadedLogoUrl=null;
@@ -725,6 +725,7 @@ function renderServices() {
         '</div>'+
         badge(s.status)+
       '</div>'+
+            (s.description?'<div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem;line-height:1.5;padding:.375rem .625rem;background:var(--bg);border-radius:.4rem">'+s.description+'</div>':'')+
       '<span class="svc-code" onclick="copyText(\''+s.service_code+'\')" title="Click to copy">'+s.service_code+'</span>'+
       '<div class="svc-meta">'+
         '<span>⏱ '+s.time_interval+' min/person</span>'+
@@ -1040,34 +1041,90 @@ async function loadReport() {
   var svcId=document.getElementById('report-svc').value;
   if(!svcId){toast('Select a service first.','e');return;}
   var r=await api('/api/org/report/'+svcId);
-  reportData=r.ok?(r.data||[]):[];
+  if(!r.ok){toast('Could not load report.','e');return;}
+  // API now returns {entries:[], form_fields:[]}
+  var entries = r.data.entries || r.data || [];
+  _reportFormFields = r.data.form_fields || [];
+  reportData = entries;
   var tb=document.getElementById('report-tbody');
-  if(!reportData.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">No completed entries yet.</td></tr>';return;}
+  if(!reportData.length){
+    tb.innerHTML='<tr><td colspan="'+(7+_reportFormFields.length)+'" style="text-align:center;padding:2rem;color:var(--muted)">No completed entries yet.</td></tr>';
+    return;
+  }
+  // Add dynamic extra columns to header if custom form fields exist
+  var thead = document.querySelector('#panel-reports thead tr');
+  if(thead){
+    var extraH = _reportFormFields.map(function(f){return '<th>'+f.label+'</th>';}).join('');
+    thead.innerHTML='<th>Ticket</th><th>Name</th><th>Phone</th><th>Method</th><th>Status</th><th>Joined</th><th>Wait</th>'+extraH;
+  }
   tb.innerHTML=reportData.map(function(e){
-    return '<tr><td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
-      '<td>'+(e.guest_name||'User')+'</td>'+
-      '<td>'+(e.join_method==='sms'?'📱 SMS':'🌐 Web')+'</td>'+
+    var cfd = e.custom_form_data || {};
+    if(typeof cfd==='string'){try{cfd=JSON.parse(cfd);}catch(x){cfd={};}}
+    var extra = _reportFormFields.map(function(f){
+      return '<td style="font-size:.78rem">'+(cfd[f.label]||'—')+'</td>';
+    }).join('');
+    return '<tr>'+
+      '<td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
+      '<td>'+(e.user_name||e.guest_name||'User')+'</td>'+
+      '<td style="font-size:.78rem">'+(e.user_phone||e.guest_phone||'—')+'</td>'+
+      '<td>'+(e.join_method==='sms'?'📱 SMS':e.join_method==='walk_in'?'🚶 Walk-in':'🌐 Web')+'</td>'+
       '<td>'+badge(e.status)+'</td>'+
       '<td style="font-size:.78rem">'+fmt(e.joined_at)+'</td>'+
-      '<td style="font-size:.78rem">'+fmt(e.completed_at)+'</td>'+
-      '<td>'+diffMin(e.joined_at,e.completed_at)+'</td></tr>';
+      '<td>'+diffMin(e.joined_at,e.completed_at)+' min</td>'+
+      extra+
+    '</tr>';
   }).join('');
 }
 
 function downloadCSV() {
   if(!reportData.length){toast('Load a report first.','e');return;}
-  var rows=reportData.map(function(e){return[e.ticket_label,e.guest_name||'User',e.join_method,e.status,fmt(e.joined_at),fmt(e.completed_at),diffMin(e.joined_at,e.completed_at)].join(',');});
-  var csv='Ticket,Name,Method,Status,Joined,Completed,WaitMin\n'+rows.join('\n');
+  var extraH = _reportFormFields.map(function(f){return '"'+f.label+'"';}).join(',');
+  var header = 'Ticket,Name,Phone,Method,Status,Joined,WaitMin'+(extraH?','+extraH:'');
+  var rows = reportData.map(function(e){
+    var cfd = e.custom_form_data || {};
+    if(typeof cfd==='string'){try{cfd=JSON.parse(cfd);}catch(x){cfd={};}}
+    var base = [
+      e.ticket_label||'',
+      '"'+(e.user_name||e.guest_name||'User')+'"',
+      e.user_phone||e.guest_phone||'',
+      e.join_method||'',
+      e.status||'',
+      fmt(e.joined_at),
+      diffMin(e.joined_at,e.completed_at)
+    ].join(',');
+    var extra = _reportFormFields.map(function(f){
+      return '"'+(cfd[f.label]||'')+'"';
+    }).join(',');
+    return base+(extra?','+extra:'');
+  });
+  var csv = header+'\n'+rows.join('\n');
   var blob=new Blob([csv],{type:'text/csv'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='qcode-report-'+Date.now()+'.csv'; a.click();
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='qcode-report-'+Date.now()+'.csv'; a.click();
   toast('CSV downloaded!','s');
 }
 
 function printReport() {
   if(!reportData.length){toast('Load a report first.','e');return;}
+  var extraH = _reportFormFields.map(function(f){return '<th>'+f.label+'</th>';}).join('');
+  var rows = reportData.map(function(e){
+    var cfd = e.custom_form_data || {};
+    if(typeof cfd==='string'){try{cfd=JSON.parse(cfd);}catch(x){cfd={};}}
+    var extra = _reportFormFields.map(function(f){return '<td>'+(cfd[f.label]||'—')+'</td>';}).join('');
+    return '<tr><td>'+(e.ticket_label||'—')+'</td><td>'+(e.user_name||e.guest_name||'User')+'</td>'+
+      '<td>'+(e.user_phone||e.guest_phone||'—')+'</td>'+
+      '<td>'+e.join_method+'</td><td>'+e.status+'</td>'+
+      '<td>'+fmt(e.joined_at)+'</td><td>'+diffMin(e.joined_at,e.completed_at)+' min</td>'+extra+'</tr>';
+  }).join('');
   var win=window.open('','_blank');
-  var rows=reportData.map(function(e){return'<tr><td>'+e.ticket_label+'</td><td>'+(e.guest_name||'User')+'</td><td>'+e.join_method+'</td><td>'+e.status+'</td><td>'+fmt(e.joined_at)+'</td><td>'+fmt(e.completed_at)+'</td><td>'+diffMin(e.joined_at,e.completed_at)+'</td></tr>';}).join('');
-  win.document.write('<!DOCTYPE html><html><head><title>QCode Report</title><style>body{font-family:sans-serif;padding:2rem}table{width:100%;border-collapse:collapse;margin-top:1rem}th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}th{background:#f4f6fb;font-weight:700;color:#8892a4;text-transform:uppercase;font-size:.78rem}</style></head><body><h1>QCode Queue Report</h1><p style="color:#8892a4">'+new Date().toLocaleString()+' · '+(profile&&profile.org_name||'')+'</p><table><thead><tr><th>Ticket</th><th>Name</th><th>Method</th><th>Status</th><th>Joined</th><th>Completed</th><th>Wait (min)</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>');
+  win.document.write('<!DOCTYPE html><html><head><title>QCode Report</title>'+
+    '<style>body{font-family:sans-serif;padding:2rem}table{width:100%;border-collapse:collapse;margin-top:1rem}'+
+    'th,td{border:1px solid #e4e8f0;padding:.5rem .875rem;text-align:left;font-size:.875rem}'+
+    'th{background:#f4f6fb;font-weight:700;color:#8892a4;text-transform:uppercase;font-size:.78rem}</style>'+
+    '</head><body><h1>QCode Queue Report</h1>'+
+    '<p style="color:#8892a4">'+new Date().toLocaleString()+' · '+(profile&&profile.org_name||'')+'</p>'+
+    '<table><thead><tr><th>Ticket</th><th>Name</th><th>Phone</th><th>Method</th><th>Status</th><th>Joined</th><th>Wait</th>'+extraH+'</tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></body></html>');
   win.document.close(); win.print();
 }
 
@@ -1284,7 +1341,11 @@ function showUserInfo(entryId) {
     {label:'Stage',value:entry.stage_name||'—'},
     {label:'Joined',value:entry.joined_at?new Date(entry.joined_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'},
   ];
-  document.getElementById('ui-basic').innerHTML=basics.map(function(b){
+  var cfd = entry.custom_form_data || {};
+  if(typeof cfd==='string'){try{cfd=JSON.parse(cfd);}catch(x){cfd={};}}
+  var cfKeys = Object.keys(cfd);
+  var extraItems = cfKeys.map(function(k){return {label:k, value:cfd[k]||'—'};});
+  document.getElementById('ui-basic').innerHTML=basics.concat(extraItems).map(function(b){
     return '<div class="ui-basic-item"><div class="ui-basic-label">'+b.label+'</div><div class="ui-basic-value">'+b.value+'</div></div>';
   }).join('');
   openModal('modal-userinfo');
