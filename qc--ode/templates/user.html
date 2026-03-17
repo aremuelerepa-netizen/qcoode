@@ -303,6 +303,8 @@ input,select,textarea,button{font-size:16px !important}
             <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
               <img id="found-logo" class="found-logo" src="" alt="" style="display:none"/>
               <div class="found-name" id="found-name"></div>
+              <div id="found-desc" style="display:none;font-size:.78rem;color:var(--muted);margin:.375rem 0 .5rem;line-height:1.5"></div>
+              <div id="found-batch" style="display:none;font-size:.75rem;color:#047857;background:#d1fae5;border-radius:.4rem;padding:.3rem .625rem;margin:.375rem 0 .5rem"></div>
             </div>
             <div class="found-meta">
               <span id="found-org"></span>
@@ -665,6 +667,20 @@ async function findService(){
   document.getElementById('found-org').textContent=r.data.org_name?'🏢 '+r.data.org_name:'';
   document.getElementById('found-eta').innerHTML='⏱ ~'+r.data.eta_minutes+' min wait';
   document.getElementById('found-waiting').textContent='👥 '+(r.data.waiting_count||0)+' waiting';
+  // Show description if available
+  var descEl=document.getElementById('found-desc');
+  if(descEl){
+    if(r.data.description){descEl.textContent=r.data.description;descEl.style.display='block';}
+    else{descEl.style.display='none';}
+  }
+  // Show batch info if service uses batch queue
+  var batchEl=document.getElementById('found-batch');
+  if(batchEl){
+    if(r.data.batch_enabled){
+      batchEl.textContent='📦 Batch queue — groups of '+(r.data.batch_size||50)+' customers · '+((r.data.batch_buffer_min||30)+' min between batches');
+      batchEl.style.display='block';
+    } else {batchEl.style.display='none';}
+  }
   const li=document.getElementById('found-logo');
   if(r.data.org_logo){li.src=r.data.org_logo;li.style.display='';}
   document.getElementById('step-code').style.display='none';
@@ -834,6 +850,8 @@ async function refreshActive(){
   document.getElementById('td-pos').textContent=pos;
   document.getElementById('sp-ahead').textContent=Math.max(0,pos-1);
   const waitMins=d.eta_minutes||Math.max(0,(pos-1)*(activeEntry.time_interval||5));
+  // Batch info for display
+  const batchNum = activeEntry.batch_number || null;
   document.getElementById('sp-wait-mins').textContent=waitMins>0?waitMins+'m':'Soon';
   // ETA is LOCKED — never update from server
   _applyLockedEta();
@@ -994,7 +1012,7 @@ async function registerPush(){
     if(!keyR.ok||!keyR.data.publicKey)return;
     const key=keyR.data.publicKey;
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(key)});
-    await api('/api/push/subscribe',{method:'POST',body:{subscription:JSON.parse(JSON.stringify(sub))}});
+    await api('/api/user/push-subscribe',{method:'POST',body:{subscription:JSON.parse(JSON.stringify(sub))}});
   }catch(e){console.warn('[Push]',e);}
 }
 function urlB64ToUint8Array(base64String){
