@@ -1051,8 +1051,13 @@ def api_org_upload_logo():
                      "Content-Type": file.content_type},
             data=data, timeout=30)
     if not r.ok:
-        print(f"[Logo Upload Error] {r.status_code} {r.text}")
-        return jsonify({"error": "Upload failed. Check Supabase Storage bucket settings."}), 500
+        err_detail = r.text[:500]
+        print(f"[Logo Upload Error] Status: {r.status_code}")
+        print(f"[Logo Upload Error] URL: {upload_url}")
+        print(f"[Logo Upload Error] Bucket: {SUPABASE_STORAGE_BUCKET}")
+        print(f"[Logo Upload Error] Response: {err_detail}")
+        print(f"[Logo Upload Error] Key prefix: {SUPABASE_KEY[:30] if SUPABASE_KEY else 'MISSING'}")
+        return jsonify({"error": f"Upload failed ({r.status_code}): {err_detail}"}), 500
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_STORAGE_BUCKET}/{filename}"
     db_update("profiles", {"id": uid}, {"logo_url": public_url})
     return jsonify({"success": True, "logo_url": public_url}), 200
