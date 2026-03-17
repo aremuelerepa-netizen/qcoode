@@ -344,6 +344,7 @@ input,select,textarea,button{font-size:16px !important}
           </div>
           <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
             <button class="btn bs" id="call-btn" onclick="callNext()">📢 Call Next</button>
+            <button class="btn bam bsm" id="batch-entry-btn" onclick="openBatchEntryModal()" style="display:none">🚪 Call In Batch</button>
             <button class="walkin-btn" onclick="openWalkInModal()">🚶 Walk-In</button>
             <select class="inp" style="padding:.5rem .875rem;width:auto;font-size:.82rem" id="status-sel" onchange="changeStatus()">
               <option value="open">Open</option>
@@ -562,6 +563,27 @@ input,select,textarea,button{font-size:16px !important}
   </div>
 </div>
 
+
+<!-- ═══ BATCH ENTRY MODAL ═══ -->
+<div id="modal-batch-entry" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-batch-entry')">
+  <div class="modal" style="max-width:420px">
+    <h2 class="modal-title">🚪 Call Customers Into Store</h2>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.25rem">How many customers should be called in at once? Each selected customer will receive a push notification to enter the store.</p>
+    <div style="display:flex;align-items:center;gap:.625rem;margin-bottom:1rem">
+      <button style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:1.1rem;cursor:pointer;font-weight:700" onclick="var v=parseInt(document.getElementById('batch-count').value)||20;document.getElementById('batch-count').value=Math.max(1,v-5)">−</button>
+      <input id="batch-count" class="inp" type="number" min="1" max="100" value="20" style="text-align:center;font-family:var(--fh);font-size:1.5rem;font-weight:700;width:100px"/>
+      <button style="width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:1.1rem;cursor:pointer;font-weight:700" onclick="var v=parseInt(document.getElementById('batch-count').value)||20;document.getElementById('batch-count').value=Math.min(100,v+5)">+</button>
+      <span style="font-size:.82rem;color:var(--muted)">customers</span>
+    </div>
+    <div id="batch-waiting-info" style="font-size:.78rem;color:var(--brand);margin-bottom:1rem"></div>
+    <div id="batch-entry-err" class="ferr"></div>
+    <div class="modal-footer">
+      <button class="btn bg" onclick="closeModal('modal-batch-entry')">Cancel</button>
+      <button class="btn bp" id="batch-entry-submit-btn" onclick="submitBatchEntry()">🚪 Call Them In</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ WALK-IN MODAL ═══ -->
 <div id="modal-walkin" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-walkin')">
   <div class="modal" style="max-width:420px">
@@ -766,6 +788,13 @@ function openQueueView(svc) {
   document.getElementById('status-sel').value=svc.status;
   document.getElementById('q-svc-badge').textContent=svc.status;
   document.getElementById('q-svc-badge').className='badge b-'+svc.status;
+  // Single stage → show Call Next only
+  // Multi stage  → hide Call Next, show Batch Entry button instead
+  var isMultiStage = svc.stages && svc.stages.length > 0;
+  var callBtn  = document.getElementById('call-btn');
+  var batchBtn = document.getElementById('batch-entry-btn');
+  if(callBtn)  callBtn.style.display  = isMultiStage ? 'none'        : 'inline-flex';
+  if(batchBtn) batchBtn.style.display = isMultiStage ? 'inline-flex' : 'none';
   switchTab('live');
   clearInterval(pollTimer);
   pollTimer=setInterval(loadQueue, 10000);
@@ -1371,6 +1400,34 @@ function openCreateModal() {
 }
 
 // ─── LOGOUT ────────────────────────────────────────────────────
+// ─── BATCH ENTRY ───────────────────────────────────────────────
+async function openBatchEntryModal() {
+  if(!activeSvc) return;
+  // Check waiting count at entry stage
+  var r = await api('/api/org/queue/entry-batch-size/'+activeSvc.id);
+  var info = document.getElementById('batch-waiting-info');
+  if(r.ok) {
+    info.textContent = r.data.waiting + ' customers waiting at ' + (r.data.stage_name||'Entry') + ' stage';
+    document.getElementById('batch-count').value = Math.min(20, r.data.waiting||20);
+  }
+  document.getElementById('batch-entry-err').style.display = 'none';
+  openModal('modal-batch-entry');
+}
+
+async function submitBatchEntry() {
+  var count = parseInt(document.getElementById('batch-count').value)||20;
+  var errEl = document.getElementById('batch-entry-err');
+  var btn   = document.getElementById('batch-entry-submit-btn');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Calling…';
+  var r = await api('/api/org/queue/batch-call-entry/'+activeSvc.id, {method:'POST', body:{count:count}});
+  btn.disabled = false; btn.textContent = '🚪 Call Them In';
+  if(!r.ok){errEl.textContent=r.data.error||'Error.';errEl.style.display='block';return;}
+  toast('🚪 Called in '+r.data.called_count+' customers: '+r.data.called_tickets.join(', '),'s',8000);
+  closeModal('modal-batch-entry');
+  await loadQueue();
+}
+
 async function doLogout() {
   clearInterval(pollTimer);
   await api('/api/auth/logout',{method:'POST'});
