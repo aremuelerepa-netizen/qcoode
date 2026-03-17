@@ -836,6 +836,47 @@ async function refreshActive(){
   const d=r.data;
   if(['completed','cancelled','no_show'].includes(d.status)){
     clearInterval(pollTimer);clearInterval(cdTimer);
+    // Check if server says we advanced to next stage
+    // If advanced_to_next_stage is true, do NOT show feedback — just reload queue
+    if(d.advanced_to_next_stage){
+      activeEntry=null;lockedEtaISO=null;_joinedAt=null;
+      clearActiveStorage();
+      toast('➡️ Moving to next stage…','i',3000);
+      setTimeout(function(){checkActiveQueue();},2000);
+      return;
+    }
+    // Check if there is a new active entry for us in a different stage
+    // (server already created it — poll once to find it)
+    if(d.status==='completed' && d.stage_id){
+      // Give server 1s to create the next stage entry then re-check
+      setTimeout(async function(){
+        var recheck = await api('/api/user/history');
+        if(recheck.ok){
+          var entries = recheck.data||[];
+          var nextActive = entries.find(function(e){return ['waiting','called','serving'].includes(e.status);});
+          if(nextActive){
+            activeEntry = nextActive;
+            _calledAlerted = false;
+            lockedEtaISO = null; _joinedAt = null;
+            await refreshEntry();
+            startPolling();
+            toast('➡️ You have been moved to the next stage!','s',5000);
+            return;
+          }
+        }
+        // No next stage found — truly complete
+        clearActiveStorage();
+        activeEntry=null;lockedEtaISO=null;_joinedAt=null;
+        document.getElementById('no-active').style.display='';
+        document.getElementById('active-view').style.display='none';
+        document.getElementById('active-dot').style.display='none';
+        const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
+        toast('✅ Service complete! Thank you.','s');
+        if(fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
+      },1500);
+      return;
+    }
+    // Cancelled or no_show — just clear
     clearActiveStorage();
     activeEntry=null;lockedEtaISO=null;_joinedAt=null;
     document.getElementById('no-active').style.display='';
