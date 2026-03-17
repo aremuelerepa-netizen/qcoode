@@ -675,12 +675,20 @@ def api_queue_status(entry_id):
     svc   = svcs[0] if svcs else {}
     org   = db_select("profiles", {"id": f"eq.{svc.get('org_id','')}"}, single=True) or {}
     eta_mins = max(0, (ahead+1)*(svc.get("time_interval") or 5))
+    # Enrich with stage name if entry has a stage_id
+    stage_name = ""
+    if entry.get("stage_id"):
+        stage_rows = db_select("stages", {"id": f"eq.{entry['stage_id']}"})
+        if stage_rows:
+            stage_name = stage_rows[0].get("name", "")
     entry.update({
         "position": ahead+1, "ahead": ahead, "total": total, "eta_minutes": eta_mins,
         "svc_name": svc.get("name",""), "svc_status": svc.get("status",""),
         "time_interval": svc.get("time_interval",5),
         "estimated_time": (datetime.now(timezone.utc)+timedelta(minutes=eta_mins)).isoformat(),
         "org_name": org.get("org_name",""), "org_logo": org.get("logo_url",""),
+        "stage_name": stage_name,
+        "advanced_to_next_stage": False,  # set true by update endpoint when advancing
     })
     return jsonify(entry), 200
 
