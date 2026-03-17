@@ -1333,14 +1333,159 @@ def api_org_update_entry(entry_id):
     if status in ("completed","no_show","cancelled"):
         upd["completed_at"] = datetime.now(timezone.utc).isoformat()
     db_update("queue_entries", {"id": entry_id}, upd)
-    # If completed \u2014 send push to user
+
+    # ── Stage progression on completed ──────────────────────────
+    advanced = False
     if status == "completed":
         rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-        if rows and rows[0].get("user_id"):
-            send_push_to_user(rows[0]["user_id"], "\u2705 Service Complete!",
-                              "You've been served. Please rate your experience.",
-                              {"type": "completed", "entry_id": entry_id})
-    return jsonify({"success": True}), 200
+        if rows:
+            entry    = rows[0]
+            svc_id   = entry.get("service_id")
+            stage_id = entry.get("stage_id")
+
+            if svc_id and stage_id:
+                current_stage = db_select("stages", {"id": f"eq.{stage_id}"})
+                if current_stage:
+                    cur_order   = current_stage[0].get("order", 1)
+                    next_stages = db_select("stages",
+                                            {"service_id": f"eq.{svc_id}",
+                                             "order":      f"eq.{cur_order+1}"})
+                    if next_stages:
+                        next_stage = next_stages[0]
+                        svcs = db_select("services", {"id": f"eq.{svc_id}"})
+                        svc  = svcs[0] if svcs else {}
+                        pos  = db_count("queue_entries",
+                                        {"service_id": f"eq.{svc_id}",
+                                         "stage_id":   f"eq.{next_stage['id']}",
+                                         "status":     "eq.waiting"}) + 1
+                        eta_t = (datetime.now(timezone.utc) +
+                                 timedelta(minutes=pos*(next_stage.get("time_interval") or
+                                                        svc.get("time_interval",5)))).isoformat()
+                        new_req = {
+                            "service_id":    svc_id,
+                            "user_id":       entry.get("user_id"),
+                            "guest_name":    entry.get("guest_name"),
+                            "guest_phone":   entry.get("guest_phone"),
+                            "ticket_label":  entry.get("ticket_label",""),
+                            "ticket_number": entry.get("ticket_number",0),
+                            "status":        "waiting",
+                            "estimated_time": eta_t,
+                            "join_method":   entry.get("join_method","web"),
+                            "joined_at":     datetime.now(timezone.utc).isoformat(),
+                        }
+                        new_opt = {
+                            "end_code":       entry.get("end_code"),
+                            "stage_id":       next_stage["id"],
+                            "pushback_count": 0,
+                        }
+                        db_insert("queue_entries", _safe_payload("queue_entries", new_req, new_opt))
+                        advanced = True
+                        # Push: next stage notification — NOT service complete
+                        if entry.get("user_id"):
+                            send_push_to_user(entry["user_id"],
+                                              f"\u27a1\ufe0f Next Stage: {next_stage['name']}",
+                                              f"You\'ve been moved to {next_stage['name']}. Position #{pos}.",
+                                              {"type": "next_stage",
+                                               "stage_name": next_stage["name"],
+                                               "entry_id":   entry_id})
+                        if entry.get("guest_phone"):
+                            send_sms(entry["guest_phone"],
+                                     f"QCode: Moving to {next_stage['name']}. "
+                                     f"Position #{pos}. ~{pos*(next_stage.get('time_interval',5))} min wait.")
+
+            # Only send Service Complete + feedback on the LAST stage
+            if not advanced and entry.get("user_id"):
+                send_push_to_user(entry["user_id"], "\u2705 Service Complete!",
+                                  "You\'ve been fully served. Please rate your experience.",
+                                  {"type": "completed", "entry_id": entry_id})
+
+    return jsonify({"success": True, "advanced_to_next_stage": advanced}), 200
+
+@app.route("/api/org/queue/batch-call-entry/<svc_id>", methods=["POST"])
+def api_org_batch_call_entry(svc_id):
+    """
+    Batch entry for Stage 1 (Entry Queue).
+    Calls multiple customers into the store at once.
+    The org sets how many to call (batch_call_count).
+    Each called customer gets a push notification to enter.
+    """
+    uid = session.get("user_id")
+    if not uid or session.get("role") != "organization":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    d = request.get_json() or {}
+    count = int(d.get("count") or 20)   # how many to call in at once
+    count = max(1, min(count, 100))     # clamp between 1 and 100
+
+    # Get the first stage (Entry) for this service
+    stages = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc"})
+    if not stages:
+        return jsonify({"error": "No stages configured for this service"}), 400
+
+    entry_stage = stages[0]  # Stage 1 = Entry
+
+    # Get waiting entries in the entry stage
+    waiting = db_select("queue_entries", {
+        "service_id": f"eq.{svc_id}",
+        "stage_id":   f"eq.{entry_stage['id']}",
+        "status":     "eq.waiting",
+        "order":      "ticket_number.asc",
+        "limit":      str(count),
+    })
+
+    if not waiting:
+        return jsonify({"error": "No customers waiting to enter"}), 404
+
+    called_entries = []
+    for entry in waiting:
+        db_update("queue_entries", {"id": entry["id"]},
+                  {"status": "called",
+                   "called_at": datetime.now(timezone.utc).isoformat()})
+        called_entries.append(entry["ticket_label"])
+
+        # Push notification to each called customer
+        if entry.get("user_id"):
+            send_push_to_user(entry["user_id"],
+                              "🚪 You May Enter!",
+                              f"Ticket {entry['ticket_label']} — Please enter the store now.",
+                              {"type": "entry_called",
+                               "ticket_label": entry["ticket_label"],
+                               "entry_id":     entry["id"]})
+        if entry.get("guest_phone"):
+            send_sms(entry["guest_phone"],
+                     f"QCode: Ticket {entry['ticket_label']} — You may now enter the store.")
+
+    return jsonify({
+        "success": True,
+        "called_count":   len(called_entries),
+        "called_tickets": called_entries,
+        "stage_name":     entry_stage.get("name", "Entry"),
+    }), 200
+
+
+@app.route("/api/org/queue/entry-batch-size/<svc_id>", methods=["GET"])
+def api_org_entry_batch_waiting(svc_id):
+    """Returns how many customers are waiting at the entry stage."""
+    uid = session.get("user_id")
+    if not uid or session.get("role") != "organization":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    stages = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc"})
+    if not stages:
+        return jsonify({"waiting": 0, "stage_name": "Entry"}), 200
+
+    entry_stage = stages[0]
+    waiting = db_count("queue_entries", {
+        "service_id": f"eq.{svc_id}",
+        "stage_id":   f"eq.{entry_stage['id']}",
+        "status":     "eq.waiting",
+    })
+    return jsonify({
+        "waiting":    waiting,
+        "stage_name": entry_stage.get("name", "Entry"),
+        "stage_id":   entry_stage["id"],
+    }), 200
+
 
 @app.route("/api/org/report/<svc_id>")
 def api_org_report(svc_id):
