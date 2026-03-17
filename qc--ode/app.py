@@ -37,12 +37,49 @@ def _fetch_columns(table: str) -> set:
         return _schema_cache[table]
     try:
         h = {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"}
+        # Use ?select=* with Accept: application/json to get column names
+        # even when table is empty — use limit=0 to get schema without data
         r2 = requests.get(f"{SUPABASE_URL}/rest/v1/{table}?limit=1",
                           headers={**h, "Accept": "application/json"}, timeout=10)
-        if r2.ok and r2.json():
-            cols = set(r2.json()[0].keys())
-        else:
-            cols = set()
+        cols = set()
+        if r2.ok:
+            rows = r2.json()
+            if rows:
+                cols = set(rows[0].keys())
+            else:
+                # Table is empty — fetch schema via OPTIONS or known columns
+                # Fall back: use a known set of columns per table
+                known = {
+                    "queue_entries": {"id","service_id","user_id","guest_name","guest_phone",
+                                      "ticket_label","ticket_number","status","join_method",
+                                      "custom_form_data","end_code","estimated_time","joined_at",
+                                      "called_at","completed_at","stage_id","counter_id",
+                                      "batch_number","batch_open_time","pushback_count"},
+                    "services":      {"id","org_id","name","description","staff_name","service_code",
+                                      "ticket_prefix","ticket_counter","time_interval","max_users",
+                                      "status","end_code","user_info_form","schedule_start",
+                                      "schedule_end","queue_start","queue_end","break_times",
+                                      "stages_enabled","batch_enabled","batch_size","batch_buffer_min",
+                                      "deleted_at","created_at"},
+                    "profiles":      {"id","role","full_name","org_name","email","phone",
+                                      "company_address","logo_url","approval_status","rejection_reason",
+                                      "preferred_lang","is_online","created_at"},
+                    "stages":        {"id","service_id","name","order","time_interval","stage_code",
+                                      "staff_names","staff_pin","counter_count","created_at"},
+                    "staff_counters":{"id","stage_id","service_id","staff_name","counter_number",
+                                      "is_active","last_seen","created_at"},
+                    "push_subscriptions":{"id","user_id","endpoint","subscription_data",
+                                          "created_at","updated_at"},
+                    "feedbacks":     {"id","entry_id","service_id","user_id","rating","comment",
+                                      "created_at"},
+                    "password_resets":{"id","user_id","email","token","expires_at","used",
+                                       "created_at"},
+                    "sms_joins":     {"id","from_phone","message_body","service_code",
+                                      "queue_entry_id","status","created_at"},
+                    "admin_logs":    {"id","admin_id","action","target_id","target_type",
+                                      "details","created_at"},
+                }
+                cols = known.get(table, set())
         _schema_cache[table] = cols
         return cols
     except Exception as e:
@@ -1297,7 +1334,9 @@ def api_org_walk_in(svc_id):
     optional = {"end_code": end_code, "pushback_count": 0}
     res = db_insert("queue_entries", _safe_payload("queue_entries", required, optional))
     if not res["ok"]:
-        return jsonify({"error": "Failed to add walk-in."}), 500
+        err_msg = res["data"].get("message","") if isinstance(res["data"],dict) else str(res["data"])
+        print(f"[Walk-in Error] {err_msg}")
+        return jsonify({"error": f"Failed to add walk-in: {err_msg}"}), 500
     entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
     entry["position"]  = pos
     entry["end_code"]  = end_code
