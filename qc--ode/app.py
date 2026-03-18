@@ -731,6 +731,14 @@ def api_queue_status(entry_id):
             "status":     "eq.waiting"
         })
         eta_mins = max(0, (ahead+1)*(svc.get("time_interval") or 5))
+    # Get counter name if assigned
+    counter_name = ""
+    if entry.get("counter_id"):
+        crows = db_select("staff_counters", {"id": f"eq.{entry['counter_id']}"})
+        if crows:
+            cnum  = crows[0].get("counter_number",1)
+            cstaff = crows[0].get("staff_name","")
+            counter_name = f"Counter {cnum}" + (f" — {cstaff}" if cstaff else "")
     entry.update({
         "position": ahead+1, "ahead": ahead, "total": total, "eta_minutes": eta_mins,
         "svc_name": svc.get("name",""), "svc_status": svc.get("status",""),
@@ -740,6 +748,7 @@ def api_queue_status(entry_id):
         "stage_name":    stage_name,
         "stage_order":   stage_order,
         "total_stages":  total_stages,
+        "counter_name":  counter_name,
         "advanced_to_next_stage": False,
     })
     return jsonify(entry), 200
@@ -1837,15 +1846,28 @@ def api_staff_call_next():
     db_update("queue_entries", {"id": entry["id"]}, upd)
     entry["status"] = "called"
     if entry.get("user_id"):
-        stage_name = stages[0].get("name","")
-        is_entry   = stages[0].get("order",1) == 1
+        stage_name   = stages[0].get("name","")
+        is_entry     = stages[0].get("order",1) == 1
+        # Get counter name for display
+        counter_name = ""
+        if counter_id:
+            crows = db_select("staff_counters", {"id": f"eq.{counter_id}"})
+            if crows:
+                cnum  = crows[0].get("counter_number",1)
+                cname = crows[0].get("staff_name","")
+                counter_name = f"Counter {cnum}" + (f" — {cname}" if cname else "")
         title = "🚪 You May Enter!" if is_entry else "📢 Your Turn!"
-        body  = (f"Ticket {entry['ticket_label']} — Please enter the store now."
-                 if is_entry else
-                 f"Ticket {entry['ticket_label']} — Please come to {stage_name}.")
+        if is_entry:
+            body = f"Ticket {entry['ticket_label']} — Please enter the store now."
+        elif counter_name:
+            body = f"Ticket {entry['ticket_label']} — Please go to {counter_name}."
+        else:
+            body = f"Ticket {entry['ticket_label']} — Please come to {stage_name}."
         send_push_to_user(entry["user_id"], title, body,
-                          {"type": "entry_called" if is_entry else "called",
-                           "entry_id": entry["id"], "stage_name": stage_name})
+                          {"type":         "entry_called" if is_entry else "called",
+                           "entry_id":     entry["id"],
+                           "stage_name":   stage_name,
+                           "counter_name": counter_name})
     if entry.get("guest_phone"):
         send_sms(entry["guest_phone"],
                  f"📢 QCode: Ticket {entry['ticket_label']} called! Come to the counter now.")
