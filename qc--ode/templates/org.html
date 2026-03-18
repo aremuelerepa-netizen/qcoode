@@ -381,7 +381,7 @@ input,select,textarea,button{font-size:16px !important}
           </div>
           <div id="pane-live">
             <div class="tbl-wrap"><table>
-              <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Stage</th><th>Status</th><th>Online</th><th>Actions</th></tr></thead>
+              <thead><tr><th>#</th><th>Ticket</th><th>Name</th><th>Method</th><th>Stage</th><th>Due At</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="live-tbody"><tr><td colspan="8"><div class="loading"><div class="spin"></div></div></td></tr></tbody>
             </table></div>
           </div>
@@ -837,8 +837,14 @@ function renderLiveTable(entries) {
   if(!entries.length) { tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">Queue is empty.</td></tr>'; return; }
   tb.innerHTML=entries.map(function(e,i) {
     var method=e.join_method==='sms'?'📱 SMS':e.join_method==='walk_in'?'🚶 Walk-in':'🌐 Web';
-    var online=e.user_id?(e.user_online?'<span class="dot-on"></span>':'<span class="dot-off"></span>'):'—';
     var stage=e.stage_name?'<span style="font-size:.72rem;background:rgba(67,97,238,.08);color:var(--brand);padding:.15rem .4rem;border-radius:.3rem">'+e.stage_name+'</span>':'—';
+    var etaHtml='—';
+    if(e.eta_display){
+      var etaColor=e.eta_due?'#047857':'#92400e';
+      var etaBg=e.eta_due?'#d1fae5':'#fef3c7';
+      var etaLabel=e.eta_due?'✅ Due':'⏳ '+e.eta_mins_left+'m';
+      etaHtml='<div style="font-size:.72rem;font-weight:700;color:'+etaColor+';background:'+etaBg+';padding:.2rem .5rem;border-radius:.3rem;white-space:nowrap">'+etaLabel+'<br><span style="font-weight:400">'+e.eta_display+'</span></div>';
+    }
     var acts='';
     if(e.status==='called') acts='<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById(\''+e.id+'\',\'completed\')">✓ Done</button><button class="btn bd bsm" onclick="markById(\''+e.id+'\',\'no_show\')">No-Show</button></div>';
     else if(e.status==='waiting') acts='<button class="btn bg bsm" onclick="markById(\''+e.id+'\',\'cancelled\')">Remove</button>';
@@ -847,11 +853,11 @@ function renderLiveTable(entries) {
       '<td style="color:var(--muted);font-size:.78rem">'+(i+1)+'</td>'+
       '<td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
       '<td style="display:flex;align-items:center;gap:.5rem">'+(e.user_name||'Guest')+
-        '<button class="info-btn" onclick="showUserInfo(\''+e.id+'\')" title="View details">ℹ</button></td>'+
+        '<button class="info-btn" onclick="showUserInfo(\''+e.id+'\''+')" title="View details">ℹ</button></td>'+
       '<td>'+method+'</td>'+
       '<td>'+stage+'</td>'+
+      '<td>'+etaHtml+'</td>'+
       '<td>'+badge(e.status)+'</td>'+
-      '<td style="text-align:center">'+online+'</td>'+
       '<td>'+acts+'</td>'+
     '</tr>';
   }).join('');
@@ -868,16 +874,29 @@ function renderCalledBanner() {
   b.style.display='flex';
 }
 
-async function callNext() {
+async function callNext(force) {
   var btn=document.getElementById('call-btn'); btn.disabled=true; btn.textContent='Calling…';
   var r0=await api('/api/org/queue/'+activeSvc.id);
   if(r0.ok) {
     var active=(r0.data||[]).filter(function(e){return e.status==='called'||e.status==='serving';});
     if(active.length>0) { btn.disabled=false; btn.textContent='📢 Call Next'; toast('⚠️ Finish '+active[0].ticket_label+' first.','w',6000); return; }
   }
-  var r=await api('/api/org/queue/call-next/'+activeSvc.id,{method:'POST'});
+  var body = force ? {force:true} : {};
+  var r=await api('/api/org/queue/call-next/'+activeSvc.id,{method:'POST',body:body});
   btn.disabled=false; btn.textContent='📢 Call Next';
-  if(!r.ok){toast(r.data.error||'No one waiting.','i');return;}
+  if(!r.ok){
+    if(r.data.can_force){
+      // Customer not due yet — ask if they want to call anyway
+      if(confirm('⏳ '+r.data.error+'
+
+Do you want to call them early anyway?')){
+        callNext(true);
+      }
+      return;
+    }
+    toast(r.data.error||'No one waiting.','i');
+    return;
+  }
   toast('📢 Calling '+r.data.entry.ticket_label,'s',6000);
   await loadQueue();
 }
