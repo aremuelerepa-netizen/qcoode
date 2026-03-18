@@ -939,6 +939,8 @@ async function createService() {
     for(var i=0;i<stageList.length;i++){
       if(!stageList[i].name.trim()){errEl.textContent='Stage '+(i+1)+' needs a name.';errEl.style.display='block';return;}
       if(stageList[i].pin&&!/^\d{4}$/.test(stageList[i].pin)){errEl.textContent='Stage '+(i+1)+' PIN must be 4 digits.';errEl.style.display='block';return;}
+      var filled=(stageList[i].counters||[]).filter(function(c){return c&&c.trim();});
+      if(filled.length===0&&i>0){errEl.textContent='Stage '+(i+1)+' needs at least one counter name.';errEl.style.display='block';return;}
     }
   }
   createBtn.disabled=true; createBtn.textContent='Creating…';
@@ -953,7 +955,15 @@ async function createService() {
   };
   if(stagesEnabled&&stageList.length) {
     body.stages=stageList.map(function(s,i){
-      return {name:s.name.trim(),order:i+1,time_interval:s.interval||5,staff_names:s.staff,staff_pin:s.pin||null,counter_count:s.staff.length||1};
+      var namedCounters = (s.counters||[]).filter(function(c){return c && c.trim();});
+      return {
+        name:          s.name.trim(),
+        order:         i+1,
+        time_interval: s.interval||5,
+        staff_names:   namedCounters,
+        staff_pin:     s.pin||null,
+        counter_count: namedCounters.length||1
+      };
     });
   }
   if(batchEnabled) {
@@ -1231,10 +1241,10 @@ function toggleStages() {
   document.getElementById('stages-wrap').style.display=stagesEnabled?'block':'none';
   if(stagesEnabled&&stageList.length===0) {
     stageList=[
-      {name:'Entry Queue',interval:5,staff:[],pin:''},
-      {name:'Shopping',interval:30,staff:[],pin:''},
-      {name:'Checkout Queue',interval:5,staff:[],pin:''},
-      {name:'Packing Queue',interval:10,staff:[],pin:''},
+      {name:'Entry Queue',interval:5,counters:[''],pin:''},
+      {name:'Shopping',interval:30,counters:[],pin:''},
+      {name:'Checkout Queue',interval:5,counters:['',''],pin:''},
+      {name:'Packing Queue',interval:10,counters:[''],pin:''},
     ];
     renderStages();
   }
@@ -1247,13 +1257,23 @@ function toggleBatch() {
   document.getElementById('batch-wrap').style.display=batchEnabled?'block':'none';
 }
 
-function addStage(){stageList.push({name:'',interval:5,staff:[],pin:''});renderStages();}
+function addStage(){stageList.push({name:'',interval:5,counters:[''],pin:''});renderStages();}
 function removeStage(i){stageList.splice(i,1);renderStages();}
+function removeCounter(si,ci){stageList[si].counters.splice(ci,1);renderStages();}
 
 function renderStages() {
   var list=document.getElementById('stage-list');
   if(!stageList.length){list.innerHTML='<p style="font-size:.78rem;color:var(--muted)">No stages added yet.</p>';return;}
   list.innerHTML=stageList.map(function(s,i){
+    // Build counter rows — one row per counter
+    var counterRows = (s.counters||[]).map(function(c,ci){
+      return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">'+
+        '<span style="font-size:.72rem;color:var(--muted);min-width:70px">Counter '+(ci+1)+'</span>'+
+        '<input class="inp" style="flex:1;padding:.35rem .625rem;font-size:.8rem" placeholder="Staff name (e.g. Bola)" value="'+esc(c)+'" '+
+          'oninput="stageList['+i+'].counters['+ci+']=this.value"/>'+
+        '<button class="btn bd bsm" style="padding:.25rem .5rem" onclick="stageList['+i+'].counters.splice('+ci+',1);renderStages()">✕</button>'+
+      '</div>';
+    }).join('');
     return '<div class="stage-item">'+
       '<div class="stage-item-header">'+
         '<div class="stage-num">'+(i+1)+'</div>'+
@@ -1261,12 +1281,14 @@ function renderStages() {
         '<input class="stage-interval-inp" type="number" min="1" placeholder="min" value="'+(s.interval||5)+'" oninput="stageList['+i+'].interval=parseInt(this.value)||5" title="Minutes per person"/>'+
         (stageList.length>1?'<button class="stage-remove-btn" onclick="removeStage('+i+')" title="Remove">✕</button>':'')+
       '</div>'+
-      '<div style="font-size:.75rem;color:var(--muted);margin-bottom:.375rem">Staff Members <span style="font-size:.7rem">(type name + Enter)</span></div>'+
-      '<div class="staff-tags-wrap" onclick="this.querySelector(\'.staff-tags-input\').focus()">'+
-        s.staff.map(function(st,si){return '<span class="staff-tag">'+st+'<button onclick="removeStaffTag('+i+','+si+')">×</button></span>';}).join('')+
-        '<input class="staff-tags-input" placeholder="Add staff name…" onkeydown="if(event.key===\'Enter\'){event.preventDefault();var v=this.value.trim();if(v){stageList['+i+'].staff.push(v);this.value=\'\';renderStages();}}"/>'+
+      // Counter section
+      '<div style="font-size:.75rem;font-weight:700;color:var(--ink3);margin-bottom:.375rem">'+
+        '🏷 Counters / Staff at this stage'+
+        '<span style="font-size:.7rem;font-weight:400;color:var(--muted);margin-left:.375rem">(each counter = one staff member, customers assigned by name)</span>'+
       '</div>'+
-      '<div class="stage-counter-count">Counters: '+(s.staff.length||'—')+'</div>'+
+      counterRows+
+      '<button class="btn bp bsm" style="margin-bottom:.875rem" onclick="stageList['+i+'].counters.push(\'\');renderStages()">+ Add Counter</button>'+
+      // PIN
       '<div class="pin-row">'+
         '<span class="pin-label">🔑 Staff PIN for this stage</span>'+
         '<input class="pin-inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="0000" value="'+esc(s.pin)+'" oninput="stageList['+i+'].pin=this.value" title="4-digit PIN"/>'+
@@ -1383,7 +1405,7 @@ function closeUserInfo(){closeModal('modal-userinfo');}
 
 // ─── OPEN CREATE MODAL ─────────────────────────────────────────
 function openCreateModal() {
-  formFields=[]; breaks=[]; stagesEnabled=false; stageList=[]; batchEnabled=false;
+  formFields=[]; breaks=[]; stagesEnabled=false; stageList=[]; batchEnabled=false; // counters are inside stageList
   renderFormFields(); renderBreaks(); renderStages();
   document.getElementById('stage-toggle-row').classList.remove('enabled');
   document.getElementById('stage-toggle-pill').classList.remove('on');
