@@ -767,21 +767,25 @@ function _applyLockedEta(){
   document.getElementById('exact-time-box').style.display='';
 }
 
-function _renderStageUI(stageName){
-  const cc=document.getElementById('checkout-card');
-  const cb=document.getElementById('counter-assign-box');
-  const tcw=document.getElementById('td-counter-wrap');
-  cc.style.display='none';cb.style.display='none';tcw.style.display='none';
-  const s=(stageName||'').toLowerCase();
-  // Show checkout button during shopping stage
-  if(s.includes('shopping')||s==='entry'||s.includes('browse')){
+function _renderStageUI(stageName, stageOrder, totalStages){
+  stageOrder   = stageOrder   || (activeEntry&&activeEntry.stage_order)   || 0;
+  totalStages  = totalStages  || (activeEntry&&activeEntry.total_stages)  || 0;
+  const cc  = document.getElementById('checkout-card');
+  const cb  = document.getElementById('counter-assign-box');
+  const tcw = document.getElementById('td-counter-wrap');
+  cc.style.display='none'; cb.style.display='none'; tcw.style.display='none';
+  // Stage 2 = Shopping — show Ready to Checkout button
+  if(stageOrder===2 && totalStages>=3){
     cc.style.display='block';
   }
-  // Show counter assignment during checkout or packing
-  if((s.includes('checkout')||s.includes('packing'))&&activeEntry&&activeEntry.assigned_counter){
-    document.getElementById('counter-assign-name').textContent=activeEntry.assigned_counter;
-    document.getElementById('td-counter').textContent='🏷 '+activeEntry.assigned_counter;
-    cb.style.display='block';tcw.style.display='';
+  // Stage 3+ = Checkout / Packing — show counter assignment
+  if(stageOrder>=3){
+    var counterName = (activeEntry&&activeEntry.counter_name) || '';
+    if(counterName){
+      document.getElementById('counter-assign-name').textContent=counterName;
+      document.getElementById('td-counter').textContent='🏷 '+counterName;
+      cb.style.display='block'; tcw.style.display='';
+    }
   }
 }
 
@@ -920,10 +924,11 @@ async function refreshActive(){
     checkoutCard.style.display = (newStageOrder===2 && totalStages>=3 && d.status==='waiting') ? 'block' : 'none';
   }
   // Counter update
-  if(d.assigned_counter&&d.assigned_counter!==activeEntry.assigned_counter){
-    activeEntry.assigned_counter=d.assigned_counter;
-    document.getElementById('counter-assign-name').textContent=d.assigned_counter;
-    document.getElementById('td-counter').textContent='🏷 '+d.assigned_counter;
+  // Update counter name from server
+  if(d.counter_name && d.counter_name !== (activeEntry.counter_name||'')){
+    activeEntry.counter_name = d.counter_name;
+    document.getElementById('counter-assign-name').textContent=d.counter_name;
+    document.getElementById('td-counter').textContent='🏷 '+d.counter_name;
     document.getElementById('counter-assign-box').style.display='block';
     document.getElementById('td-counter-wrap').style.display='';
   }
