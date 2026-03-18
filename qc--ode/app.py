@@ -1461,6 +1461,24 @@ def api_org_queue(svc_id):
             try: cfd = json.loads(cfd)
             except: cfd = {}
         e["custom_form_data"] = cfd
+        # Add human-readable estimated time for display
+        eta_raw = e.get("estimated_time") or ""
+        if eta_raw:
+            try:
+                eta_dt = datetime.fromisoformat(eta_raw.replace("Z","+00:00"))
+                now_utc = datetime.now(timezone.utc)
+                mins_left = max(0, int((eta_dt - now_utc).total_seconds() / 60))
+                e["eta_display"] = eta_dt.strftime("%I:%M %p")
+                e["eta_mins_left"] = mins_left
+                e["eta_due"] = now_utc >= eta_dt  # True if customer's time has come
+            except:
+                e["eta_display"] = ""
+                e["eta_mins_left"] = 0
+                e["eta_due"] = False
+        else:
+            e["eta_display"] = ""
+            e["eta_mins_left"] = 0
+            e["eta_due"] = False
     return jsonify(entries), 200
 
 @app.route("/api/org/queue/call-next/<svc_id>", methods=["POST"])
@@ -1474,18 +1492,34 @@ def api_org_call_next(svc_id):
     })
     if not waiting: return jsonify({"error": "No one waiting"}), 404
     entry = waiting[0]
+    # Check if customer's estimated time has arrived
+    force = (request.get_json() or {}).get("force", False)
+    eta_raw = entry.get("estimated_time") or ""
+    eta_due = True
+    if eta_raw and not force:
+        try:
+            eta_dt = datetime.fromisoformat(eta_raw.replace("Z","+00:00"))
+            now_utc = datetime.now(timezone.utc)
+            if now_utc < eta_dt:
+                mins_left = int((eta_dt - now_utc).total_seconds() / 60)
+                return jsonify({
+                    "error": f"Customer's turn is not yet. {mins_left} min remaining.",
+                    "eta_display": eta_dt.strftime("%I:%M %p"),
+                    "eta_mins_left": mins_left,
+                    "can_force": True
+                }), 400
+        except: pass
     db_update("queue_entries", {"id": entry["id"]},
               {"status": "called", "called_at": datetime.now(timezone.utc).isoformat()})
     entry["status"] = "called"
     # Push notification
     if entry.get("user_id"):
-        send_push_to_user(entry["user_id"], "\ud83d\udce2 It's Your Turn!",
-                          f"Ticket {entry['ticket_label']} \u2014 Please go to the counter now.",
+        send_push_to_user(entry["user_id"], "📢 It's Your Turn!",
+                          f"Ticket {entry['ticket_label']} — Please go to the counter now.",
                           {"type": "called", "entry_id": entry["id"]})
-    # SMS for guests/SMS users
     phone = entry.get("guest_phone") or ""
     if phone:
-        send_sms(phone, f"\ud83d\udce2 QCode: Ticket {entry['ticket_label']} is being called! Go to the counter now. End code: {entry.get('end_code','\u2014')}")
+        send_sms(phone, f"📢 QCode: Ticket {entry['ticket_label']} is being called! Go to the counter now.")
     return jsonify({"success": True, "entry": entry}), 200
 
 @app.route("/api/org/queue/walk-in/<svc_id>", methods=["POST"])
@@ -1942,6 +1976,22 @@ def api_staff_call_next():
     })
     if not waiting: return jsonify({"error": "No one waiting at this stage"}), 404
     entry = waiting[0]
+    # Check if customer's time has arrived (can be overridden with force=true)
+    force = d.get("force", False)
+    eta_raw = entry.get("estimated_time") or ""
+    if eta_raw and not force:
+        try:
+            eta_dt = datetime.fromisoformat(eta_raw.replace("Z","+00:00"))
+            now_utc = datetime.now(timezone.utc)
+            if now_utc < eta_dt:
+                mins_left = int((eta_dt - now_utc).total_seconds() / 60)
+                return jsonify({
+                    "error": f"Not yet time. {mins_left} min remaining.",
+                    "eta_display": eta_dt.strftime("%I:%M %p"),
+                    "eta_mins_left": mins_left,
+                    "can_force": True
+                }), 400
+        except: pass
     upd = {"status": "called", "called_at": datetime.now(timezone.utc).isoformat()}
     # Record which counter called this customer
     if counter_id: upd["counter_id"] = counter_id
