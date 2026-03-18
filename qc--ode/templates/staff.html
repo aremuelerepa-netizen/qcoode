@@ -457,17 +457,29 @@ function updateStats(entries) {
 }
 
 // ── CALL NEXT ──────────────────────────────────────────────────
-async function callNext() {
+async function callNext(force) {
   const btn = document.getElementById('call-next-btn');
   btn.disabled = true; btn.textContent = '📢 Calling…';
   try {
+    const body = { stage_id: staffSession.stage_id };
+    if(force) body.force = true;
     const r = await fetch('/api/staff/call-next', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ stage_id: staffSession.stage_id })
+      body: JSON.stringify(body)
     });
     const d = await r.json();
     btn.disabled = false; btn.textContent = '📢 Call Next Customer';
-    if (!r.ok) { toast(d.error || 'No one waiting.','e'); return; }
+    if (!r.ok) {
+      if(d.can_force){
+        // Not yet time — ask staff if they want to call early
+        if(confirm('⏳ ' + d.error + '\n\nCall this customer early anyway?')){
+          callNext(true);
+        }
+        return;
+      }
+      toast(d.error || 'No one waiting.','e');
+      return;
+    }
     setCurrentEntry(d.entry);
     toast(`Called: ${d.entry.ticket_label} — ${d.entry.user_name||d.entry.guest_name||'Guest'}`, 's');
     loadQueue();
