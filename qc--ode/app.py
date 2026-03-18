@@ -748,7 +748,9 @@ def api_queue_status(entry_id):
         "stage_name":    stage_name,
         "stage_order":   stage_order,
         "total_stages":  total_stages,
-        "counter_name":  counter_name,
+        "counter_name":       counter_name,
+        "next_service_group": svc.get("next_service_group") or None,
+        "is_final":           svc.get("is_final", False),
         "advanced_to_next_stage": False,
     })
     return jsonify(entry), 200
@@ -1107,6 +1109,90 @@ def api_auto_schedule():
                     "paused": paused, "resumed": resumed}), 200
 
 # \u2500\u2500\u2500 ORG APIs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+@app.route("/api/user/linked-services", methods=["GET"])
+def api_user_linked_services():
+    """Return open services in a group — for customer to see least busy next service."""
+    uid   = session.get("user_id")
+    if not uid: return jsonify({"error": "Not logged in"}), 401
+    group = request.args.get("group","").strip()
+    if not group: return jsonify({"error": "group required"}), 400
+    svcs  = db_select("services", {"service_group": f"eq.{group}",
+                                   "status": "eq.open", "deleted_at": "is.null"})
+    result = []
+    for svc in svcs:
+        waiting = db_count("queue_entries", {"service_id": f"eq.{svc['id']}",
+                                              "status": "in.(waiting,called,serving)"})
+        result.append({"id": svc["id"], "name": svc["name"],
+                       "service_code": svc["service_code"],
+                       "waiting": waiting,
+                       "time_interval": svc.get("time_interval", 5)})
+    # Sort by least busy
+    result.sort(key=lambda x: x["waiting"])
+    return jsonify(result), 200
+
+
+@app.route("/api/user/join-next", methods=["POST"])
+def api_user_join_next():
+    """After being marked done, customer joins the least busy service in the next group."""
+    uid = session.get("user_id")
+    if not uid: return jsonify({"error": "Not logged in"}), 401
+    d          = request.get_json() or {}
+    entry_id   = d.get("entry_id")
+    group      = d.get("next_service_group","").strip()
+    if not entry_id or not group:
+        return jsonify({"error": "entry_id and next_service_group required"}), 400
+    # Get current entry
+    rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
+    if not rows or rows[0].get("user_id") != uid:
+        return jsonify({"error": "Entry not found"}), 404
+    entry = rows[0]
+    # Find open services in the next group — pick least busy
+    svcs = db_select("services", {"service_group": f"eq.{group}",
+                                   "status": "eq.open", "deleted_at": "is.null"})
+    if not svcs: return jsonify({"error": "No open services available in next step"}), 404
+    best_svc   = None
+    best_count = 99999
+    for svc in svcs:
+        count = db_count("queue_entries", {"service_id": f"eq.{svc['id']}",
+                                            "status": "in.(waiting,called,serving)"})
+        if count < best_count:
+            best_count = count
+            best_svc   = svc
+    if not best_svc: return jsonify({"error": "No available service found"}), 404
+    # Check not already in this service
+    already = db_select("queue_entries", {"service_id": f"eq.{best_svc['id']}",
+                                           "user_id": f"eq.{uid}",
+                                           "status": "in.(waiting,called,serving)"})
+    if already: return jsonify({"error": "Already in this queue", "entry": already[0]}), 409
+    # Create entry in next service
+    n     = (best_svc.get("ticket_counter") or 0) + 1
+    label = f"{best_svc.get('ticket_prefix','A')}{str(n).zfill(3)}"
+    db_update("services", {"id": best_svc["id"]}, {"ticket_counter": n})
+    pos   = best_count + 1
+    eta_t = (datetime.now(timezone.utc) +
+             timedelta(minutes=pos*(best_svc.get("time_interval") or 5))).isoformat()
+    required = {
+        "service_id":   best_svc["id"], "user_id": uid,
+        "ticket_label": label, "ticket_number": n,
+        "status":       "waiting", "estimated_time": eta_t,
+        "join_method":  "web", "joined_at": datetime.now(timezone.utc).isoformat(),
+    }
+    optional = {"end_code": _rcode(4), "pushback_count": 0,
+                "custom_form_data": entry.get("custom_form_data") or {}}
+    res = db_insert("queue_entries", _safe_payload("queue_entries", required, optional))
+    if not res["ok"]:
+        return jsonify({"error": "Failed to join next service"}), 500
+    new_entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
+    org = db_select("profiles", {"id": f"eq.{best_svc['org_id']}"}, single=True) or {}
+    new_entry.update({"svc_name": best_svc["name"], "org_name": org.get("org_name",""),
+                      "position": pos, "time_interval": best_svc.get("time_interval",5)})
+    send_push_to_user(uid, f"✅ Joined {best_svc['name']}!",
+                      f"Ticket {label} — Position #{pos}. ~{pos*(best_svc.get('time_interval') or 5)} min wait.",
+                      {"type": "joined", "entry_id": new_entry.get("id")})
+    return jsonify({"success": True, "entry": new_entry,
+                    "service_name": best_svc["name"]}), 201
+
+
 @app.route("/api/org/profile", methods=["GET"])
 def api_org_profile():
     uid = session.get("user_id")
@@ -1228,6 +1314,11 @@ def api_org_create_service():
         "batch_enabled":   bool(d.get("batch_enabled")),
         "batch_size":      int(d.get("batch_size") or 50) if d.get("batch_enabled") else None,
         "batch_buffer_min":int(d.get("batch_buffer_min") or 30) if d.get("batch_enabled") else None,
+        # Linked service fields
+        "next_service_group": d.get("next_service_group") or None,  # group tag e.g. "checkout"
+        "is_entry":           bool(d.get("is_entry")),               # first in chain
+        "is_final":           bool(d.get("is_final")),               # last in chain — show feedback
+        "service_group":      d.get("service_group") or None,        # group tag for this service
     }
     payload = _safe_payload("services", required, optional)
     res = db_insert("services", payload)
@@ -1534,11 +1625,22 @@ def api_org_update_entry(entry_id):
                                      f"QCode: Moving to {next_stage['name']}. "
                                      f"Position #{pos}. ~{pos*(next_stage.get('time_interval',5))} min wait.")
 
-            # Only send Service Complete + feedback on the LAST stage
+            # Check if this service links to a next group
+            next_group = None
+            if not advanced and svc_id:
+                svc_rows = db_select("services", {"id": f"eq.{svc_id}"})
+                if svc_rows:
+                    next_group = svc_rows[0].get("next_service_group") or None
             if not advanced and entry.get("user_id"):
-                send_push_to_user(entry["user_id"], "\u2705 Service Complete!",
-                                  "You\'ve been fully served. Please rate your experience.",
-                                  {"type": "completed", "entry_id": entry_id})
+                if next_group:
+                    send_push_to_user(entry["user_id"], "✅ Done! Next step ready.",
+                                      "Tap to proceed to the next step.",
+                                      {"type": "join_next", "entry_id": entry_id,
+                                       "next_service_group": next_group})
+                else:
+                    send_push_to_user(entry["user_id"], "✅ Service Complete!",
+                                      "You've been fully served. Please rate your experience.",
+                                      {"type": "completed", "entry_id": entry_id})
 
     return jsonify({"success": True, "advanced_to_next_stage": advanced}), 200
 
