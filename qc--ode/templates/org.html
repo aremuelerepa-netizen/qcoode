@@ -534,6 +534,28 @@ input,select,textarea,button{font-size:16px !important}
         <div class="fg" style="margin-bottom:.5rem"><label class="lbl">Buffer (min)</label><input id="m-batch-buffer" class="inp" type="number" min="0" value="30"/></div>
       </div>
     </div>
+    <div class="section-hdr">Linked Service Flow <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional — for multi-step queues)</span></div>
+    <div style="background:rgba(67,97,238,.04);border:1.5px solid rgba(67,97,238,.15);border-radius:var(--r);padding:1rem;margin-bottom:1.25rem">
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:.875rem">Use this to chain services together. Example: Entry → Checkout → Packing. Each service automatically sends customers to the next step when done.</p>
+      <div class="fg">
+        <label class="lbl">This service belongs to group <span style="font-weight:400">(e.g. "checkout", "packing", "entry")</span></label>
+        <input id="m-service-group" class="inp" placeholder="e.g. checkout" style="text-transform:lowercase"/>
+        <span class="hint">Give all checkout counters the same group name so the system can pick the least busy one</span>
+      </div>
+      <div class="fg">
+        <label class="lbl">After done → send customer to group <span style="font-weight:400">(optional)</span></label>
+        <input id="m-next-group" class="inp" placeholder="e.g. packing"/>
+        <span class="hint">Leave blank if this is the last step — feedback will show instead</span>
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+          <input type="checkbox" id="m-is-entry" style="width:16px;height:16px"/> This is the first/entry service in the chain
+        </label>
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
+          <input type="checkbox" id="m-is-final" style="width:16px;height:16px"/> This is the last service — show feedback when done
+        </label>
+      </div>
+    </div>
     <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
     <div class="form-builder">
       <div class="fb-header">Form Fields</div>
@@ -971,6 +993,13 @@ async function createService() {
     body.batch_size=parseInt(document.getElementById('m-batch-size').value)||50;
     body.batch_buffer_min=parseInt(document.getElementById('m-batch-buffer').value)||30;
   }
+  // Linked service fields
+  var sg = (document.getElementById('m-service-group').value||'').trim().toLowerCase();
+  var ng = (document.getElementById('m-next-group').value||'').trim().toLowerCase();
+  if(sg) body.service_group = sg;
+  if(ng) body.next_service_group = ng;
+  body.is_entry = document.getElementById('m-is-entry').checked;
+  body.is_final = document.getElementById('m-is-final').checked;
   var r=await api('/api/org/services',{method:'POST',body:body});
   createBtn.disabled=false; createBtn.textContent='Create Service';
   if(!r.ok){errEl.textContent=r.data.error||'Failed to create service.';errEl.style.display='block';return;}
@@ -1413,7 +1442,7 @@ function openCreateModal() {
   document.getElementById('batch-toggle-row').classList.remove('enabled');
   document.getElementById('batch-toggle-pill').classList.remove('on');
   document.getElementById('batch-wrap').style.display='none';
-  ['m-name','m-staff','m-desc','m-start','m-end'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['m-name','m-staff','m-desc','m-start','m-end','m-service-group','m-next-group'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-prefix').value='A';
   document.getElementById('m-interval').value='5';
   document.getElementById('m-max').value='';
