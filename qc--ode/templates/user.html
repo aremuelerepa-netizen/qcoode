@@ -829,6 +829,17 @@ function renderActive(){
 }
 
 // ── POLL / REFRESH ────────────────────────────────────────────
+function clearAndComplete(d){
+  clearActiveStorage();
+  activeEntry=null;lockedEtaISO=null;_joinedAt=null;
+  document.getElementById('no-active').style.display='';
+  document.getElementById('active-view').style.display='none';
+  document.getElementById('active-dot').style.display='none';
+  const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
+  toast('✅ Service complete! Thank you.','s');
+  if(d&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
+}
+
 async function refreshActive(){
   if(!activeEntry)return;
   const r=await api('/api/user/queue-status/'+activeEntry.id);
@@ -851,33 +862,48 @@ async function refreshActive(){
     }
     // Check if there is a new active entry for us in a different stage
     // (server already created it — poll once to find it)
-    if(d.status==='completed' && d.stage_id){
-      // Give server 1s to create the next stage entry then re-check
-      setTimeout(async function(){
-        var recheck = await api('/api/user/history');
-        if(recheck.ok){
-          var entries = recheck.data||[];
-          var nextActive = entries.find(function(e){return ['waiting','called','serving'].includes(e.status);});
-          if(nextActive){
-            activeEntry = nextActive;
+    if(d.status==='completed'){
+      // Check for linked next service group
+      if(d.next_service_group){
+        // Auto-join the least busy service in the next group
+        toast('✅ Done! Finding your next step…','i',3000);
+        setTimeout(async function(){
+          var jr = await api('/api/user/join-next',{method:'POST',body:{entry_id:d.id,next_service_group:d.next_service_group}});
+          if(jr.ok){
+            activeEntry = jr.data.entry;
             _calledAlerted = false;
             lockedEtaISO = null; _joinedAt = null;
-            await refreshEntry();
-            startPolling();
-            toast('➡️ You have been moved to the next stage!','s',5000);
-            return;
+            if(profile) localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+            toast('➡️ Joined '+jr.data.service_name+'! Ticket '+activeEntry.ticket_label,'s',6000);
+            renderActive(); startPolling();
+          } else {
+            toast(jr.data.error||'Could not join next step.','e');
+            clearAndComplete(d);
           }
-        }
-        // No next stage found — truly complete
-        clearActiveStorage();
-        activeEntry=null;lockedEtaISO=null;_joinedAt=null;
-        document.getElementById('no-active').style.display='';
-        document.getElementById('active-view').style.display='none';
-        document.getElementById('active-dot').style.display='none';
-        const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
-        toast('✅ Service complete! Thank you.','s');
-        if(fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
-      },1500);
+        },1000);
+        return;
+      }
+      // No next group — check history for next active entry (stage progression)
+      if(d.stage_id){
+        setTimeout(async function(){
+          var recheck = await api('/api/user/history');
+          if(recheck.ok){
+            var entries = recheck.data||[];
+            var nextActive = entries.find(function(e){return ['waiting','called','serving'].includes(e.status);});
+            if(nextActive){
+              activeEntry = nextActive;
+              _calledAlerted = false;
+              lockedEtaISO = null; _joinedAt = null;
+              await refreshEntry(); startPolling();
+              toast('➡️ Moved to next stage!','s',5000);
+              return;
+            }
+          }
+          clearAndComplete(d);
+        },1500);
+        return;
+      }
+      clearAndComplete(d);
       return;
     }
     // Cancelled or no_show — just clear
