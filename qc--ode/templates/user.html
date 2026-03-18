@@ -896,23 +896,28 @@ async function refreshActive(){
   document.getElementById('sp-wait-mins').textContent=waitMins>0?waitMins+'m':'Soon';
   // ETA is LOCKED — never update from server
   _applyLockedEta();
-  // Stage change
-  const newStage=d.stage_name||'';
-  if(newStage&&newStage!==(activeEntry.stage_name||'')){
-    activeEntry.stage_name=newStage;
-    activeEntry.current_stage_index=d.current_stage_index||0;
-    if(d.stages)activeEntry.stages=d.stages;
-    if(d.assigned_counter)activeEntry.assigned_counter=d.assigned_counter;
-    if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
-    _renderStageUI(newStage);
-    if(d.stages)_renderStageProgress(d.stages,d.current_stage_index||0);
-    // Lock new ETA when entering checkout or packing
-    if((newStage.toLowerCase().includes('checkout')||newStage.toLowerCase().includes('packing'))&&d.estimated_time){
-      lockedEtaISO=d.estimated_time;
-      localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
-      _applyLockedEta();startCountdown();
+  // Stage change — use stage_order from server
+  const newStage      = d.stage_name  || '';
+  const newStageOrder = d.stage_order || 0;
+  const totalStages   = d.total_stages|| 0;
+  if(newStage && newStage !== (activeEntry.stage_name||'')){
+    activeEntry.stage_name    = newStage;
+    activeEntry.stage_order   = newStageOrder;
+    activeEntry.total_stages  = totalStages;
+    if(d.assigned_counter) activeEntry.assigned_counter = d.assigned_counter;
+    if(profile) localStorage.setItem('activeEntry_'+profile.id, JSON.stringify(activeEntry));
+    _renderStageUI(newStage, newStageOrder, totalStages);
+    if((newStageOrder >= 3) && d.estimated_time){
+      lockedEtaISO = d.estimated_time;
+      localStorage.setItem('lockedEta_'+activeEntry.id, lockedEtaISO);
+      _applyLockedEta(); startCountdown();
     }
-    toast('➡️ Moved to: '+newStage,'i',6000);
+    toast('➡️ Moved to: '+newStage, 'i', 6000);
+  }
+  // Show/hide checkout card based on stage_order (show on stage 2 = shopping)
+  var checkoutCard = document.getElementById('checkout-card');
+  if(checkoutCard){
+    checkoutCard.style.display = (newStageOrder===2 && totalStages>=3 && d.status==='waiting') ? 'block' : 'none';
   }
   // Counter update
   if(d.assigned_counter&&d.assigned_counter!==activeEntry.assigned_counter){
@@ -940,9 +945,9 @@ async function refreshActive(){
     showBrowserNotif('QCode — It\'s Your Turn!','Head to the counter now. You have 5 minutes!');
   } else if(d.status==='serving'){
     box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are at the counter.';
-  } else if(newStage.toLowerCase().includes('shopping')){
+  } else if(newStageOrder===2){
     box.classList.add('sb-shop');ico.textContent='🛒';title.textContent='Happy Shopping!';desc.textContent='Take your time. Press Ready to Checkout when done.';
-  } else if(newStage.toLowerCase().includes('packing')){
+  } else if(newStageOrder>=3 && newStageOrder===totalStages){
     box.classList.add('sb-pack');ico.textContent='📦';title.textContent='Packing & Verification';desc.textContent='Head to the packing desk.';
   } else {
     box.classList.add('sb-wait');
