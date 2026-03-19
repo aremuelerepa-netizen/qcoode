@@ -88,14 +88,14 @@ textarea.inp{resize:vertical;min-height:70px}
 .svc-sched{font-size:.73rem;color:var(--muted);margin-top:.5rem;padding:.3rem .625rem;background:var(--bg);border-radius:.4rem;display:inline-block}
 .svc-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
 /* Staff links on card */
-.stage-links{margin-top:.875rem;padding:.75rem;background:rgba(67,97,238,.04);border:1px solid rgba(67,97,238,.12);border-radius:var(--r)}
-.stage-links-title{font-size:.72rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
-.stage-link-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;flex-wrap:wrap}
-.stage-link-name{font-size:.78rem;color:var(--ink3);font-weight:600;min-width:100px}
-.stage-link-code{font-family:var(--fh);font-size:.78rem;color:var(--brand);background:rgba(67,97,238,.08);padding:.2rem .5rem;border-radius:.35rem;cursor:pointer;font-weight:700;letter-spacing:.08em}
-.stage-link-code:hover{background:rgba(67,97,238,.15)}
-.stage-link-url{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;word-break:break-all}
-.stage-link-url:hover{color:var(--brand)}
+
+
+
+
+
+
+
+
 /* Badge */
 .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:99px;font-size:.72rem;font-weight:700}
 .b-waiting{background:rgba(67,97,238,.1);color:var(--brand)}
@@ -176,17 +176,12 @@ tr:hover td{background:var(--bg)}
 .logo-upload-lbl strong{color:var(--brand)}
 .logo-preview-img{width:72px;height:72px;border-radius:var(--r);object-fit:cover;border:2px solid var(--border);margin:0 auto .75rem;display:block}
 /* Stage builder */
-.stage-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:.875rem;cursor:pointer;transition:all var(--t)}
-.stage-toggle-row:hover,.stage-toggle-row.enabled{border-color:rgba(67,97,238,.4)}
-.stage-toggle-row.enabled{background:rgba(67,97,238,.04)}
+
 .toggle-pill{width:44px;height:24px;border-radius:999px;background:var(--border);position:relative;transition:.25s;flex-shrink:0}
 .toggle-pill.on{background:var(--brand)}
 .toggle-pill::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle-pill.on::after{left:23px}
-.stage-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:.875rem}
-.stage-item{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:.875rem 1rem;position:relative}
-.stage-item-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
-.stage-num{width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
 .stage-name-inp{flex:1;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white)}
 .stage-interval-inp{width:80px;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white);text-align:center}
 .stage-remove-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.25rem;border-radius:var(--r);transition:all var(--t);flex-shrink:0}
@@ -487,7 +482,8 @@ input,select,textarea,button{font-size:16px !important}
     <div class="section-hdr">Basic Info</div>
     <div class="inp-row">
       <div class="fg"><label class="lbl">Service Name *</label><input id="m-name" class="inp" placeholder="e.g. Window 1 – Visa"/></div>
-      <div class="fg"><label class="lbl">Staff Member</label><input id="m-staff" class="inp" placeholder="e.g. John Doe"/></div>
+      <div class="fg"><label class="lbl">Staff Name</label><input id="m-staff" class="inp" placeholder="e.g. Bola"/><span class="hint">Name of the staff managing this counter</span></div>
+      <div class="fg"><label class="lbl">Staff PIN <span style="font-weight:400;color:var(--muted)">(4 digits)</span></label><input id="m-staff-pin" class="inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="e.g. 1234"/><span class="hint">Staff enters this PIN to access their queue page</span></div>
     </div>
     <div class="fg"><label class="lbl">Description</label><textarea id="m-desc" class="inp" placeholder="Brief description (optional)"></textarea></div>
     <div class="section-hdr">Queue Settings</div>
@@ -508,20 +504,7 @@ input,select,textarea,button{font-size:16px !important}
       <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break End</label><input id="brk-end" class="inp" type="time"/></div>
       <button class="btn bp bsm" style="align-self:flex-end;margin-bottom:1.125rem" onclick="addBreak()">+ Add Break</button>
     </div>
-    <div class="section-hdr">Multi-Stage Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(Entry → Shopping → Checkout → Packing)</span></div>
-    <div class="stage-toggle-row" id="stage-toggle-row" onclick="toggleStages()">
-      <div>
-        <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Stage Queue</div>
-        <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customer automatically progresses through multiple stages</div>
-      </div>
-      <div class="toggle-pill" id="stage-toggle-pill"></div>
-    </div>
-    <div id="stages-wrap" style="display:none">
-      <div class="stage-list" id="stage-list"></div>
-      <button class="btn bp bsm" onclick="addStage()" style="margin-bottom:1rem">+ Add Stage</button>
-    </div>
-    <div class="section-hdr">Batch Queue <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
-    <div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
+<div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
       <div>
         <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Batch Queue</div>
         <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customers join in fixed-time batches</div>
@@ -547,7 +530,7 @@ input,select,textarea,button{font-size:16px !important}
         <input id="m-next-group" class="inp" placeholder="e.g. packing"/>
         <span class="hint">Leave blank if this is the last step — feedback will show instead</span>
       </div>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:.625rem">
         <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;cursor:pointer">
           <input type="checkbox" id="m-is-entry" style="width:16px;height:16px"/> This is the first/entry service in the chain
         </label>
@@ -555,6 +538,13 @@ input,select,textarea,button{font-size:16px !important}
           <input type="checkbox" id="m-is-final" style="width:16px;height:16px"/> This is the last service — show feedback when done
         </label>
       </div>
+      <label style="display:flex;align-items:flex-start;gap:.625rem;font-size:.82rem;cursor:pointer;background:#f0fdf4;border:1.5px solid #86efac;border-radius:var(--r);padding:.75rem 1rem">
+        <input type="checkbox" id="m-has-free-time" style="width:16px;height:16px;margin-top:.1rem;flex-shrink:0"/>
+        <div>
+          <div style="font-weight:700;color:#15803d">🛒 Customer has free time before next step</div>
+          <div style="color:#166534;margin-top:.2rem">After staff marks done — customer shops freely and taps a button when ready to move on. Used for supermarkets: Entry → Shopping → Checkout.</div>
+        </div>
+      </label>
     </div>
     <div class="section-hdr">Custom Info Form <span style="font-size:.7rem;color:var(--muted);font-weight:400">(optional)</span></div>
     <div class="form-builder">
@@ -675,7 +665,7 @@ function openModal(id){document.getElementById(id).style.display='flex';}
 var profile=null, services=[], activeSvc=null, calledEntry=null;
 var formFields=[], breaks=[], reportData=[], _reportFormFields=[];
 var pollTimer=null;
-var stagesEnabled=false, stageList=[], batchEnabled=false;
+var batchEnabled=false;
 var _uploadedLogoUrl=null;
 
 // ─── INIT ──────────────────────────────────────────────────────
@@ -745,27 +735,70 @@ function renderServices() {
     grid.innerHTML='<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" to add your first queue.</p></div>';
     return;
   }
-  grid.innerHTML=services.map(function(s) {
-    var sched=fmtSched(s);
-    // Build staff links for staged services
-    var stageLinksHtml='';
-    if(s.stages && s.stages.length) {
-      stageLinksHtml='<div class="stage-links"><div class="stage-links-title">🔗 Staff Links</div>'+
-        s.stages.map(function(st) {
-          var code=st.stage_code||'';
-          var link=window.location.origin+'/staff/'+code;
-          return '<div class="stage-link-row">'+
-            '<span class="stage-link-name">'+(st.name||'Stage')+'</span>'+
-            (code?'<span class="stage-link-code" onclick="copyText(\''+code+'\')" title="Click to copy code">'+code+'</span>':'')+''+
-            '<span class="stage-link-url" onclick="copyText(\''+link+'\')" title="Click to copy link">📋 Copy link</span>'+
-            '</div>';
-        }).join('')+'</div>';
+  // Group services by chain
+  // Standalone = no service_group
+  // Linked chain = group by service_group, show entry first then others
+  var chains = {}; // group_key -> [{svc}]
+  var standalone = [];
+  services.forEach(function(s){
+    var grp = s.service_group || '';
+    if(!grp){ standalone.push(s); return; }
+    // Use org_id+group as unique chain key so different orgs never mix
+    var key = (s.org_id||'')+':'+grp;
+    if(!chains[key]) chains[key] = {group:grp, svcs:[]};
+    chains[key].svcs.push(s);
+  });
+  // Sort each chain: entry first, then by name
+  Object.values(chains).forEach(function(chain){
+    chain.svcs.sort(function(a,b){
+      if(a.is_entry && !b.is_entry) return -1;
+      if(!a.is_entry && b.is_entry) return 1;
+      if(a.is_final && !b.is_final) return 1;
+      if(!a.is_final && b.is_final) return -1;
+      return (a.name||'').localeCompare(b.name||'');
+    });
+  });
+  // Build HTML - chains first then standalone
+  var html = '';
+  // Linked chains
+  Object.values(chains).forEach(function(chain){
+    var chainLabel = chain.svcs.find(function(s){return s.is_entry;});
+    var chainName = chainLabel ? chainLabel.name : chain.group;
+    html += '<div style="background:rgba(67,97,238,.03);border:1.5px solid rgba(67,97,238,.15);border-radius:var(--rl);padding:1rem;margin-bottom:1.25rem">';
+    html += '<div style="font-size:.75rem;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">🔗 Linked Chain — '+chainName+'</div>';
+    html += chain.svcs.map(function(s,idx){
+      var arrow = idx < chain.svcs.length-1 ? '<div style="text-align:center;color:var(--muted);font-size:1.2rem;margin:.25rem 0">↓</div>' : '';
+      return renderSvcCard(s) + arrow;
+    }).join('');
+    html += '</div>';
+  });
+  // Standalone services
+  if(standalone.length){
+    if(Object.keys(chains).length){
+      html += '<div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Simple Queues</div>';
     }
+    html += standalone.map(function(s){ return renderSvcCard(s); }).join('');
+  }
+  grid.innerHTML = html;
+}
+
+function renderSvcCard(s) {
+    var sched=fmtSched(s);
+    // Chain indicator
+    var chainBadge = '';
+    if(s.service_group){
+      if(s.is_entry)  chainBadge = '<span style="font-size:.65rem;background:#dbeafe;color:#1d4ed8;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">ENTRY</span>';
+      else if(s.is_final) chainBadge = '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">FINAL</span>';
+      else chainBadge = '<span style="font-size:.65rem;background:#f3f4f6;color:#6b7280;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">'+s.service_group.toUpperCase()+'</span>';
+    }
+    if(s.has_free_time) chainBadge += '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.25rem">🛒 FREE TIME</span>';
+
     return '<div class="svc-card">'+
       '<div class="svc-card-top">'+
         '<div style="min-width:0">'+
           '<div class="svc-name">'+s.name+'</div>'+
           (s.staff_name?'<div class="svc-staff">👤 '+s.staff_name+'</div>':'')+
+        (s.service_code?'<div style="margin-top:.375rem"><span style="font-size:.72rem;color:var(--muted)">Staff link: </span><span class="stage-link-code" onclick="copyText(window.location.origin+\'\'/staff/\'+s.service_code)" title="Copy staff link">'+window.location.origin+'/staff/'+s.service_code+'</span></div>':'')+
         '</div>'+
         badge(s.status)+
       '</div>'+
@@ -775,7 +808,7 @@ function renderServices() {
         '<span>⏱ '+s.time_interval+' min/person</span>'+
         '<span>🎫 '+s.ticket_prefix+'###</span>'+
         '<span>👥 '+(s.max_users?'Max '+s.max_users:'Unlimited')+'</span>'+
-        (s.stages&&s.stages.length?'<span>📊 '+s.stages.length+' stages</span>':'')+
+        
       '</div>'+
       '<div class="svc-meta" style="margin-top:.375rem">'+
         '<span>Waiting: <strong style="color:var(--brand)">'+(s.count_waiting||0)+'</strong></span>'+
@@ -783,13 +816,13 @@ function renderServices() {
         '<span>No-show: <strong style="color:var(--red)">'+(s.count_no_show||0)+'</strong></span>'+
       '</div>'+
       (sched?'<div class="svc-sched">'+sched+'</div>':'')+
-      stageLinksHtml+
+
       '<div class="svc-actions">'+
         '<button class="btn bp bsm" onclick=\'openQueueView('+JSON.stringify(s)+')\'>📋 Manage Queue</button>'+
         '<button class="btn bd bsm" onclick="deleteSvc(\''+s.id+'\',\''+esc(s.name)+'\')">🗑 Delete</button>'+
       '</div>'+
     '</div>';
-  }).join('');
+  ;
 }
 
 function copyText(text) {
@@ -812,11 +845,12 @@ function openQueueView(svc) {
   document.getElementById('q-svc-badge').className='badge b-'+svc.status;
   // Single stage → show Call Next only
   // Multi stage  → hide Call Next, show Batch Entry button instead
-  var isMultiStage = svc.stages && svc.stages.length > 0;
+  // Show batch button for batch-enabled services, call next for regular
+  var isBatch = svc.batch_enabled;
   var callBtn  = document.getElementById('call-btn');
   var batchBtn = document.getElementById('batch-entry-btn');
-  if(callBtn)  callBtn.style.display  = isMultiStage ? 'none'        : 'inline-flex';
-  if(batchBtn) batchBtn.style.display = isMultiStage ? 'inline-flex' : 'none';
+  if(callBtn)  callBtn.style.display  = isBatch ? 'none'        : 'inline-flex';
+  if(batchBtn) batchBtn.style.display = isBatch ? 'inline-flex' : 'none';
   switchTab('live');
   clearInterval(pollTimer);
   pollTimer=setInterval(loadQueue, 10000);
@@ -959,6 +993,7 @@ async function createService() {
   errEl.style.display='none';
   var name=(document.getElementById('m-name').value||'').trim();
   var staff=(document.getElementById('m-staff').value||'').trim();
+  var staffPin=(document.getElementById('m-staff-pin')?document.getElementById('m-staff-pin').value||'':'').trim();
   var desc=(document.getElementById('m-desc').value||'').trim();
   var prefix=(document.getElementById('m-prefix').value||'').trim().toUpperCase();
   var interval=parseInt(document.getElementById('m-interval').value)||5;
@@ -968,17 +1003,10 @@ async function createService() {
   if(!name){errEl.textContent='Service name is required.';errEl.style.display='block';return;}
   if(!prefix){errEl.textContent='Ticket prefix is required.';errEl.style.display='block';return;}
   if(startVal&&endVal&&startVal>=endVal){errEl.textContent='End time must be after start time.';errEl.style.display='block';return;}
-  if(stagesEnabled) {
-    for(var i=0;i<stageList.length;i++){
-      if(!stageList[i].name.trim()){errEl.textContent='Stage '+(i+1)+' needs a name.';errEl.style.display='block';return;}
-      if(stageList[i].pin&&!/^\d{4}$/.test(stageList[i].pin)){errEl.textContent='Stage '+(i+1)+' PIN must be 4 digits.';errEl.style.display='block';return;}
-      var filled=(stageList[i].counters||[]).filter(function(c){return c&&c.trim();});
-      if(filled.length===0&&i>0){errEl.textContent='Stage '+(i+1)+' needs at least one counter name.';errEl.style.display='block';return;}
-    }
-  }
+
   createBtn.disabled=true; createBtn.textContent='Creating…';
   var body={
-    name:name, staff_name:staff||null, description:desc||null,
+    name:name, staff_name:staff||null, end_code:staffPin||null, description:desc||null,
     ticket_prefix:prefix, time_interval:interval,
     max_users:maxVal?parseInt(maxVal):null,
     user_info_form:formFields,
@@ -986,19 +1014,7 @@ async function createService() {
     schedule_end:endVal?new Date(endVal).toISOString():null,
     break_times:breaks,
   };
-  if(stagesEnabled&&stageList.length) {
-    body.stages=stageList.map(function(s,i){
-      var namedCounters = (s.counters||[]).filter(function(c){return c && c.trim();});
-      return {
-        name:          s.name.trim(),
-        order:         i+1,
-        time_interval: s.interval||5,
-        staff_names:   namedCounters,
-        staff_pin:     s.pin||null,
-        counter_count: namedCounters.length||1
-      };
-    });
-  }
+
   if(batchEnabled) {
     body.batch_enabled=true;
     body.batch_size=parseInt(document.getElementById('m-batch-size').value)||50;
@@ -1011,6 +1027,7 @@ async function createService() {
   if(ng) body.next_service_group = ng;
   body.is_entry = document.getElementById('m-is-entry').checked;
   body.is_final = document.getElementById('m-is-final').checked;
+  body.has_free_time = document.getElementById('m-has-free-time').checked;
   var r=await api('/api/org/services',{method:'POST',body:body});
   createBtn.disabled=false; createBtn.textContent='Create Service';
   if(!r.ok){errEl.textContent=r.data.error||'Failed to create service.';errEl.style.display='block';return;}
@@ -1274,21 +1291,6 @@ async function updateAccount() {
 }
 
 // ─── STAGE BUILDER ─────────────────────────────────────────────
-function toggleStages() {
-  stagesEnabled=!stagesEnabled;
-  document.getElementById('stage-toggle-row').classList.toggle('enabled',stagesEnabled);
-  document.getElementById('stage-toggle-pill').classList.toggle('on',stagesEnabled);
-  document.getElementById('stages-wrap').style.display=stagesEnabled?'block':'none';
-  if(stagesEnabled&&stageList.length===0) {
-    stageList=[
-      {name:'Entry Queue',interval:5,counters:[''],pin:''},
-      {name:'Shopping',interval:30,counters:[],pin:''},
-      {name:'Checkout Queue',interval:5,counters:['',''],pin:''},
-      {name:'Packing Queue',interval:10,counters:[''],pin:''},
-    ];
-    renderStages();
-  }
-}
 
 function toggleBatch() {
   batchEnabled=!batchEnabled;
@@ -1297,90 +1299,10 @@ function toggleBatch() {
   document.getElementById('batch-wrap').style.display=batchEnabled?'block':'none';
 }
 
-function addStage(){stageList.push({name:'',interval:5,counters:[''],pin:''});renderStages();}
-function removeStage(i){stageList.splice(i,1);renderStages();}
-function removeCounter(si,ci){stageList[si].counters.splice(ci,1);renderStages();}
 
-function renderStages() {
-  var list=document.getElementById('stage-list');
-  if(!stageList.length){list.innerHTML='<p style="font-size:.78rem;color:var(--muted)">No stages added yet.</p>';return;}
-  list.innerHTML=stageList.map(function(s,i){
-    // Build counter rows — one row per counter
-    var counterRows = (s.counters||[]).map(function(c,ci){
-      return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem">'+
-        '<span style="font-size:.72rem;color:var(--muted);min-width:70px">Counter '+(ci+1)+'</span>'+
-        '<input class="inp" style="flex:1;padding:.35rem .625rem;font-size:.8rem" placeholder="Staff name (e.g. Bola)" value="'+esc(c)+'" '+
-          'oninput="stageList['+i+'].counters['+ci+']=this.value"/>'+
-        '<button class="btn bd bsm" style="padding:.25rem .5rem" onclick="stageList['+i+'].counters.splice('+ci+',1);renderStages()">✕</button>'+
-      '</div>';
-    }).join('');
-    return '<div class="stage-item">'+
-      '<div class="stage-item-header">'+
-        '<div class="stage-num">'+(i+1)+'</div>'+
-        '<input class="stage-name-inp" placeholder="Stage name (e.g. Checkout)" value="'+esc(s.name)+'" oninput="stageList['+i+'].name=this.value"/>'+
-        '<input class="stage-interval-inp" type="number" min="1" placeholder="min" value="'+(s.interval||5)+'" oninput="stageList['+i+'].interval=parseInt(this.value)||5" title="Minutes per person"/>'+
-        (stageList.length>1?'<button class="stage-remove-btn" onclick="removeStage('+i+')" title="Remove">✕</button>':'')+
-      '</div>'+
-      // Counter section
-      '<div style="font-size:.75rem;font-weight:700;color:var(--ink3);margin-bottom:.375rem">'+
-        '🏷 Counters / Staff at this stage'+
-        '<span style="font-size:.7rem;font-weight:400;color:var(--muted);margin-left:.375rem">(each counter = one staff member, customers assigned by name)</span>'+
-      '</div>'+
-      counterRows+
-      '<button class="btn bp bsm" style="margin-bottom:.875rem" onclick="stageList['+i+'].counters.push(\'\');renderStages()">+ Add Counter</button>'+
-      // PIN
-      '<div class="pin-row">'+
-        '<span class="pin-label">🔑 Staff PIN for this stage</span>'+
-        '<input class="pin-inp" type="text" maxlength="4" pattern="[0-9]{4}" placeholder="0000" value="'+esc(s.pin)+'" oninput="stageList['+i+'].pin=this.value" title="4-digit PIN"/>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
 
-function removeStaffTag(stageIdx,staffIdx){stageList[stageIdx].staff.splice(staffIdx,1);renderStages();}
 
-// ─── EMERGENCY CONTROLS ────────────────────────────────────────
-async function emergencySkip() {
-  if(!activeSvc||!calledEntry){toast('No one is currently called.','w');return;}
-  if(!confirm('Skip current ticket and mark as no-show?'))return;
-  await markById(calledEntry.id,'no_show');
-  toast('Ticket skipped.','w');
-}
 
-async function emergencyPause() {
-  if(!activeSvc)return;
-  var cur=document.getElementById('status-sel').value;
-  var newStatus=cur==='paused'?'open':'paused';
-  document.getElementById('status-sel').value=newStatus;
-  await changeStatus();
-  toast(newStatus==='paused'?'⏸ Queue paused.':'▶ Queue resumed.','i');
-}
-
-async function emergencyAdjustInterval() {
-  if(!activeSvc)return;
-  var cur=activeSvc.time_interval||5;
-  var val=prompt('Current: '+cur+' min/person.\nNew interval (minutes):',cur);
-  if(!val||isNaN(parseInt(val)))return;
-  var newVal=Math.max(1,parseInt(val));
-  var r=await api('/api/org/services/'+activeSvc.id+'/interval',{method:'POST',body:{time_interval:newVal}});
-  if(!r.ok){toast(r.data.error||'Error.','e');return;}
-  activeSvc.time_interval=newVal;
-  toast('⏱ Interval updated to '+newVal+' min/person.','s');
-}
-
-async function emergencyMoveTicket() {
-  if(!activeSvc)return;
-  var ticket=prompt('Ticket label to move (e.g. A005):');
-  if(!ticket)return;
-  var newPos=prompt('Move to position # (1 = next):');
-  if(!newPos||isNaN(parseInt(newPos)))return;
-  var r=await api('/api/org/queue/move-ticket/'+activeSvc.id,{method:'POST',body:{ticket_label:ticket.trim().toUpperCase(),position:parseInt(newPos)}});
-  if(!r.ok){toast(r.data.error||'Ticket not found.','e');return;}
-  toast('🔀 '+ticket.toUpperCase()+' moved to position '+newPos+'.','s');
-  await loadQueue();
-}
-
-// ─── ANALYTICS ─────────────────────────────────────────────────
 function populateAnalyticsSelect() {
   var sel=document.getElementById('analytics-svc'); if(!sel)return;
   sel.innerHTML='<option value="">All services</option>'+services.map(function(s){return'<option value="'+s.id+'">'+s.name+'</option>';}).join('');
@@ -1445,7 +1367,7 @@ function closeUserInfo(){closeModal('modal-userinfo');}
 
 // ─── OPEN CREATE MODAL ─────────────────────────────────────────
 function openCreateModal() {
-  formFields=[]; breaks=[]; stagesEnabled=false; stageList=[]; batchEnabled=false; // counters are inside stageList
+  formFields=[]; breaks=[]; batchEnabled=false;
   renderFormFields(); renderBreaks(); renderStages();
   document.getElementById('stage-toggle-row').classList.remove('enabled');
   document.getElementById('stage-toggle-pill').classList.remove('on');
@@ -1453,7 +1375,7 @@ function openCreateModal() {
   document.getElementById('batch-toggle-row').classList.remove('enabled');
   document.getElementById('batch-toggle-pill').classList.remove('on');
   document.getElementById('batch-wrap').style.display='none';
-  ['m-name','m-staff','m-desc','m-start','m-end','m-service-group','m-next-group'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['m-name','m-staff','m-staff-pin','m-desc','m-start','m-end','m-service-group','m-next-group','m-has-free-time'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('m-prefix').value='A';
   document.getElementById('m-interval').value='5';
   document.getElementById('m-max').value='';
