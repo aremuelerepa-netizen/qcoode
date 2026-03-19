@@ -452,7 +452,10 @@ input,select,textarea,button{font-size:16px !important}
         </div>
       </div>
       <div style="margin-bottom:1rem">
-        <input id="nearby-filter" class="inp" type="text" placeholder="Filter by name or org…" style="max-width:320px" oninput="filterNearby(this.value)"/>
+        <div style="display:flex;gap:.625rem;flex-wrap:wrap;align-items:center">
+        <input id="nearby-filter" class="inp" type="text" placeholder="Search by name or org…" style="flex:1;min-width:180px" oninput="filterNearby()"/>
+        <select id="nearby-state" class="inp" style="min-width:130px;max-width:180px" onchange="filterNearby()"><option value="">All States</option><option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT Abuja">FCT Abuja</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option></select>
+      </div>
       </div>
       <div id="nearby-grid" class="nearby-grid"><div class="loading"><div class="spin"></div> Loading…</div></div>
     </div>
@@ -465,6 +468,7 @@ input,select,textarea,button{font-size:16px !important}
         <div class="card-title">Settings</div>
         <div class="fg"><label class="lbl">Full Name</label><input id="acc-name" class="inp" type="text"/></div>
         <div class="fg"><label class="lbl">Phone Number</label><input id="acc-phone" class="inp" type="tel" placeholder="+234 000 000 0000"/></div>
+        <div class="fg"><label class="lbl">Your State</label><select id="acc-user-state" class="inp"><option value="">Select State</option><option value="Abia">Abia</option><option value="Adamawa">Adamawa</option><option value="Akwa Ibom">Akwa Ibom</option><option value="Anambra">Anambra</option><option value="Bauchi">Bauchi</option><option value="Bayelsa">Bayelsa</option><option value="Benue">Benue</option><option value="Borno">Borno</option><option value="Cross River">Cross River</option><option value="Delta">Delta</option><option value="Ebonyi">Ebonyi</option><option value="Edo">Edo</option><option value="Ekiti">Ekiti</option><option value="Enugu">Enugu</option><option value="FCT Abuja">FCT Abuja</option><option value="Gombe">Gombe</option><option value="Imo">Imo</option><option value="Jigawa">Jigawa</option><option value="Kaduna">Kaduna</option><option value="Kano">Kano</option><option value="Katsina">Katsina</option><option value="Kebbi">Kebbi</option><option value="Kogi">Kogi</option><option value="Kwara">Kwara</option><option value="Lagos">Lagos</option><option value="Nasarawa">Nasarawa</option><option value="Niger">Niger</option><option value="Ogun">Ogun</option><option value="Ondo">Ondo</option><option value="Osun">Osun</option><option value="Oyo">Oyo</option><option value="Plateau">Plateau</option><option value="Rivers">Rivers</option><option value="Sokoto">Sokoto</option><option value="Taraba">Taraba</option><option value="Yobe">Yobe</option><option value="Zamfara">Zamfara</option></select><span class="hint">Used to filter nearby services automatically</span></div>
         <button class="btn btn-primary" onclick="saveAccount()">Save Changes</button>
       </div>
     </div>
@@ -569,6 +573,26 @@ function badge(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serv
 let profile=null,activeEntry=null,foundSvc=null,_nsSvc=null;
 let pollTimer=null,cdTimer=null;
 let _freeTimeMode=false,_freeTimeGroup='';
+let _activeEntries=[]; // multi-queue support — up to 3
+
+// ── ALARM SOUND ──────────────────────────────────────────────
+function playAlarm(){
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [0,0.15,0.3].forEach(function(t){
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value=880;
+      osc.type='sine';
+      gain.gain.setValueAtTime(0,ctx.currentTime+t);
+      gain.gain.linearRampToValueAtTime(0.4,ctx.currentTime+t+0.05);
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.35);
+      osc.start(ctx.currentTime+t);
+      osc.stop(ctx.currentTime+t+0.4);
+    });
+  } catch(e){}
+}
 let fbEntryId=null,fbRating=0;
 let notifEnabled=false,notifSent=false;
 let lockedEtaISO=null,_joinedAt=null;
@@ -608,6 +632,7 @@ async function init(){
   document.getElementById('tb-name').textContent=profile.full_name||profile.email||'—';
   document.getElementById('acc-name').value=profile.full_name||'';
   document.getElementById('acc-phone').value=profile.phone||'';
+  if(document.getElementById('acc-user-state')) document.getElementById('acc-user-state').value=profile.state||'';
   const initials=((profile.full_name||profile.email||'U').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));
   document.getElementById('profile-hero').innerHTML=
     `<div class="avatar">${initials}</div>`+
@@ -740,8 +765,11 @@ async function confirmJoin(){
 // ── RENDER ACTIVE ─────────────────────────────────────────────
 function _renderOrgLogo(logoUrl,orgName){
   const wrap=document.getElementById('a-org-logo-wrap');if(!wrap)return;
-  if(logoUrl){wrap.innerHTML=`<img class="org-logo-img" src="${logoUrl}" alt="${orgName||''}"/>`;}
-  else{const ini=((orgName||'Q').trim().split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));wrap.innerHTML=`<div class="org-logo-placeholder">${ini}</div>`;}
+  let html='';
+  if(logoUrl) html+=`<img class="org-logo-img" src="${logoUrl}" alt="${orgName||''}" style="height:52px;width:auto;object-fit:contain;border-radius:.5rem;display:block" onerror="this.style.display='none'"/>`;
+  else{const ini=((orgName||'Q').trim().split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2));html+=`<div class="org-logo-placeholder" style="font-size:1.4rem;font-weight:800">${ini}</div>`;}
+  if(orgName) html+=`<div style="font-weight:800;font-size:.9rem;color:#fff;text-align:center;margin-top:.375rem;letter-spacing:.01em">${orgName}</div>`;
+  wrap.innerHTML=html;
 }
 
 function _renderStageProgress(stages,currentIdx){
@@ -991,6 +1019,7 @@ async function refreshActive(){
     desc.textContent='Please proceed to the counter immediately! You have 5 minutes.';
     toast('📢 You are being called! Go to the counter NOW.','w',10000);
     showBrowserNotif('QCode — It\'s Your Turn!','Head to the counter now. You have 5 minutes!');
+    playAlarm();
   } else if(d.status==='serving'){
     box.classList.add('sb-serv');ico.textContent='✅';title.textContent='Being served';desc.textContent='You are at the counter.';
   } else if(newStageOrder===2){
@@ -1163,6 +1192,10 @@ async function loadHistory(){
 
 // ── NEARBY ────────────────────────────────────────────────────
 async function loadNearby(){
+  // Set saved state from profile
+  if(profile&&profile.state&&document.getElementById('nearby-state')){
+    document.getElementById('nearby-state').value=profile.state;
+  }
   const r=await api('/api/user/open-services');
   const grid=document.getElementById('nearby-grid');
   if(!r.ok||!r.data.length){_allNearbyServices=[];grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><div style="font-size:3rem;margin-bottom:.75rem">🔍</div><p>No open services right now.</p></div>';return;}
@@ -1171,18 +1204,23 @@ async function loadNearby(){
 function renderNearbyGrid(svcs){
   const grid=document.getElementById('nearby-grid');
   if(!svcs.length){grid.innerHTML='<div style="text-align:center;padding:3rem;color:#64748b"><p>No matching services found.</p></div>';return;}
-  grid.innerHTML=svcs.map(s=>
-    `<div class="nb-card" onclick="nsLoadService('${s.service_code}')">
-      <div class="nb-name">${s.name}</div>
-      <div class="nb-meta">🏢 ${s.org_name||'—'}<br>👥 ${s.waiting_count||0} waiting · ⏱ ${s.time_interval||5} min/person</div>
+  grid.innerHTML=svcs.map(s=>{
+    const linkedBadge=s.is_linked?'<span style="font-size:.65rem;background:#dbeafe;color:#1d4ed8;padding:.15rem .45rem;border-radius:99px;font-weight:700;margin-left:.375rem">🔗 Multi-step</span>':'';
+    const stateBadge=s.org_state?`<span style="font-size:.65rem;color:#6b7280"> · ${s.org_state}</span>`:'';
+    return `<div class="nb-card" onclick="nsLoadService('${s.service_code}')">
+      <div class="nb-name">${s.name}${linkedBadge}</div>
+      <div style="font-weight:700;font-size:.875rem;color:#1e3a5f;margin-bottom:.25rem">🏢 ${s.org_name||'—'}${stateBadge}</div>
+      <div class="nb-meta">👥 ${s.waiting_count||0} waiting · ⏱ ${s.time_interval||5} min/person</div>
       <div class="nb-code">${s.service_code}</div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 }
-function filterNearby(q){
-  if(!q.trim()){renderNearbyGrid(_allNearbyServices);return;}
-  const low=q.toLowerCase();
-  renderNearbyGrid(_allNearbyServices.filter(s=>(s.name||'').toLowerCase().includes(low)||(s.org_name||'').toLowerCase().includes(low)||(s.service_code||'').toLowerCase().includes(low)));
+function filterNearby(){
+  const q=(document.getElementById('nearby-filter')?document.getElementById('nearby-filter').value:'').toLowerCase().trim();
+  const st=(document.getElementById('nearby-state')?document.getElementById('nearby-state').value:'');
+  var filtered=_allNearbyServices;
+  if(st) filtered=filtered.filter(s=>s.org_state===st);
+  if(q) filtered=filtered.filter(s=>(s.name||'').toLowerCase().includes(q)||(s.org_name||'').toLowerCase().includes(q)||(s.service_code||'').toLowerCase().includes(q));
 }
 async function nearbyFindService(){
   const code=document.getElementById('ns-code-in').value.trim().toUpperCase();
@@ -1235,8 +1273,11 @@ async function nsConfirmJoin(){
 async function saveAccount(){
   const name=document.getElementById('acc-name').value.trim();
   const phone=document.getElementById('acc-phone').value.trim();
-  const r=await api('/api/user/profile',{method:'POST',body:{full_name:name,phone:phone}});
+  const stEl=document.getElementById('acc-user-state');
+  const st=stEl?stEl.value||null:null;
+  const r=await api('/api/user/profile',{method:'POST',body:{full_name:name,phone:phone,state:st}});
   if(!r.ok){toast(r.data.error||'Save failed.','e');return;}
+  if(profile){profile.state=st;}
   document.getElementById('tb-name').textContent=name||profile.email||'—';
   toast('Account saved! ✓','s');
 }
