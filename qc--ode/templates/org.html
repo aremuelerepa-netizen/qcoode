@@ -87,15 +87,6 @@ textarea.inp{resize:vertical;min-height:70px}
 .svc-meta span{font-size:.76rem;color:var(--muted)}
 .svc-sched{font-size:.73rem;color:var(--muted);margin-top:.5rem;padding:.3rem .625rem;background:var(--bg);border-radius:.4rem;display:inline-block}
 .svc-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap}
-/* Staff links on card */
-
-
-
-
-
-
-
-
 /* Badge */
 .badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:99px;font-size:.72rem;font-weight:700}
 .b-waiting{background:rgba(67,97,238,.1);color:var(--brand)}
@@ -175,13 +166,10 @@ tr:hover td{background:var(--bg)}
 .logo-upload-lbl{font-size:.82rem;color:var(--muted)}
 .logo-upload-lbl strong{color:var(--brand)}
 .logo-preview-img{width:72px;height:72px;border-radius:var(--r);object-fit:cover;border:2px solid var(--border);margin:0 auto .75rem;display:block}
-/* Stage builder */
-
 .toggle-pill{width:44px;height:24px;border-radius:999px;background:var(--border);position:relative;transition:.25s;flex-shrink:0}
 .toggle-pill.on{background:var(--brand)}
 .toggle-pill::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle-pill.on::after{left:23px}
-
 .stage-name-inp{flex:1;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white)}
 .stage-interval-inp{width:80px;padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:var(--r);font-family:var(--fb);font-size:.875rem;background:var(--white);text-align:center}
 .stage-remove-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.25rem;border-radius:var(--r);transition:all var(--t);flex-shrink:0}
@@ -504,7 +492,7 @@ input,select,textarea,button{font-size:16px !important}
       <div class="fg" style="margin:0;flex:1;min-width:100px"><label class="lbl">Break End</label><input id="brk-end" class="inp" type="time"/></div>
       <button class="btn bp bsm" style="align-self:flex-end;margin-bottom:1.125rem" onclick="addBreak()">+ Add Break</button>
     </div>
-<div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
+    <div class="stage-toggle-row" id="batch-toggle-row" onclick="toggleBatch()">
       <div>
         <div style="font-weight:700;font-size:.875rem;color:var(--ink)">Enable Batch Queue</div>
         <div style="font-size:.75rem;color:var(--muted);margin-top:.1rem">Customers join in fixed-time batches</div>
@@ -574,7 +562,6 @@ input,select,textarea,button{font-size:16px !important}
     </div>
   </div>
 </div>
-
 
 <!-- ═══ BATCH ENTRY MODAL ═══ -->
 <div id="modal-batch-entry" class="overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-batch-entry')">
@@ -735,20 +722,15 @@ function renderServices() {
     grid.innerHTML='<div class="empty"><div style="font-size:3rem">🗂</div><h3>No services yet</h3><p>Click "Create Service" to add your first queue.</p></div>';
     return;
   }
-  // Group services by chain
-  // Standalone = no service_group
-  // Linked chain = group by service_group, show entry first then others
-  var chains = {}; // group_key -> [{svc}]
+  var chains = {};
   var standalone = [];
   services.forEach(function(s){
     var grp = s.service_group || '';
     if(!grp){ standalone.push(s); return; }
-    // Use org_id+group as unique chain key so different orgs never mix
     var key = (s.org_id||'')+':'+grp;
     if(!chains[key]) chains[key] = {group:grp, svcs:[]};
     chains[key].svcs.push(s);
   });
-  // Sort each chain: entry first, then by name
   Object.values(chains).forEach(function(chain){
     chain.svcs.sort(function(a,b){
       if(a.is_entry && !b.is_entry) return -1;
@@ -758,9 +740,7 @@ function renderServices() {
       return (a.name||'').localeCompare(b.name||'');
     });
   });
-  // Build HTML - chains first then standalone
   var html = '';
-  // Linked chains
   Object.values(chains).forEach(function(chain){
     var chainLabel = chain.svcs.find(function(s){return s.is_entry;});
     var chainName = chainLabel ? chainLabel.name : chain.group;
@@ -772,7 +752,6 @@ function renderServices() {
     }).join('');
     html += '</div>';
   });
-  // Standalone services
   if(standalone.length){
     if(Object.keys(chains).length){
       html += '<div style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem">Simple Queues</div>';
@@ -783,46 +762,42 @@ function renderServices() {
 }
 
 function renderSvcCard(s) {
-    var sched=fmtSched(s);
-    // Chain indicator
-    var chainBadge = '';
-    if(s.service_group){
-      if(s.is_entry)  chainBadge = '<span style="font-size:.65rem;background:#dbeafe;color:#1d4ed8;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">ENTRY</span>';
-      else if(s.is_final) chainBadge = '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">FINAL</span>';
-      else chainBadge = '<span style="font-size:.65rem;background:#f3f4f6;color:#6b7280;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">'+s.service_group.toUpperCase()+'</span>';
-    }
-    if(s.has_free_time) chainBadge += '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.25rem">🛒 FREE TIME</span>';
+  var sched=fmtSched(s);
+  var chainBadge = '';
+  if(s.service_group){
+    if(s.is_entry)  chainBadge = '<span style="font-size:.65rem;background:#dbeafe;color:#1d4ed8;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">ENTRY</span>';
+    else if(s.is_final) chainBadge = '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">FINAL</span>';
+    else chainBadge = '<span style="font-size:.65rem;background:#f3f4f6;color:#6b7280;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.375rem">'+s.service_group.toUpperCase()+'</span>';
+  }
+  if(s.has_free_time) chainBadge += '<span style="font-size:.65rem;background:#d1fae5;color:#065f46;padding:.15rem .4rem;border-radius:99px;font-weight:700;margin-left:.25rem">🛒 FREE TIME</span>';
 
-    return '<div class="svc-card">'+
-      '<div class="svc-card-top">'+
-        '<div style="min-width:0">'+
-          '<div class="svc-name">'+s.name+'</div>'+
-          (s.staff_name?'<div class="svc-staff">👤 '+s.staff_name+'</div>':'')+
-        (s.service_code?'<div style="margin-top:.375rem"><span style="font-size:.72rem;color:var(--muted)">Staff link: </span><span class="stage-link-code" onclick="copyText(window.location.origin+\'\'/staff/\'+s.service_code)" title="Copy staff link">'+window.location.origin+'/staff/'+s.service_code+'</span></div>':'')+
-        '</div>'+
-        badge(s.status)+
+  return '<div class="svc-card">'+
+    '<div class="svc-card-top">'+
+      '<div style="min-width:0">'+
+        '<div class="svc-name">'+s.name+'</div>'+
+        (s.staff_name?'<div class="svc-staff">👤 '+s.staff_name+'</div>':'')+
+        (s.service_code?'<div style="margin-top:.375rem"><span style="font-size:.72rem;color:var(--muted)">Staff link: </span><span class="stage-link-code" onclick="copyText(window.location.origin+\'/staff/\'+\''+s.service_code+'\')" title="Copy staff link">'+window.location.origin+'/staff/'+s.service_code+'</span></div>':'')+
       '</div>'+
-            (s.description?'<div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem;line-height:1.5;padding:.375rem .625rem;background:var(--bg);border-radius:.4rem">'+s.description+'</div>':'')+
-      '<span class="svc-code" onclick="copyText(\''+s.service_code+'\')" title="Click to copy">'+s.service_code+'</span>'+
-      '<div class="svc-meta">'+
-        '<span>⏱ '+s.time_interval+' min/person</span>'+
-        '<span>🎫 '+s.ticket_prefix+'###</span>'+
-        '<span>👥 '+(s.max_users?'Max '+s.max_users:'Unlimited')+'</span>'+
-        
-      '</div>'+
-      '<div class="svc-meta" style="margin-top:.375rem">'+
-        '<span>Waiting: <strong style="color:var(--brand)">'+(s.count_waiting||0)+'</strong></span>'+
-        '<span>Served: <strong style="color:#047857">'+(s.count_completed||0)+'</strong></span>'+
-        '<span>No-show: <strong style="color:var(--red)">'+(s.count_no_show||0)+'</strong></span>'+
-      '</div>'+
-      (sched?'<div class="svc-sched">'+sched+'</div>':'')+
-
-      '<div class="svc-actions">'+
-        '<button class="btn bp bsm" onclick=\'openQueueView('+JSON.stringify(s)+')\'>📋 Manage Queue</button>'+
-        '<button class="btn bd bsm" onclick="deleteSvc(\''+s.id+'\',\''+esc(s.name)+'\')">🗑 Delete</button>'+
-      '</div>'+
-    '</div>';
-  ;
+      badge(s.status)+
+    '</div>'+
+    (s.description?'<div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem;line-height:1.5;padding:.375rem .625rem;background:var(--bg);border-radius:.4rem">'+s.description+'</div>':'')+
+    '<span class="svc-code" onclick="copyText(\''+s.service_code+'\')" title="Click to copy">'+s.service_code+'</span>'+
+    '<div class="svc-meta">'+
+      '<span>⏱ '+s.time_interval+' min/person</span>'+
+      '<span>🎫 '+s.ticket_prefix+'###</span>'+
+      '<span>👥 '+(s.max_users?'Max '+s.max_users:'Unlimited')+'</span>'+
+    '</div>'+
+    '<div class="svc-meta" style="margin-top:.375rem">'+
+      '<span>Waiting: <strong style="color:var(--brand)">'+(s.count_waiting||0)+'</strong></span>'+
+      '<span>Served: <strong style="color:#047857">'+(s.count_completed||0)+'</strong></span>'+
+      '<span>No-show: <strong style="color:var(--red)">'+(s.count_no_show||0)+'</strong></span>'+
+    '</div>'+
+    (sched?'<div class="svc-sched">'+sched+'</div>':'')+
+    '<div class="svc-actions">'+
+      '<button class="btn bp bsm" onclick=\'openQueueView('+JSON.stringify(s)+')\'>📋 Manage Queue</button>'+
+      '<button class="btn bd bsm" onclick="deleteSvc(\''+s.id+'\',\''+esc(s.name)+'\')">🗑 Delete</button>'+
+    '</div>'+
+  '</div>';
 }
 
 function copyText(text) {
@@ -843,9 +818,6 @@ function openQueueView(svc) {
   document.getElementById('status-sel').value=svc.status;
   document.getElementById('q-svc-badge').textContent=svc.status;
   document.getElementById('q-svc-badge').className='badge b-'+svc.status;
-  // Single stage → show Call Next only
-  // Multi stage  → hide Call Next, show Batch Entry button instead
-  // Show batch button for batch-enabled services, call next for regular
   var isBatch = svc.batch_enabled;
   var callBtn  = document.getElementById('call-btn');
   var batchBtn = document.getElementById('batch-entry-btn');
@@ -889,7 +861,6 @@ function renderLiveTable(entries) {
       '<td>'+acts+'</td>'+
     '</tr>';
   }).join('');
-  // Store for userinfo modal
   _liveEntries=entries;
 }
 var _liveEntries=[];
@@ -914,7 +885,6 @@ async function callNext(force) {
   btn.disabled=false; btn.textContent='📢 Call Next';
   if(!r.ok){
     if(r.data.can_force){
-      // Customer not due yet — ask if they want to call anyway
       if(confirm('Not yet: ' + r.data.error + ' Call early anyway?')){
         callNext(true);
       }
@@ -1020,7 +990,6 @@ async function createService() {
     body.batch_size=parseInt(document.getElementById('m-batch-size').value)||50;
     body.batch_buffer_min=parseInt(document.getElementById('m-batch-buffer').value)||30;
   }
-  // Linked service fields
   var sg = (document.getElementById('m-service-group').value||'').trim().toLowerCase();
   var ng = (document.getElementById('m-next-group').value||'').trim().toLowerCase();
   if(sg) body.service_group = sg;
@@ -1035,7 +1004,6 @@ async function createService() {
   var code=r.data.service_code||'—';
   var createdStages=r.data.stages||[];
 
-  // Build success content
   var html='<div class="svc-created-box">'+
     '<div class="scb-title">✅ Service created successfully!</div>'+
     '<div style="font-size:.82rem;color:#065f46;margin-bottom:.25rem">Share this code with customers:</div>'+
@@ -1058,7 +1026,6 @@ async function createService() {
       }).join('')+
     '</div>';
   } else {
-    // Single-stage: show service code as the staff link
     var svcLink=window.location.origin+'/staff/'+code;
     html+='<div class="staff-links-box">'+
       '<div class="slb-title">🔗 Staff Access Link</div>'+
@@ -1076,7 +1043,7 @@ async function createService() {
   await loadServices();
 }
 
-// ─── WALK-IN MODAL (FIXED — no prompt()) ───────────────────────
+// ─── WALK-IN MODAL ─────────────────────────────────────────────
 function openWalkInModal() {
   if(!activeSvc){toast('Select a service queue first.','e');return;}
   document.getElementById('wi-name').value='';
@@ -1138,7 +1105,6 @@ async function loadReport() {
   if(!svcId){toast('Select a service first.','e');return;}
   var r=await api('/api/org/report/'+svcId);
   if(!r.ok){toast('Could not load report.','e');return;}
-  // API now returns {entries:[], form_fields:[]}
   var entries = r.data.entries || r.data || [];
   _reportFormFields = r.data.form_fields || [];
   reportData = entries;
@@ -1147,7 +1113,6 @@ async function loadReport() {
     tb.innerHTML='<tr><td colspan="'+(7+_reportFormFields.length)+'" style="text-align:center;padding:2rem;color:var(--muted)">No completed entries yet.</td></tr>';
     return;
   }
-  // Add dynamic extra columns to header if custom form fields exist
   var thead = document.querySelector('#panel-reports thead tr');
   if(thead){
     var extraH = _reportFormFields.map(function(f){return '<th>'+f.label+'</th>';}).join('');
@@ -1290,18 +1255,13 @@ async function updateAccount() {
   toast('Account updated!','s');
 }
 
-// ─── STAGE BUILDER ─────────────────────────────────────────────
-
+// ─── BATCH TOGGLE ──────────────────────────────────────────────
 function toggleBatch() {
   batchEnabled=!batchEnabled;
   document.getElementById('batch-toggle-row').classList.toggle('enabled',batchEnabled);
   document.getElementById('batch-toggle-pill').classList.toggle('on',batchEnabled);
   document.getElementById('batch-wrap').style.display=batchEnabled?'block':'none';
 }
-
-
-
-
 
 function populateAnalyticsSelect() {
   var sel=document.getElementById('analytics-svc'); if(!sel)return;
@@ -1368,26 +1328,41 @@ function closeUserInfo(){closeModal('modal-userinfo');}
 // ─── OPEN CREATE MODAL ─────────────────────────────────────────
 function openCreateModal() {
   formFields=[]; breaks=[]; batchEnabled=false;
-  renderFormFields(); renderBreaks(); renderStages();
-  document.getElementById('stage-toggle-row').classList.remove('enabled');
-  document.getElementById('stage-toggle-pill').classList.remove('on');
-  document.getElementById('stages-wrap').style.display='none';
+  renderFormFields(); renderBreaks();
+
+  // Reset batch toggle
   document.getElementById('batch-toggle-row').classList.remove('enabled');
   document.getElementById('batch-toggle-pill').classList.remove('on');
   document.getElementById('batch-wrap').style.display='none';
-  ['m-name','m-staff','m-staff-pin','m-desc','m-start','m-end','m-service-group','m-next-group','m-has-free-time'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+
+  // Reset text/number/textarea inputs
+  ['m-name','m-staff','m-staff-pin','m-desc','m-start','m-end','m-service-group','m-next-group']
+    .forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+
+  // Reset checkboxes
+  ['m-has-free-time','m-is-entry','m-is-final'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.checked=false;
+  });
+
+  // Reset defaults
   document.getElementById('m-prefix').value='A';
   document.getElementById('m-interval').value='5';
   document.getElementById('m-max').value='';
   document.getElementById('m-err').style.display='none';
+
   openModal('modal-create');
 }
 
 // ─── LOGOUT ────────────────────────────────────────────────────
+async function doLogout() {
+  clearInterval(pollTimer);
+  await api('/api/auth/logout',{method:'POST'});
+  window.location.href='/';
+}
+
 // ─── BATCH ENTRY ───────────────────────────────────────────────
 async function openBatchEntryModal() {
   if(!activeSvc) return;
-  // Check waiting count at entry stage
   var r = await api('/api/org/queue/entry-batch-size/'+activeSvc.id);
   var info = document.getElementById('batch-waiting-info');
   if(r.ok) {
@@ -1410,12 +1385,6 @@ async function submitBatchEntry() {
   toast('🚪 Called in '+r.data.called_count+' customers: '+r.data.called_tickets.join(', '),'s',8000);
   closeModal('modal-batch-entry');
   await loadQueue();
-}
-
-async function doLogout() {
-  clearInterval(pollTimer);
-  await api('/api/auth/logout',{method:'POST'});
-  window.location.href='/';
 }
 
 init();
