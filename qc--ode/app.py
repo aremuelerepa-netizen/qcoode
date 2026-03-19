@@ -18,11 +18,11 @@ SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
 SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "org-logos")
-SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
-SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
+SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "").strip().lower()
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "").strip()
 VAPID_PUBLIC_KEY  = os.getenv("VAPID_PUBLIC_KEY", "")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "")
-VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "admin@qcode.com")
+VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "")
 SENDGRID_API_KEY  = os.getenv("SENDGRID_API_KEY", "")
 SENDGRID_FROM     = os.getenv("SENDGRID_FROM_EMAIL", "noreply@qcode.com")
 
@@ -64,7 +64,7 @@ def _fetch_columns(table: str) -> set:
                                       "deleted_at","created_at"},
                     "profiles":      {"id","role","full_name","org_name","email","phone",
                                       "company_address","logo_url","approval_status","rejection_reason",
-                                      "preferred_lang","is_online","created_at"},
+                                      "preferred_lang","is_online","state","created_at"},
                     "stages":        {"id","service_id","name","order","time_interval","stage_code",
                                       "staff_names","staff_pin","counter_count","created_at"},
                     "staff_counters":{"id","stage_id","service_id","staff_name","counter_number",
@@ -560,7 +560,7 @@ def api_user_profile_update():
     if not uid: return jsonify({"error": "Not logged in"}), 401
     d   = request.get_json() or {}
     upd = {}
-    for k in ("full_name","phone","preferred_lang"):
+    for k in ("full_name","phone","preferred_lang","state"):
         if k in d: upd[k] = d[k] or None
     if upd: db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
@@ -787,22 +787,30 @@ def api_user_history():
 
 @app.route("/api/user/open-services")
 def api_open_services():
+    state_filter = (request.args.get("state") or "").strip()
+    search_query = (request.args.get("q") or "").strip().lower()
     svcs   = db_select("services", {"status": "eq.open", "deleted_at": "is.null",
-                                     "order": "created_at.desc", "limit": "50"})
+                                     "order": "created_at.desc", "limit": "100"})
     result = []
     for svc in svcs:
         org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
         if org.get("approval_status") != "approved": continue
-        # Only show services that are entry points or standalone (no service_group OR is_entry=True)
-        # Hide middle and final linked services — customers should not join those directly
+        # State filter
+        if state_filter and org.get("state","") != state_filter: continue
+        # Only show entry or standalone services
         svc_group = svc.get("service_group") or ""
         is_entry  = svc.get("is_entry", False)
-        if svc_group and not is_entry:
-            continue  # Hidden — it is a middle or final linked service
+        if svc_group and not is_entry: continue
         svc["org_name"]      = org.get("org_name","")
         svc["org_logo"]      = org.get("logo_url","")
+        svc["org_state"]     = org.get("state","")
+        svc["is_linked"]     = bool(svc_group)  # tells user.html it is a multi-step service
         svc["waiting_count"] = db_count("queue_entries",
                                          {"service_id": f"eq.{svc['id']}", "status": "eq.waiting"})
+        # Search filter
+        if search_query:
+            haystack = f"{svc['name']} {svc['org_name']}".lower()
+            if search_query not in haystack: continue
         result.append(svc)
     return jsonify(result), 200
 
@@ -1092,6 +1100,7 @@ def api_user_join_next():
     label = f"{best_svc.get('ticket_prefix','A')}{str(n).zfill(3)}"
     db_update("services", {"id": best_svc["id"]}, {"ticket_counter": n})
     pos   = best_count + 1
+    # ETA from NOW — not from original join time
     eta_t = (datetime.now(timezone.utc) +
              timedelta(minutes=pos*(best_svc.get("time_interval") or 5))).isoformat()
     required = {
@@ -1130,7 +1139,7 @@ def api_org_profile_update():
         return jsonify({"error": "Unauthorized"}), 403
     d = request.get_json() or {}
     upd = {}
-    for k in ("phone","logo_url"):
+    for k in ("phone","logo_url","org_name","company_address","state"):
         if k in d: upd[k] = d[k] or None
     if upd: db_update("profiles", {"id": uid}, upd)
     return jsonify({"success": True}), 200
