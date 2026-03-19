@@ -568,6 +568,7 @@ function badge(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serv
 // ── STATE ─────────────────────────────────────────────────────
 let profile=null,activeEntry=null,foundSvc=null,_nsSvc=null;
 let pollTimer=null,cdTimer=null;
+let _freeTimeMode=false,_freeTimeGroup='';
 let fbEntryId=null,fbRating=0;
 let notifEnabled=false,notifSent=false;
 let lockedEtaISO=null,_joinedAt=null;
@@ -862,7 +863,23 @@ async function refreshActive(){
     }
     // Check if there is a new active entry for us in a different stage
     // (server already created it — poll once to find it)
-    if(d.status==='completed'){
+    // Check if server says free_time mode
+  if(d.has_free_time && d.next_service_group && d.status==='completed'){
+    _freeTimeMode = true;
+    _freeTimeGroup = d.next_service_group;
+    activeEntry.free_time_group = d.next_service_group;
+    if(profile) localStorage.setItem('activeEntry_'+profile.id, JSON.stringify(activeEntry));
+    clearInterval(pollTimer); clearInterval(cdTimer);
+    // Show shopping screen
+    document.getElementById('checkout-card').style.display='block';
+    document.getElementById('status-box').className='status-box sb-shop';
+    document.getElementById('sb-ico').textContent='🛒';
+    document.getElementById('sb-title').textContent='Happy Shopping!';
+    document.getElementById('sb-desc').textContent='Take your time. Press Ready for Checkout when done.';
+    toast('🛒 You are in! Enjoy your shopping.','s',8000);
+    return;
+  }
+  if(d.status==='completed'){
       // Check for linked next service group
       if(d.next_service_group){
         // Auto-join the least busy service in the next group
@@ -1002,6 +1019,22 @@ async function readyToCheckout(){
   if(!activeEntry)return;
   const btn=document.getElementById('checkout-btn');
   btn.disabled=true;btn.textContent='⏳ Assigning counter…';
+  // Use free_time_group if in free time mode
+  const nextGroup = activeEntry.free_time_group || null;
+  if(nextGroup){
+    // Use join-next endpoint with the group
+    const r=await api('/api/user/join-next',{method:'POST',body:{entry_id:activeEntry.id,next_service_group:nextGroup}});
+    btn.disabled=false;btn.textContent='✅ Ready for Checkout →';
+    if(!r.ok){toast(r.data.error||'Could not join checkout queue.','e');return;}
+    _freeTimeMode=false;_freeTimeGroup='';
+    activeEntry=r.data.entry;
+    activeEntry.org_name=activeEntry.org_name||'';
+    if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+    document.getElementById('checkout-card').style.display='none';
+    toast('✅ Assigned to '+r.data.service_name+'!','s',6000);
+    renderActive();startPolling();
+    return;
+  }
   const r=await api('/api/user/ready-checkout',{method:'POST',body:{entry_id:activeEntry.id}});
   if(!r.ok){
     toast(r.data.error||'Failed. Please try again.','e');
