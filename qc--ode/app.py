@@ -18,8 +18,8 @@ SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
 SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "org-logos")
-SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "").strip().lower()
-SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "").strip()
+SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
 VAPID_PUBLIC_KEY  = os.getenv("VAPID_PUBLIC_KEY", "")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "")
 VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "admin@qcode.com")
@@ -60,7 +60,7 @@ def _fetch_columns(table: str) -> set:
                                       "status","end_code","user_info_form","schedule_start",
                                       "schedule_end","queue_start","queue_end","break_times",
                                       "stages_enabled","batch_enabled","batch_size","batch_buffer_min",
-                                      "next_service_group","service_group","is_entry","is_final",
+                                      "next_service_group","service_group","is_entry","is_final","has_free_time",
                                       "deleted_at","created_at"},
                     "profiles":      {"id","role","full_name","org_name","email","phone",
                                       "company_address","logo_url","approval_status","rejection_reason",
@@ -752,6 +752,7 @@ def api_queue_status(entry_id):
         "counter_name":       counter_name,
         "next_service_group": svc.get("next_service_group") or None,
         "is_final":           svc.get("is_final", False),
+        "has_free_time":      svc.get("has_free_time", False),
         "advanced_to_next_stage": False,
     })
     return jsonify(entry), 200
@@ -765,101 +766,6 @@ def api_leave_queue(entry_id):
     db_update("queue_entries", {"id": entry_id},
               {"status": "cancelled", "completed_at": datetime.now(timezone.utc).isoformat()})
     return jsonify({"success": True}), 200
-
-@app.route("/api/user/ready-checkout", methods=["POST"])
-def api_user_ready_checkout():
-    """Customer signals they are done shopping and ready for checkout.
-    Finds their active Entry/Shopping queue entry, marks it complete,
-    then assigns them to the least-busy checkout counter stage."""
-    uid = session.get("user_id")
-    if not uid: return jsonify({"error": "Not logged in"}), 401
-    d        = request.get_json() or {}
-    entry_id = d.get("entry_id")
-    if not entry_id: return jsonify({"error": "entry_id required"}), 400
-    # Fetch the entry
-    rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
-    if not rows or rows[0].get("user_id") != uid:
-        return jsonify({"error": "Queue entry not found"}), 404
-    entry  = rows[0]
-    svc_id = entry.get("service_id")
-    # Mark current stage entry as completed
-    db_update("queue_entries", {"id": entry_id},
-              {"status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()})
-    # Find the Checkout stage for this service (order=3 by convention, or name contains "checkout")
-    all_stages = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc"})
-    checkout_stage = None
-    for st in all_stages:
-        if "checkout" in (st.get("name") or "").lower() or st.get("order", 0) >= 3:
-            checkout_stage = st
-            break
-    if not checkout_stage:
-        return jsonify({"error": "Checkout stage not configured for this service"}), 400
-    # Find least-busy counter in checkout stage
-    counters = db_select("staff_counters", {"stage_id": f"eq.{checkout_stage['id']}", "is_active": "eq.true"})
-    least_busy_counter = None
-    least_count = 999
-    for c in counters:
-        # Count entries assigned specifically to this counter
-        count = db_count("queue_entries", {
-            "service_id": f"eq.{svc_id}",
-            "stage_id":   f"eq.{checkout_stage['id']}",
-            "counter_id": f"eq.{c['id']}",
-            "status":     "in.(waiting,called,serving)"
-        })
-        if count < least_count:
-            least_count = count
-            least_busy_counter = c
-    # Get current checkout queue position
-    svcs = db_select("services", {"id": f"eq.{svc_id}"})
-    svc  = svcs[0] if svcs else {}
-    pos  = db_count("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "stage_id":   f"eq.{checkout_stage['id']}",
-        "status":     "eq.waiting"
-    }) + 1
-    eta_t = (datetime.now(timezone.utc) + timedelta(
-        minutes=pos * (checkout_stage.get("time_interval") or svc.get("time_interval", 5))
-    )).isoformat()
-    # Determine checkout ticket label
-    n = (svc.get("ticket_counter") or 0) + 1
-    label = f"{svc.get('ticket_prefix', 'P')}{str(n).zfill(3)}"
-    db_update("services", {"id": svc_id}, {"ticket_counter": n})
-    new_req = {
-        "service_id":   svc_id,
-        "user_id":      uid,
-        "guest_name":   entry.get("guest_name"),
-        "guest_phone":  entry.get("guest_phone"),
-        "ticket_label": label,
-        "ticket_number": n,
-        "status":       "waiting",
-        "estimated_time": eta_t,
-        "join_method":  entry.get("join_method", "web"),
-        "joined_at":    datetime.now(timezone.utc).isoformat(),
-    }
-    new_opt = {
-        "end_code":  entry.get("end_code"),
-        "stage_id":  checkout_stage["id"],
-        "counter_id": least_busy_counter.get("id") if least_busy_counter else None,
-        "pushback_count": 0,
-    }
-    res = db_insert("queue_entries", _safe_payload("queue_entries", new_req, new_opt))
-    if not res["ok"]:
-        return jsonify({"error": "Failed to enroll in checkout queue"}), 500
-    new_entry = res["data"][0] if isinstance(res["data"], list) else res["data"]
-    # Push notification
-    send_push_to_user(uid, "✅ Ready for Checkout!",
-                      f"Ticket {label} — Position #{pos} at checkout. ~{pos * (checkout_stage.get('time_interval') or 5)} min wait.",
-                      {"type": "checkout_ready", "entry_id": new_entry.get("id")})
-    counter_label = f"Counter {least_busy_counter['counter_number']}" if least_busy_counter else "Next available counter"
-    return jsonify({
-        "success":        True,
-        "entry":          new_entry,
-        "ticket_label":   label,
-        "position":       pos,
-        "counter":        counter_label,
-        "stage_name":     checkout_stage.get("name", "Checkout"),
-        "eta_minutes":    pos * (checkout_stage.get("time_interval") or 5),
-    }), 201
 
 @app.route("/api/user/history")
 def api_user_history():
@@ -882,11 +788,17 @@ def api_user_history():
 @app.route("/api/user/open-services")
 def api_open_services():
     svcs   = db_select("services", {"status": "eq.open", "deleted_at": "is.null",
-                                     "order": "created_at.desc", "limit": "30"})
+                                     "order": "created_at.desc", "limit": "50"})
     result = []
     for svc in svcs:
         org = db_select("profiles", {"id": f"eq.{svc['org_id']}"}, single=True) or {}
         if org.get("approval_status") != "approved": continue
+        # Only show services that are entry points or standalone (no service_group OR is_entry=True)
+        # Hide middle and final linked services — customers should not join those directly
+        svc_group = svc.get("service_group") or ""
+        is_entry  = svc.get("is_entry", False)
+        if svc_group and not is_entry:
+            continue  # Hidden — it is a middle or final linked service
         svc["org_name"]      = org.get("org_name","")
         svc["org_logo"]      = org.get("logo_url","")
         svc["waiting_count"] = db_count("queue_entries",
@@ -1117,8 +1029,11 @@ def api_user_linked_services():
     if not uid: return jsonify({"error": "Not logged in"}), 401
     group = request.args.get("group","").strip()
     if not group: return jsonify({"error": "group required"}), 400
-    svcs  = db_select("services", {"service_group": f"eq.{group}",
-                                   "status": "eq.open", "deleted_at": "is.null"})
+    # Get org_id from the current entry's service so we only search within same org
+    org_id = request.args.get("org_id","").strip()
+    query = {"service_group": f"eq.{group}", "status": "eq.open", "deleted_at": "is.null"}
+    if org_id: query["org_id"] = f"eq.{org_id}"
+    svcs  = db_select("services", query)
     result = []
     for svc in svcs:
         waiting = db_count("queue_entries", {"service_id": f"eq.{svc['id']}",
@@ -1147,9 +1062,16 @@ def api_user_join_next():
     if not rows or rows[0].get("user_id") != uid:
         return jsonify({"error": "Entry not found"}), 404
     entry = rows[0]
-    # Find open services in the next group — pick least busy
-    svcs = db_select("services", {"service_group": f"eq.{group}",
-                                   "status": "eq.open", "deleted_at": "is.null"})
+    # Get org_id from current entry's service — MUST only search within same org
+    org_id = None
+    if entry.get("service_id"):
+        svc_rows = db_select("services", {"id": f"eq.{entry['service_id']}"})
+        if svc_rows:
+            org_id = svc_rows[0].get("org_id")
+    # Find open services in the next group — same org only
+    query = {"service_group": f"eq.{group}", "status": "eq.open", "deleted_at": "is.null"}
+    if org_id: query["org_id"] = f"eq.{org_id}"
+    svcs = db_select("services", query)
     if not svcs: return jsonify({"error": "No open services available in next step"}), 404
     best_svc   = None
     best_count = 99999
@@ -1268,13 +1190,7 @@ def api_org_services():
         for s in ("waiting","called","serving","completed","no_show"):
             svc[f"count_{s}"] = db_count("queue_entries",
                                           {"service_id": f"eq.{svc['id']}", "status": f"eq.{s}"})
-        # Attach stages so org.html knows if service is multi-stage
-        if svc.get("stages_enabled"):
-            stage_rows = db_select("stages", {"service_id": f"eq.{svc['id']}", "order": "order.asc"})
-            svc["stages"] = [{"id": st["id"], "name": st["name"], "order": st.get("order",1),
-                               "stage_code": st.get("stage_code","")} for st in stage_rows]
-        else:
-            svc["stages"] = []
+        svc["stages"] = []  # stages removed — using linked services instead
     return jsonify(svcs), 200
 
 @app.route("/api/org/services", methods=["POST"])
@@ -1288,7 +1204,8 @@ def api_org_create_service():
     for _ in range(20):
         code = _rcode(6)
         if not db_select("services", {"service_code": f"eq.{code}"}): break
-    end_code = _rcode(4)
+    # Use org-provided PIN as end_code (staff PIN), else generate random
+    end_code = (d.get("end_code") or "").strip().upper() or _rcode(4)
     required = {
         "org_id":         uid,
         "name":           name,
@@ -1311,7 +1228,6 @@ def api_org_create_service():
         "queue_start":     d.get("schedule_start") or d.get("queue_start") or None,
         "queue_end":       d.get("schedule_end")   or d.get("queue_end")   or None,
         "break_times":     d.get("break_times") or [],
-        "stages_enabled":  bool(d.get("stages")),
         "batch_enabled":   bool(d.get("batch_enabled")),
         "batch_size":      int(d.get("batch_size") or 50) if d.get("batch_enabled") else None,
         "batch_buffer_min":int(d.get("batch_buffer_min") or 30) if d.get("batch_enabled") else None,
@@ -1320,6 +1236,7 @@ def api_org_create_service():
         "is_entry":           bool(d.get("is_entry")),               # first in chain
         "is_final":           bool(d.get("is_final")),               # last in chain — show feedback
         "service_group":      d.get("service_group") or None,        # group tag for this service
+        "has_free_time":      bool(d.get("has_free_time")),           # customer shops freely before next step
     }
     payload = _safe_payload("services", required, optional)
     res = db_insert("services", payload)
@@ -1328,53 +1245,12 @@ def api_org_create_service():
         return jsonify({"error": err_msg}), 500
     svc = res["data"][0] if isinstance(res["data"], list) else res["data"]
     svc_id = svc["id"]
-    # Create stages if provided
-    stages_data = d.get("stages") or []
-    created_stages = []
-    if stages_data:
-        for i, st in enumerate(stages_data):
-            stage_code = _rcode(6)
-            stage_payload = {
-                "service_id":    svc_id,
-                "name":          st.get("name","").strip(),
-                "order":         st.get("order", i+1),
-                "time_interval": int(st.get("time_interval") or 5),
-                "stage_code":    stage_code,
-                "staff_names":   json.dumps(st.get("staff_names") or []),
-                "staff_pin":     st.get("staff_pin") or None,
-                "counter_count": int(st.get("counter_count") or 1),
-                "created_at":    datetime.now(timezone.utc).isoformat(),
-            }
-            s_res = db_insert("stages", _safe_payload("stages", stage_payload, {}))
-            if s_res.get("ok") and s_res["data"]:
-                stage_row = s_res["data"][0] if isinstance(s_res["data"], list) else s_res["data"]
-                stage_id  = stage_row.get("id")
-                # Track for response
-                created_stages.append({
-                    "id":         stage_id,
-                    "name":       st.get("name","").strip(),
-                    "order":      st.get("order", i+1),
-                    "stage_code": stage_code,
-                    "staff_link": f"/staff/{stage_code}",
-                })
-                # Create staff_counters rows
-                staff_list = st.get("staff_names") or []
-                for j, staff_name in enumerate(staff_list):
-                    counter_payload = {
-                        "stage_id":      stage_id,
-                        "service_id":    svc_id,
-                        "staff_name":    staff_name,
-                        "counter_number": j+1,
-                        "is_active":     True,
-                        "created_at":    datetime.now(timezone.utc).isoformat(),
-                    }
-                    db_insert("staff_counters", _safe_payload("staff_counters", counter_payload, {}))
     return jsonify({
         "success":      True,
         "service":      svc,
         "service_code": code,
+        "staff_link":   f"/staff/{code}",
         "end_code":     end_code,
-        "stages":       created_stages,
     }), 201
 
 @app.route("/api/org/services/<svc_id>/status", methods=["POST"])
@@ -1661,13 +1537,28 @@ def api_org_update_entry(entry_id):
                                      f"Position #{pos}. ~{pos*(next_stage.get('time_interval',5))} min wait.")
 
             # Check if this service links to a next group
-            next_group = None
+            next_group   = None
+            has_free_time = False
             if not advanced and svc_id:
                 svc_rows = db_select("services", {"id": f"eq.{svc_id}"})
                 if svc_rows:
-                    next_group = svc_rows[0].get("next_service_group") or None
+                    next_group    = svc_rows[0].get("next_service_group") or None
+                    has_free_time = bool(svc_rows[0].get("has_free_time", False))
             if not advanced and entry.get("user_id"):
-                if next_group:
+                if next_group and has_free_time:
+                    # Free time — customer shops, taps button when ready
+                    send_push_to_user(entry["user_id"], "🛒 You're in! Happy Shopping!",
+                                      "Tap 'Ready for Checkout' on your phone when done shopping.",
+                                      {"type": "free_time", "entry_id": entry_id,
+                                       "next_service_group": next_group})
+                elif next_group and has_free_time:
+                    # Free time — customer shops freely then taps button
+                    send_push_to_user(entry["user_id"], "🛒 You're in! Happy Shopping!",
+                                      "Tap 'Ready for Checkout' when done shopping.",
+                                      {"type": "free_time", "entry_id": entry_id,
+                                       "next_service_group": next_group})
+                elif next_group:
+                    # Auto-join next service immediately
                     send_push_to_user(entry["user_id"], "✅ Done! Next step ready.",
                                       "Tap to proceed to the next step.",
                                       {"type": "join_next", "entry_id": entry_id,
@@ -1695,24 +1586,20 @@ def api_org_batch_call_entry(svc_id):
     count = int(d.get("count") or 20)   # how many to call in at once
     count = max(1, min(count, 100))     # clamp between 1 and 100
 
-    # Get the first stage (Entry) for this service
-    stages = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc"})
-    if not stages:
-        return jsonify({"error": "No stages configured for this service"}), 400
+    # Get waiting entries directly from this service (no stages needed)
+    svcs = db_select("services", {"id": f"eq.{svc_id}"})
+    if not svcs: return jsonify({"error": "Service not found"}), 404
+    svc = svcs[0]
 
-    entry_stage = stages[0]  # Stage 1 = Entry
-
-    # Get waiting entries in the entry stage
     waiting = db_select("queue_entries", {
         "service_id": f"eq.{svc_id}",
-        "stage_id":   f"eq.{entry_stage['id']}",
         "status":     "eq.waiting",
         "order":      "ticket_number.asc",
         "limit":      str(count),
     })
 
     if not waiting:
-        return jsonify({"error": "No customers waiting to enter"}), 404
+        return jsonify({"error": "No customers waiting"}), 404
 
     called_entries = []
     for entry in waiting:
@@ -1720,8 +1607,6 @@ def api_org_batch_call_entry(svc_id):
                   {"status": "called",
                    "called_at": datetime.now(timezone.utc).isoformat()})
         called_entries.append(entry["ticket_label"])
-
-        # Push notification to each called customer
         if entry.get("user_id"):
             send_push_to_user(entry["user_id"],
                               "🚪 You May Enter!",
@@ -1731,13 +1616,13 @@ def api_org_batch_call_entry(svc_id):
                                "entry_id":     entry["id"]})
         if entry.get("guest_phone"):
             send_sms(entry["guest_phone"],
-                     f"QCode: Ticket {entry['ticket_label']} — You may now enter the store.")
+                     f"QCode: Ticket {entry['ticket_label']} — You may now enter.")
 
     return jsonify({
-        "success": True,
+        "success":        True,
         "called_count":   len(called_entries),
         "called_tickets": called_entries,
-        "stage_name":     entry_stage.get("name", "Entry"),
+        "service_name":   svc.get("name", "Entry"),
     }), 200
 
 
@@ -1748,20 +1633,15 @@ def api_org_entry_batch_waiting(svc_id):
     if not uid or session.get("role") != "organization":
         return jsonify({"error": "Unauthorized"}), 403
 
-    stages = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc"})
-    if not stages:
-        return jsonify({"waiting": 0, "stage_name": "Entry"}), 200
-
-    entry_stage = stages[0]
+    svcs = db_select("services", {"id": f"eq.{svc_id}"})
+    if not svcs: return jsonify({"waiting": 0}), 200
     waiting = db_count("queue_entries", {
         "service_id": f"eq.{svc_id}",
-        "stage_id":   f"eq.{entry_stage['id']}",
         "status":     "eq.waiting",
     })
     return jsonify({
-        "waiting":    waiting,
-        "stage_name": entry_stage.get("name", "Entry"),
-        "stage_id":   entry_stage["id"],
+        "waiting":      waiting,
+        "service_name": svcs[0].get("name", "Entry"),
     }), 200
 
 
@@ -1884,26 +1764,47 @@ def api_org_analytics():
 # \u2500\u2500\u2500 STAFF APIs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 @app.route("/api/staff/access", methods=["POST"])
 def api_staff_access():
-    """Staff logs in with name + 4-digit PIN to access their counter."""
-    d          = request.get_json() or {}
-    stage_code = (d.get("stage_code") or "").strip().upper()
-    staff_name = (d.get("staff_name") or "").strip()
-    pin        = (d.get("pin") or "").strip()
-    if not stage_code or not staff_name or not pin:
-        return jsonify({"error": "Stage code, name, and PIN are required."}), 400
-    stages = db_select("stages", {"stage_code": f"eq.{stage_code}"})
+    """Staff logs in with service code + name + PIN set on the service."""
+    d            = request.get_json() or {}
+    service_code = (d.get("stage_code") or d.get("service_code") or "").strip().upper()
+    staff_name   = (d.get("staff_name") or "").strip()
+    pin          = (d.get("pin") or "").strip()
+    if not service_code or not staff_name or not pin:
+        return jsonify({"error": "Service code, name, and PIN are required."}), 400
+
+    # Try service first (new linked service model)
+    svcs = db_select("services", {"service_code": f"eq.{service_code}"})
+    if svcs:
+        svc = svcs[0]
+        stored_pin = (svc.get("end_code") or "").strip().upper()
+        if stored_pin and stored_pin.upper() != pin.upper():
+            return jsonify({"error": "Incorrect PIN."}), 401
+        # Update last_seen via staff_name on service
+        return jsonify({
+            "success":      True,
+            "stage_id":     None,
+            "stage_name":   svc.get("name",""),
+            "service_id":   svc["id"],
+            "service_name": svc.get("name",""),
+            "service_code": svc.get("service_code",""),
+            "staff_name":   staff_name,
+            "counter_id":   None,
+            "counter_number": 1,
+            "is_service_mode": True,
+        }), 200
+
+    # Fall back to stage code (old stages model)
+    stages = db_select("stages", {"stage_code": f"eq.{service_code}"})
     if not stages:
-        return jsonify({"error": "Invalid stage code."}), 404
+        return jsonify({"error": "Invalid code. Check the service code and try again."}), 404
     stage = stages[0]
     stored_pin = stage.get("staff_pin") or ""
     if stored_pin and stored_pin != pin:
         return jsonify({"error": "Incorrect PIN."}), 401
-    # Find or assign a counter for this staff member
     counter = db_select("staff_counters",
                          {"stage_id": f"eq.{stage['id']}",
                           "staff_name": f"eq.{staff_name}"})
     if not counter:
-        # Auto-assign next available counter
         existing = db_select("staff_counters", {"stage_id": f"eq.{stage['id']}"})
         next_num = len(existing) + 1
         db_insert("staff_counters", {
@@ -1915,11 +1816,10 @@ def api_staff_access():
                              {"stage_id": f"eq.{stage['id']}",
                               "staff_name": f"eq.{staff_name}"})
     counter_row = counter[0] if counter else {}
-    # Mark counter active + set session (24h expiry enforced by cookie lifetime)
     db_update("staff_counters", {"id": counter_row.get("id","x")},
               {"is_active": True, "last_seen": datetime.now(timezone.utc).isoformat()})
-    svcs = db_select("services", {"id": f"eq.{stage['service_id']}"})
-    svc  = svcs[0] if svcs else {}
+    svc_rows = db_select("services", {"id": f"eq.{stage['service_id']}"})
+    svc = svc_rows[0] if svc_rows else {}
     return jsonify({
         "success":       True,
         "stage_id":      stage["id"],
@@ -1930,17 +1830,25 @@ def api_staff_access():
         "staff_name":    staff_name,
         "counter_id":    counter_row.get("id"),
         "counter_number":counter_row.get("counter_number",1),
+        "is_service_mode": False,
     }), 200
 
 @app.route("/api/staff/queue/<stage_id>")
 def api_staff_queue(stage_id):
-    """Return waiting entries for a specific stage."""
+    """Return waiting entries for a specific stage OR service."""
+    # First try as service_id directly (new linked service model)
     entries = db_select("queue_entries", {
-        "stage_id": f"eq.{stage_id}",
+        "service_id": f"eq.{stage_id}",
         "status": "in.(waiting,called,serving)",
         "order": "ticket_number.asc"
     })
-    # If stage_id not stored on entries, fall back to service_id + stage order
+    if not entries:
+        # Try as stage_id (old stages model)
+        entries = db_select("queue_entries", {
+            "stage_id": f"eq.{stage_id}",
+            "status": "in.(waiting,called,serving)",
+            "order": "ticket_number.asc"
+        })
     if not entries:
         stages = db_select("stages", {"id": f"eq.{stage_id}"})
         if stages:
@@ -1961,20 +1869,33 @@ def api_staff_queue(stage_id):
 def api_staff_call_next():
     """Staff calls the next person in their stage queue — filtered by stage_id."""
     d          = request.get_json() or {}
-    stage_id   = d.get("stage_id")
+    stage_id   = d.get("stage_id")  # can be stage_id or service_id
     counter_id = d.get("counter_id")
     if not stage_id: return jsonify({"error": "stage_id required"}), 400
-    stages = db_select("stages", {"id": f"eq.{stage_id}"})
-    if not stages: return jsonify({"error": "Stage not found"}), 404
-    svc_id = stages[0]["service_id"]
-    # Filter strictly by stage_id so each counter only sees their own stage
-    waiting = db_select("queue_entries", {
-        "service_id": f"eq.{svc_id}",
-        "stage_id":   f"eq.{stage_id}",
-        "status":     "eq.waiting",
-        "order":      "ticket_number.asc",
-        "limit":      "1"
-    })
+
+    # Check if this is a service_id (new model) or stage_id (old model)
+    svcs = db_select("services", {"id": f"eq.{stage_id}"})
+    if svcs:
+        # New linked service model — stage_id is actually service_id
+        svc_id = stage_id
+        waiting = db_select("queue_entries", {
+            "service_id": f"eq.{svc_id}",
+            "status":     "eq.waiting",
+            "order":      "ticket_number.asc",
+            "limit":      "1"
+        })
+    else:
+        # Old stages model
+        stages = db_select("stages", {"id": f"eq.{stage_id}"})
+        if not stages: return jsonify({"error": "Stage not found"}), 404
+        svc_id = stages[0]["service_id"]
+        waiting = db_select("queue_entries", {
+            "service_id": f"eq.{svc_id}",
+            "stage_id":   f"eq.{stage_id}",
+            "status":     "eq.waiting",
+            "order":      "ticket_number.asc",
+            "limit":      "1"
+        })
     if not waiting: return jsonify({"error": "No one waiting at this stage"}), 404
     entry = waiting[0]
     # Check if customer's time has arrived (can be overridden with force=true)
@@ -2039,55 +1960,68 @@ def api_staff_mark_done():
     if status in ("completed","no_show"):
         upd["completed_at"] = datetime.now(timezone.utc).isoformat()
     db_update("queue_entries", {"id": entry_id}, upd)
-    # If completed in a stage-enabled service \u2014 auto-enroll in next stage
+    # Linked service progression on completed
     if status == "completed":
         rows = db_select("queue_entries", {"id": f"eq.{entry_id}"})
         if rows:
-            entry   = rows[0]
-            svc_id  = entry.get("service_id")
-            stage_id= entry.get("stage_id")
-            if svc_id and stage_id:
-                # Find next stage
-                current_stage = db_select("stages", {"id": f"eq.{stage_id}"})
-                if current_stage:
-                    cur_order = current_stage[0].get("order", 1)
-                    next_stages = db_select("stages",
-                                            {"service_id": f"eq.{svc_id}",
-                                             "order": f"eq.{cur_order+1}"})
-                    if next_stages:
-                        next_stage = next_stages[0]
-                        # Enroll into next stage
-                        svcs = db_select("services", {"id": f"eq.{svc_id}"})
-                        svc  = svcs[0] if svcs else {}
-                        pos  = db_count("queue_entries",
-                                        {"service_id": f"eq.{svc_id}",
-                                         "stage_id":   f"eq.{next_stage['id']}",
-                                         "status":     "eq.waiting"}) + 1
-                        eta_t = (datetime.now(timezone.utc) +
-                                 timedelta(minutes=pos*(next_stage.get("time_interval") or svc.get("time_interval",5)))).isoformat()
-                        new_req = {
-                            "service_id":   svc_id,
-                            "user_id":      entry.get("user_id"),
-                            "guest_name":   entry.get("guest_name"),
-                            "guest_phone":  entry.get("guest_phone"),
-                            "ticket_label": entry.get("ticket_label",""),
-                            "ticket_number":entry.get("ticket_number",0),
-                            "status":       "waiting",
-                            "estimated_time": eta_t,
-                            "join_method":  entry.get("join_method","web"),
-                            "joined_at":    datetime.now(timezone.utc).isoformat(),
-                        }
-                        new_opt = {"end_code": entry.get("end_code"), "stage_id": next_stage["id"], "pushback_count": 0}
-                        db_insert("queue_entries", _safe_payload("queue_entries", new_req, new_opt))
-                        # Notify user
+            entry  = rows[0]
+            svc_id = entry.get("service_id")
+            if svc_id:
+                svc_rows = db_select("services", {"id": f"eq.{svc_id}"})
+                if svc_rows:
+                    svc           = svc_rows[0]
+                    next_group    = svc.get("next_service_group") or None
+                    has_free_time = bool(svc.get("has_free_time", False))
+                    org_id        = svc.get("org_id")
+                    if next_group and has_free_time:
                         if entry.get("user_id"):
-                            send_push_to_user(entry["user_id"],
-                                              f"\u27a1\ufe0f Next Stage: {next_stage['name']}",
-                                              f"You've been enrolled in {next_stage['name']}. Position #{pos}.",
-                                              {"type": "next_stage", "stage_name": next_stage["name"]})
-                        if entry.get("guest_phone"):
-                            send_sms(entry["guest_phone"],
-                                     f"QCode: Moving to {next_stage['name']}. Position #{pos}. ~{pos*(next_stage.get('time_interval',5))} min wait.")
+                            send_push_to_user(entry["user_id"], "🛒 You're in! Happy Shopping!",
+                                              "Tap Ready for Checkout when done.",
+                                              {"type": "free_time", "entry_id": entry_id,
+                                               "next_service_group": next_group})
+                    elif next_group:
+                        q = {"service_group": f"eq.{next_group}",
+                             "status": "eq.open", "deleted_at": "is.null"}
+                        if org_id: q["org_id"] = f"eq.{org_id}"
+                        next_svcs = db_select("services", q)
+                        if next_svcs:
+                            best = min(next_svcs, key=lambda s: db_count("queue_entries",
+                                       {"service_id": f"eq.{s['id']}",
+                                        "status": "in.(waiting,called,serving)"}))
+                            pos   = db_count("queue_entries", {"service_id": f"eq.{best['id']}",
+                                             "status": "in.(waiting,called,serving)"}) + 1
+                            eta_t = (datetime.now(timezone.utc) +
+                                     timedelta(minutes=pos*(best.get("time_interval") or 5))).isoformat()
+                            n     = (best.get("ticket_counter") or 0) + 1
+                            label = f"{best.get('ticket_prefix','A')}{str(n).zfill(3)}"
+                            db_update("services", {"id": best["id"]}, {"ticket_counter": n})
+                            new_req = {
+                                "service_id":    best["id"],
+                                "user_id":       entry.get("user_id"),
+                                "guest_name":    entry.get("guest_name"),
+                                "guest_phone":   entry.get("guest_phone"),
+                                "ticket_label":  label,
+                                "ticket_number": n,
+                                "status":        "waiting",
+                                "estimated_time": eta_t,
+                                "join_method":   entry.get("join_method", "web"),
+                                "joined_at":     datetime.now(timezone.utc).isoformat(),
+                            }
+                            new_opt = {"end_code": entry.get("end_code"), "pushback_count": 0}
+                            db_insert("queue_entries", _safe_payload("queue_entries", new_req, new_opt))
+                            if entry.get("user_id"):
+                                send_push_to_user(entry["user_id"], f"➡️ Next: {best['name']}",
+                                                  f"Ticket {label} — Position #{pos}.",
+                                                  {"type": "join_next", "entry_id": entry_id,
+                                                   "next_service_group": next_group})
+                            if entry.get("guest_phone"):
+                                send_sms(entry["guest_phone"],
+                                         f"QCode: Next step — {best['name']}. Ticket {label}, Position #{pos}.")
+                    else:
+                        if entry.get("user_id"):
+                            send_push_to_user(entry["user_id"], "✅ Service Complete!",
+                                              "You've been fully served. Please rate your experience.",
+                                              {"type": "completed", "entry_id": entry_id})
     return jsonify({"success": True}), 200
 
 # \u2500\u2500\u2500 ADMIN APIs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
