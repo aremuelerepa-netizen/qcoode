@@ -18,8 +18,8 @@ SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
 SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "org-logos")
-SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
-SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
+SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "").strip().lower()
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "").strip()
 VAPID_PUBLIC_KEY  = os.getenv("VAPID_PUBLIC_KEY", "")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "")
 VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "admin@qcode.com")
@@ -60,6 +60,7 @@ def _fetch_columns(table: str) -> set:
                                       "status","end_code","user_info_form","schedule_start",
                                       "schedule_end","queue_start","queue_end","break_times",
                                       "stages_enabled","batch_enabled","batch_size","batch_buffer_min",
+                                      "next_service_group","service_group","is_entry","is_final",
                                       "deleted_at","created_at"},
                     "profiles":      {"id","role","full_name","org_name","email","phone",
                                       "company_address","logo_url","approval_status","rejection_reason",
