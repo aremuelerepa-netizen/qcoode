@@ -839,21 +839,15 @@ function renderLiveTable(entries) {
     var method=e.join_method==='sms'?'📱 SMS':e.join_method==='walk_in'?'🚶 Walk-in':'🌐 Web';
     var stage=e.stage_name?'<span style="font-size:.72rem;background:rgba(67,97,238,.08);color:var(--brand);padding:.15rem .4rem;border-radius:.3rem">'+e.stage_name+'</span>':'—';
     var etaHtml='—';
-    if(e.eta_display){
-      var etaColor=e.eta_due?'#047857':'#92400e';
-      var etaBg=e.eta_due?'#d1fae5':'#fef3c7';
-      var etaLabel=e.eta_due?'✅ Due':'⏳ '+e.eta_mins_left+'m';
-      etaHtml='<div style="font-size:.72rem;font-weight:700;color:'+etaColor+';background:'+etaBg+';padding:.2rem .5rem;border-radius:.3rem;white-space:nowrap">'+etaLabel+'<br><span style="font-weight:400">'+e.eta_display+'</span></div>';
-    }
+    if(e.eta_display){var etaColor=e.eta_due?'#047857':'#92400e';var etaBg=e.eta_due?'#d1fae5':'#fef3c7';var etaLabel=e.eta_due?'✅ Due':'⏳ '+e.eta_mins_left+'m';etaHtml='<span style="font-size:.72rem;font-weight:700;color:'+etaColor+';background:'+etaBg+';padding:.2rem .5rem;border-radius:.3rem">'+etaLabel+' '+e.eta_display+'</span>';}
     var acts='';
-    if(e.status==='called') acts='<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById(\''+e.id+'\',\'completed\')">✓ Done</button><button class="btn bd bsm" onclick="markById(\''+e.id+'\',\'no_show\')">No-Show</button></div>';
-    else if(e.status==='waiting') acts='<button class="btn bg bsm" onclick="markById(\''+e.id+'\',\'cancelled\')">Remove</button>';
+    if(e.status==='called') acts='<div style="display:flex;gap:.35rem"><button class="btn bs bsm" onclick="markById('+JSON.stringify(e.id)+',' +JSON.stringify('completed')+')">✓ Done</button><button class="btn bd bsm" onclick="markById('+JSON.stringify(e.id)+','+JSON.stringify('no_show')+')">No-Show</button></div>';
+    else if(e.status==='waiting') acts='<button class="btn bg bsm" onclick="markById('+JSON.stringify(e.id)+','+JSON.stringify('cancelled')+')">Remove</button>';
     else acts=badge(e.status);
     return '<tr>'+
       '<td style="color:var(--muted);font-size:.78rem">'+(i+1)+'</td>'+
       '<td><span class="ticket-tag">'+(e.ticket_label||'—')+'</span></td>'+
-      '<td style="display:flex;align-items:center;gap:.5rem">'+(e.user_name||'Guest')+
-        '<button class="info-btn" onclick="showUserInfo(\''+e.id+'\''+')" title="View details">ℹ</button></td>'+
+      '<td style="display:flex;align-items:center;gap:.5rem">'+(e.user_name||'Guest')+'<button class="info-btn" onclick="showUserInfo('+JSON.stringify(e.id)+')" title="View details">ℹ</button></td>'+
       '<td>'+method+'</td>'+
       '<td>'+stage+'</td>'+
       '<td>'+etaHtml+'</td>'+
@@ -887,9 +881,7 @@ async function callNext(force) {
   if(!r.ok){
     if(r.data.can_force){
       // Customer not due yet — ask if they want to call anyway
-      if(confirm('⏳ '+r.data.error+'
-
-Do you want to call them early anyway?')){
+      if(confirm('Not yet: ' + r.data.error + ' Call early anyway?')){
         callNext(true);
       }
       return;
