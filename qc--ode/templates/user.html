@@ -337,6 +337,8 @@ input,select,textarea,button{font-size:16px !important}
           <button class="btn btn-primary" onclick="show('join')">Join a Queue →</button>
         </div>
       </div>
+      <!-- MULTI-QUEUE TABS -->
+      <div id="multi-queue-tabs" style="display:none;margin-bottom:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;overflow-x:auto;padding-bottom:.25rem"></div>
       <div id="active-view" style="display:none">
         <!-- Org header -->
         <div style="background:var(--ink2);border-radius:var(--r2);padding:1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap">
@@ -508,6 +510,32 @@ input,select,textarea,button{font-size:16px !important}
   </div>
 </div>
 
+<!-- REMINDER MODAL -->
+<div id="modal-reminder" class="overlay" style="display:none">
+  <div class="modal">
+    <h2 class="modal-title">⏰ Set a Reminder</h2>
+    <p style="font-size:.875rem;color:#64748b;line-height:1.65;margin-bottom:1.25rem">We will buzz and notify you before your turn. Enter how many minutes or hours before your turn you want to be reminded.</p>
+    <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem">
+      <input id="reminder-value" class="inp" type="number" min="1" max="300" placeholder="e.g. 5" style="width:100px;font-size:1.1rem;text-align:center;font-weight:700"/>
+      <select id="reminder-unit" class="inp" style="flex:1">
+        <option value="minutes">Minutes before</option>
+        <option value="hours">Hours before</option>
+      </select>
+    </div>
+    <p id="reminder-eta-hint" style="font-size:.8rem;color:#2E6DA4;margin-bottom:1rem;font-weight:600"></p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeReminderModal(false)">Skip</button>
+      <button class="btn btn-primary" onclick="closeReminderModal(true)">Set Reminder ⏰</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUDIO UNLOCK BANNER -->
+<div id="audio-unlock-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1E3A5F;color:#fff;padding:.875rem 1.25rem;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+  <div style="font-size:.875rem"><strong>🔔 Enable sound alerts</strong><br><span style="font-size:.78rem;opacity:.85">Tap to hear your alarm when called</span></div>
+  <button onclick="unlockAudio()" style="background:#4CC9F0;color:#1E3A5F;border:none;border-radius:99px;padding:.5rem 1.25rem;font-weight:700;font-size:.875rem;cursor:pointer;white-space:nowrap">Enable Sound</button>
+</div>
+
 <!-- DRAGGABLE ASK AI BUTTON -->
 <div id="faq-widget">
   <button id="faq-btn" title="Ask AI — drag to move">
@@ -573,25 +601,94 @@ function badge(s){const m={waiting:'b-waiting',called:'b-called',serving:'b-serv
 let profile=null,activeEntry=null,foundSvc=null,_nsSvc=null;
 let pollTimer=null,cdTimer=null;
 let _freeTimeMode=false,_freeTimeGroup='';
+let _reminderMinutes=0; // 0 = no reminder set
+let _reminderFired=false;
 let _activeEntries=[]; // multi-queue support — up to 3
 
-// ── ALARM SOUND ──────────────────────────────────────────────
+// ── ALARM SOUND + VIBRATION ──────────────────────────────────
+// ── AUDIO UNLOCK ─────────────────────────────────────────────
+var _audioUnlocked=false;
+function unlockAudio(){
+  try{
+    var a=new Audio();
+    a.play().catch(function(){});
+    _audioUnlocked=true;
+  }catch(e){}
+  document.getElementById('audio-unlock-banner').style.display='none';
+  localStorage.setItem('qc_audio_unlocked','1');
+  toast('🔔 Sound alerts enabled!','s');
+}
+function checkAudioBanner(){
+  if(localStorage.getItem('qc_audio_unlocked')==='1'){
+    _audioUnlocked=true;
+    document.getElementById('audio-unlock-banner').style.display='none';
+  } else {
+    document.getElementById('audio-unlock-banner').style.display='flex';
+  }
+}
+
+// ── REMINDER ─────────────────────────────────────────────────
+function openReminderModal(){
+  _reminderFired=false;
+  // Show ETA hint
+  const hint=document.getElementById('reminder-eta-hint');
+  if(lockedEtaISO){
+    const eta=new Date(lockedEtaISO);
+    hint.textContent='Your estimated turn time: '+eta.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  } else { hint.textContent=''; }
+  document.getElementById('reminder-value').value='5';
+  document.getElementById('reminder-unit').value='minutes';
+  document.getElementById('modal-reminder').style.display='flex';
+}
+
+function closeReminderModal(save){
+  document.getElementById('modal-reminder').style.display='none';
+  if(!save){_reminderMinutes=0;return;}
+  const val=parseInt(document.getElementById('reminder-value').value)||5;
+  const unit=document.getElementById('reminder-unit').value;
+  _reminderMinutes = unit==='hours' ? val*60 : val;
+  // Save with entry
+  if(activeEntry&&profile){
+    activeEntry.reminderMinutes=_reminderMinutes;
+    localStorage.setItem('activeEntries_'+profile.id,JSON.stringify(_activeEntries));
+  }
+  toast('⏰ Reminder set for '+val+' '+(unit==='hours'?'hour':'minute')+(val>1?'s':'')+' before your turn','s',4000);
+}
+
+function checkReminder(etaMinutesLeft){
+  if(!_reminderMinutes||_reminderFired) return;
+  if(etaMinutesLeft<=_reminderMinutes && etaMinutesLeft>0){
+    _reminderFired=true;
+    playAlarm();
+    toast('⏰ Your turn is in ~'+etaMinutesLeft+' minute'+(etaMinutesLeft===1?'':'s')+'! Get ready.','w',10000);
+    showBrowserNotif('⏰ QCode Reminder','Your turn is in ~'+etaMinutesLeft+' minutes. Get ready!');
+  }
+}
+
+// ── ALARM — base64 WAV (reliable on all Android browsers) ───
+var _beepB64='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';
+var _beep2B64='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';
+function _playWav(b64,delay){
+  setTimeout(function(){
+    try{
+      var raw=atob(b64);
+      var buf=new ArrayBuffer(raw.length);
+      var view=new Uint8Array(buf);
+      for(var i=0;i<raw.length;i++)view[i]=raw.charCodeAt(i);
+      var blob=new Blob([buf],{type:'audio/wav'});
+      var url=URL.createObjectURL(blob);
+      var a=new Audio(url);
+      a.volume=1.0;
+      a.play().catch(function(){});
+      a.onended=function(){URL.revokeObjectURL(url);};
+    }catch(e){}
+  },delay||0);
+}
 function playAlarm(){
-  try {
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    [0,0.15,0.3].forEach(function(t){
-      const osc=ctx.createOscillator();
-      const gain=ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value=880;
-      osc.type='sine';
-      gain.gain.setValueAtTime(0,ctx.currentTime+t);
-      gain.gain.linearRampToValueAtTime(0.4,ctx.currentTime+t+0.05);
-      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+t+0.35);
-      osc.start(ctx.currentTime+t);
-      osc.stop(ctx.currentTime+t+0.4);
-    });
-  } catch(e){}
+  if(navigator.vibrate)navigator.vibrate([400,100,400,100,400]);
+  _playWav(_beepB64,0);
+  _playWav(_beep2B64,350);
+  _playWav(_beepB64,650);
 }
 let fbEntryId=null,fbRating=0;
 let notifEnabled=false,notifSent=false;
@@ -640,20 +737,28 @@ async function init(){
     `<div class="pf-sub">${profile.email||''}</div>`+
     (profile.phone?`<div class="pf-sub">📞 ${profile.phone}</div>`:'')+`</div>`+
     `<div class="pf-stats"><div class="pf-n">${profile.total_queues||0}</div><div class="pf-l">Total Queues</div></div>`;
-  // Restore active entry
-  let stored=localStorage.getItem('activeEntry_'+profile.id)||localStorage.getItem('qc_active_entry');
-  if(stored){try{const p=JSON.parse(stored);activeEntry=p.entry||p;}catch(e){activeEntry=null;}}
-  if(activeEntry&&activeEntry.id){
+  // Restore active entries (multi-queue support)
+  let storedAll=localStorage.getItem('activeEntries_'+profile.id);
+  if(storedAll){try{_activeEntries=JSON.parse(storedAll);}catch(e){_activeEntries=[];}}
+  // Also check legacy single entry
+  let storedSingle=localStorage.getItem('activeEntry_'+profile.id)||localStorage.getItem('qc_active_entry');
+  if(storedSingle&&!_activeEntries.length){
+    try{const p=JSON.parse(storedSingle);if(p&&p.id)_activeEntries=[p.entry||p];}catch(e){}
+  }
+  if(_activeEntries.length){
+    activeEntry=_activeEntries[0];
     const savedEta=localStorage.getItem('lockedEta_'+activeEntry.id);
     if(savedEta)lockedEtaISO=savedEta;
     else if(activeEntry.estimated_time){lockedEtaISO=activeEntry.estimated_time;localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);}
     _joinedAt=localStorage.getItem('joinedAt_'+activeEntry.id)||null;
     document.getElementById('active-dot').style.display='';
     const bd=document.getElementById('bn-dot');if(bd)bd.style.display='';
+    renderMultiQueueTabs();
     renderActive();startPolling();
   }
   await loadHistory();
   if('Notification' in window&&Notification.permission==='granted'){notifEnabled=true;registerPush();}
+  checkAudioBanner();
 }
 
 // ── PANELS ────────────────────────────────────────────────────
@@ -752,13 +857,17 @@ async function confirmJoin(){
     if(lockedEtaISO)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
     localStorage.setItem('joinedAt_'+activeEntry.id,_joinedAt);
   }
-  if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+  // Add to multi-queue list
+  addToActiveEntries(activeEntry);
   cancelFind();
   document.getElementById('active-dot').style.display='';
   const bd=document.getElementById('bn-dot');if(bd)bd.style.display='';
+  renderMultiQueueTabs();
   renderActive();show('active');
   toast('🎉 Joined! Ticket: '+(activeEntry.ticket_label||''),'s');
   startPolling();
+  // Ask for reminder
+  setTimeout(function(){openReminderModal();},1200);
   setTimeout(()=>{document.getElementById('modal-notif').style.display='flex';},700);
 }
 
@@ -839,6 +948,48 @@ function startCountdown(){
   tick();cdTimer=setInterval(tick,1000);
 }
 
+function renderMultiQueueTabs(){
+  const wrap=document.getElementById('multi-queue-tabs');
+  if(!wrap)return;
+  if(_activeEntries.length<=1){wrap.style.display='none';return;}
+  wrap.style.display='flex';
+  wrap.innerHTML=_activeEntries.map(function(e,i){
+    const isActive=activeEntry&&activeEntry.id===e.id;
+    return '<button onclick="switchActiveQueue('+i+')" style="'+
+      'padding:.4rem .875rem;border-radius:99px;border:2px solid '+(isActive?'var(--brand)':'var(--border)')+
+      ';background:'+(isActive?'var(--brand)':'var(--white)')+
+      ';color:'+(isActive?'#fff':'var(--ink)')+
+      ';font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap">'+
+      (e.svc_name||e.ticket_label||'Queue '+(i+1))+'</button>';
+  }).join('');
+}
+
+function switchActiveQueue(idx){
+  if(!_activeEntries[idx])return;
+  clearInterval(pollTimer);clearInterval(cdTimer);
+  activeEntry=_activeEntries[idx];
+  _reminderMinutes=activeEntry.reminderMinutes||0;
+  _reminderFired=false;
+  lockedEtaISO=localStorage.getItem('lockedEta_'+activeEntry.id)||activeEntry.estimated_time||null;
+  _joinedAt=localStorage.getItem('joinedAt_'+activeEntry.id)||null;
+  renderMultiQueueTabs();
+  renderActive();startPolling();
+}
+
+function addToActiveEntries(entry){
+  // Remove if already exists
+  _activeEntries=_activeEntries.filter(function(e){return e.id!==entry.id;});
+  // Add and cap at 3
+  _activeEntries.unshift(entry);
+  if(_activeEntries.length>3)_activeEntries=_activeEntries.slice(0,3);
+  if(profile)localStorage.setItem('activeEntries_'+profile.id,JSON.stringify(_activeEntries));
+}
+
+function removeFromActiveEntries(entryId){
+  _activeEntries=_activeEntries.filter(function(e){return e.id!==entryId;});
+  if(profile)localStorage.setItem('activeEntries_'+profile.id,JSON.stringify(_activeEntries));
+}
+
 function renderActive(){
   if(!activeEntry)return;
   document.getElementById('no-active').style.display='none';
@@ -859,7 +1010,17 @@ function renderActive(){
 
 // ── POLL / REFRESH ────────────────────────────────────────────
 function clearAndComplete(d){
+  if(d&&d.id)removeFromActiveEntries(d.id);
   clearActiveStorage();
+  // Switch to next active entry if available
+  if(_activeEntries.length>0){
+    activeEntry=_activeEntries[0];
+    lockedEtaISO=localStorage.getItem('lockedEta_'+activeEntry.id)||activeEntry.estimated_time||null;
+    _joinedAt=localStorage.getItem('joinedAt_'+activeEntry.id)||null;
+    renderMultiQueueTabs();renderActive();startPolling();
+    if(d&&fbEntryId!==d.id){fbEntryId=d.id;openFeedbackModal();}
+    return;
+  }
   activeEntry=null;lockedEtaISO=null;_joinedAt=null;
   document.getElementById('no-active').style.display='';
   document.getElementById('active-view').style.display='none';
@@ -918,8 +1079,10 @@ async function refreshActive(){
             activeEntry = jr.data.entry;
             _calledAlerted = false;
             lockedEtaISO = null; _joinedAt = null;
-            if(profile) localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+            if(activeEntry.id) localStorage.removeItem('lockedEta_'+activeEntry.id);
+            addToActiveEntries(activeEntry);
             toast('➡️ Joined '+jr.data.service_name+'! Ticket '+activeEntry.ticket_label,'s',6000);
+            renderMultiQueueTabs();
             renderActive(); startPolling();
           } else {
             toast(jr.data.error||'Could not join next step.','e');
@@ -969,7 +1132,14 @@ async function refreshActive(){
   // Batch info for display
   const batchNum = activeEntry.batch_number || null;
   document.getElementById('sp-wait-mins').textContent=waitMins>0?waitMins+'m':'Soon';
-  // ETA is LOCKED — never update from server
+  // Check reminder
+  if(waitMins>0) checkReminder(waitMins);
+  // Recalculate ETA from current position every poll
+  if(pos>0 && waitMins>0){
+    const newEta=new Date(Date.now()+(waitMins*60000)).toISOString();
+    lockedEtaISO=newEta;
+    if(activeEntry&&activeEntry.id)localStorage.setItem('lockedEta_'+activeEntry.id,lockedEtaISO);
+  }
   _applyLockedEta();
   // Stage change — use stage_order from server
   const newStage      = d.stage_name  || '';
@@ -1058,9 +1228,10 @@ async function readyToCheckout(){
     _freeTimeMode=false;_freeTimeGroup='';
     activeEntry=r.data.entry;
     activeEntry.org_name=activeEntry.org_name||'';
-    if(profile)localStorage.setItem('activeEntry_'+profile.id,JSON.stringify(activeEntry));
+    addToActiveEntries(activeEntry);
     document.getElementById('checkout-card').style.display='none';
     toast('✅ Assigned to '+r.data.service_name+'!','s',6000);
+    renderMultiQueueTabs();
     renderActive();startPolling();
     return;
   }
@@ -1095,6 +1266,41 @@ async function readyToCheckout(){
   showBrowserNotif('QCode — Checkout Ready!','Assigned to '+(d.assigned_counter||'checkout')+'. Head over!');
 }
 
+async function checkActiveQueue(){
+  // Re-check history for any active entries after completing a queue
+  const r=await api('/api/user/history');
+  if(!r.ok) return;
+  const entries=(r.data||[]).filter(function(e){
+    return ['waiting','called','serving'].includes(e.status);
+  });
+  if(entries.length>0){
+    // Restore all active entries
+    _activeEntries=entries.slice(0,3);
+    activeEntry=_activeEntries[0];
+    // Clear old ETA — let it recalculate fresh from new position
+    lockedEtaISO=null;
+    _joinedAt=null;
+    if(activeEntry.id) localStorage.removeItem('lockedEta_'+activeEntry.id);
+    if(profile)localStorage.setItem('activeEntries_'+profile.id,JSON.stringify(_activeEntries));
+    renderMultiQueueTabs();
+    renderActive();startPolling();
+  }
+}
+
+async function refreshEntry(){
+  // Reload current entry details from history
+  if(!activeEntry)return;
+  const r=await api('/api/user/history');
+  if(!r.ok)return;
+  const entries=r.data||[];
+  const fresh=entries.find(function(e){return e.id===activeEntry.id;});
+  if(fresh){
+    activeEntry=Object.assign(activeEntry,fresh);
+    addToActiveEntries(activeEntry);
+    renderActive();
+  }
+}
+
 function startPolling(){
   clearInterval(pollTimer);
   pollTimer=setInterval(refreshActive,12000);
@@ -1105,21 +1311,36 @@ async function leaveQueue(){
   document.getElementById('leave-btn').disabled=true;
   const r=await api('/api/user/leave-queue/'+activeEntry.id,{method:'POST'});
   if(!r.ok){toast(r.data.error||'Error.','e');document.getElementById('leave-btn').disabled=false;return;}
-  clearActiveEntry();toast('You have left the queue.','i');
+  const leftId=activeEntry.id;
+  removeFromActiveEntries(leftId);
+  clearActiveEntry();
+  // Switch to next active queue if any
+  if(_activeEntries.length>0){
+    activeEntry=_activeEntries[0];
+    lockedEtaISO=localStorage.getItem('lockedEta_'+activeEntry.id)||activeEntry.estimated_time||null;
+    renderMultiQueueTabs();renderActive();startPolling();
+  }
+  toast('You have left the queue.','i');
 }
 
 function clearActiveEntry(){
   clearInterval(pollTimer);clearInterval(cdTimer);
   clearActiveStorage();
   activeEntry=null;lockedEtaISO=null;_joinedAt=null;
-  document.getElementById('no-active').style.display='';
-  document.getElementById('active-view').style.display='none';
-  document.getElementById('active-dot').style.display='none';
-  const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
+  if(_activeEntries.length===0){
+    document.getElementById('no-active').style.display='';
+    document.getElementById('active-view').style.display='none';
+    document.getElementById('active-dot').style.display='none';
+    const bd=document.getElementById('bn-dot');if(bd)bd.style.display='none';
+  }
+  renderMultiQueueTabs();
 }
 
 function clearActiveStorage(){
-  if(profile)localStorage.removeItem('activeEntry_'+profile.id);
+  if(profile){
+    localStorage.removeItem('activeEntry_'+profile.id);
+    localStorage.removeItem('activeEntries_'+profile.id);
+  }
   localStorage.removeItem('qc_active_entry');
   if(activeEntry&&activeEntry.id){
     localStorage.removeItem('lockedEta_'+activeEntry.id);
