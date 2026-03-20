@@ -18,11 +18,11 @@ SUPABASE_URL      = os.getenv("SUPABASE_URL", "").rstrip("/")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 SUPABASE_KEY      = os.getenv("SUPABASE_KEY", "")
 SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "org-logos")
-SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "").strip().lower()
-SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "").strip()
+SUPER_ADMIN_EMAIL    = os.getenv("SUPER_ADMIN_EMAIL", "admin@qcode.com").strip().lower()
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "admin123").strip()
 VAPID_PUBLIC_KEY  = os.getenv("VAPID_PUBLIC_KEY", "")
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY", "")
-VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "")
+VAPID_CLAIM_EMAIL = os.getenv("VAPID_CLAIM_EMAIL", "admin@qcode.com")
 SENDGRID_API_KEY  = os.getenv("SENDGRID_API_KEY", "")
 SENDGRID_FROM     = os.getenv("SENDGRID_FROM_EMAIL", "noreply@qcode.com")
 
@@ -1262,6 +1262,35 @@ def api_org_create_service():
         "end_code":     end_code,
     }), 201
 
+@app.route("/api/org/services/<svc_id>/edit", methods=["POST"])
+def api_org_edit_service(svc_id):
+    """Edit an existing service — name, group, interval, linked service fields etc."""
+    uid = session.get("user_id")
+    if not uid or session.get("role") != "organization":
+        return jsonify({"error": "Unauthorized"}), 403
+    svcs = db_select("services", {"id": f"eq.{svc_id}", "org_id": f"eq.{uid}"})
+    if not svcs: return jsonify({"error": "Service not found"}), 404
+    d = request.get_json() or {}
+    upd = {}
+    # Allowed editable fields
+    for k in ("name","description","staff_name","ticket_prefix","time_interval",
+              "max_users","service_group","next_service_group","has_free_time",
+              "is_entry","is_final","batch_enabled","batch_size","batch_buffer_min",
+              "schedule_start","schedule_end"):
+        if k in d:
+            if k in ("time_interval","batch_size","batch_buffer_min"):
+                upd[k] = int(d[k]) if d[k] else None
+            elif k in ("has_free_time","is_entry","is_final","batch_enabled"):
+                upd[k] = bool(d[k])
+            elif k == "max_users":
+                upd[k] = int(d[k]) if d[k] else None
+            else:
+                upd[k] = (d[k] or "").strip() or None
+    if not upd: return jsonify({"error": "Nothing to update"}), 400
+    db_update("services", {"id": svc_id}, upd)
+    return jsonify({"success": True}), 200
+
+
 @app.route("/api/org/services/<svc_id>/status", methods=["POST"])
 def api_org_service_status(svc_id):
     uid = session.get("user_id")
@@ -1426,20 +1455,13 @@ def api_org_walk_in(svc_id):
     pos  = db_count("queue_entries", {"service_id": f"eq.{svc_id}", "status": "eq.waiting"}) + 1
     eta_t= (datetime.now(timezone.utc) + timedelta(minutes=pos*(svc.get("time_interval") or 5))).isoformat()
     end_code = _rcode(4)
-    # Assign Stage 1 if service has stages
-    walkin_stage_id = None
-    if svc.get("stages_enabled"):
-        stage_rows = db_select("stages", {"service_id": f"eq.{svc_id}", "order": "order.asc", "limit": "1"})
-        if stage_rows: walkin_stage_id = stage_rows[0]["id"]
-
     required = {
         "service_id": svc_id, "user_id": None, "guest_name": name,
         "guest_phone": phone, "ticket_label": label, "ticket_number": n,
         "status": "waiting", "estimated_time": eta_t,
         "join_method": "walk_in", "joined_at": datetime.now(timezone.utc).isoformat(),
     }
-    optional = {"end_code": end_code, "pushback_count": 0,
-                "stage_id": walkin_stage_id}
+    optional = {"end_code": end_code, "pushback_count": 0}
     res = db_insert("queue_entries", _safe_payload("queue_entries", required, optional))
     if not res["ok"]:
         err_msg = res["data"].get("message","") if isinstance(res["data"],dict) else str(res["data"])
@@ -1790,16 +1812,17 @@ def api_staff_access():
             return jsonify({"error": "Incorrect PIN."}), 401
         # Update last_seen via staff_name on service
         return jsonify({
-            "success":      True,
-            "stage_id":     None,
-            "stage_name":   svc.get("name",""),
-            "service_id":   svc["id"],
-            "service_name": svc.get("name",""),
-            "service_code": svc.get("service_code",""),
-            "staff_name":   staff_name,
-            "counter_id":   None,
+            "success":        True,
+            "stage_id":       svc["id"],  # use service_id as stage_id for staff queue calls
+            "stage_name":     svc.get("name",""),
+            "service_id":     svc["id"],
+            "service_name":   svc.get("name",""),
+            "service_code":   svc.get("service_code",""),
+            "staff_name":     staff_name,
+            "counter_id":     None,
             "counter_number": 1,
             "is_service_mode": True,
+            "time_interval":  svc.get("time_interval", 5),
         }), 200
 
     # Fall back to stage code (old stages model)
