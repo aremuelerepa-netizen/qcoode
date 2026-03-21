@@ -617,17 +617,87 @@ var _audioUnlocked=false;
 // BUG FIX: FAQ system prompt
 var FAQ_SYS='You are QCode Assistant. QCode is a queue management platform. Help users with joining queues, checking position, the checkout process, SMS joining, and general queue questions. Be brief and friendly.';
 
-// ── ALARM SOUND + VIBRATION ──────────────────────────────────
-var _snd1=new Audio('data:audio/wav;base64,UklGRtIzAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0Ya4zAAAAABMASwCcAPgATQGHAZcBbwEKAWsAnP+u/rv93fwz/NT71vtE/B79Wf7f/48BQAPKBAIGwQbrBnIGVQWjA38BD/+O/Dj6Rvjt9lj2nfbD97v5X/x6/8cC/QXNCPAKLQxbDGwLagl3BtECxf6t+snW2fKz68rvpevK6EDqs8T4Coo1');
-var _snd2=new Audio('data:audio/wav;base64,UklGRtIzAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0Ya4zAAAAAA4AOQB8ANAALAGGAdQBCgIgAg4C0AFkAcwADQAw/0D+S/1h/JL77/qF+l/6iPoC+8775vw//sz/eAEvA9kEXQajB5YIIwk8CdsI/QeoBucEzgJ1APn9efsY+fb2NPXt8zjzJPO58/X0z/Y1+Qv8L/97AsUF4gilC+gNiQ9sEIAQvg8oDs0Lxgg1BUYBKv0U+Sv13e+m7LPqXuq86fXr');
-var _snd3=new Audio('data:audio/wav;base64,UklGRjQrAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YRArAAAAAAkAJwBWAJYA4gA4AZQB8QFKApoC3QIPAysDLgMVA94CiQIVAoMB1gAQADf/Tv5c/Wf8dfuO+rn5//hl+PD3qPeQ96z3//eI+Ej5PPph+7L8Kf69/2YBHAPTBIEGGwiVCeYKBAzlDIIN1A3XDYgN5QzsC6oKGglHBzkF+gKXAB3+mv0c+bT2b/Rc8obu7szVse');
-[_snd1,_snd2,_snd3].forEach(function(a){a.volume=1.0;a.preload='auto';});
+/var _actx = null;
 
-function playAlarm(){
-  if(navigator.vibrate) navigator.vibrate([400,150,400,150,400]);
-  try{_snd1.currentTime=0;_snd1.play().catch(function(){});}catch(e){}
-  setTimeout(function(){try{_snd2.currentTime=0;_snd2.play().catch(function(){});}catch(e){}},350);
-  setTimeout(function(){try{_snd3.currentTime=0;_snd3.play().catch(function(){});}catch(e){}},650);
+function _alarmRingOnce(ctx, vol, startTime) {
+  // A real phone ring is two tones played together — 480Hz + 440Hz
+  // with a tremolo (amplitude wobble) at ~20Hz to give it that
+  // warbling ringing character
+  var duration = 2.0; // one ring lasts 2 seconds
+
+  // Tremolo LFO — creates the warbling effect
+  var lfo = ctx.createOscillator();
+  var lfoGain = ctx.createGain();
+  lfo.frequency.value = 20;       // 20 wobbles per second
+  lfoGain.gain.value = 0.4;       // depth of wobble
+  lfo.connect(lfoGain);
+
+  // Master gain — overall volume envelope
+  var masterGain = ctx.createGain();
+  masterGain.gain.setValueAtTime(0, startTime);
+  masterGain.gain.linearRampToValueAtTime(vol, startTime + 0.05);
+  masterGain.gain.setValueAtTime(vol, startTime + duration - 0.05);
+  masterGain.gain.linearRampToValueAtTime(0, startTime + duration);
+  lfoGain.connect(masterGain.gain); // tremolo modulates master volume
+
+  // Tone 1 — 480Hz (standard phone ringer frequency)
+  var osc1 = ctx.createOscillator();
+  osc1.type = 'sine';
+  osc1.frequency.value = 480;
+  osc1.connect(masterGain);
+
+  // Tone 2 — 440Hz played together with tone 1
+  var osc2 = ctx.createOscillator();
+  osc2.type = 'sine';
+  osc2.frequency.value = 440;
+  osc2.connect(masterGain);
+
+  // Slight overtone to add body — makes it sound less digital
+  var osc3 = ctx.createOscillator();
+  osc3.type = 'triangle';
+  osc3.frequency.value = 960;     // octave above osc1
+  var osc3Gain = ctx.createGain();
+  osc3Gain.gain.value = 0.15;     // quiet — just adds warmth
+  osc3.connect(osc3Gain);
+  osc3Gain.connect(masterGain);
+
+  masterGain.connect(ctx.destination);
+
+  lfo.start(startTime);       lfo.stop(startTime + duration);
+  osc1.start(startTime);      osc1.stop(startTime + duration);
+  osc2.start(startTime);      osc2.stop(startTime + duration);
+  osc3.start(startTime);      osc3.stop(startTime + duration);
+
+  // Return when this ring ends + the silent pause before next ring
+  // Classic pattern: 2s ring, 4s silence — but for urgency we use 2s ring, 1s pause
+  return startTime + duration + 1.0;
+}
+
+function playAlarm() {
+  // Unlock audio context
+  if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_actx.state === 'suspended') _actx.resume();
+
+  var ctx = _actx;
+  var vol = 0.9;   // loud — 90% volume
+  var t   = ctx.currentTime + 0.05;
+
+  // Ring 3 times with pause between each
+  // Pattern: RING(2s) — pause(1s) — RING(2s) — pause(1s) — RING(2s)
+  t = _alarmRingOnce(ctx, vol, t);
+  t = _alarmRingOnce(ctx, vol, t);
+  t = _alarmRingOnce(ctx, vol, t);
+
+  // Vibration pattern matches the ring-pause-ring rhythm
+  if (navigator.vibrate) {
+    navigator.vibrate([
+      600, 100, 600, 100, 600, // ring 1 pulses
+      1000,                    // pause between rings
+      600, 100, 600, 100, 600, // ring 2 pulses
+      1000,                    // pause
+      600, 100, 600, 100, 600  // ring 3 pulses
+    ]);
+  }
 }
 
 // ── AUDIO UNLOCK ─────────────────────────────────────────────
